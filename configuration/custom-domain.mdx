@@ -1,0 +1,106 @@
+---
+title: Custom Domain with Cloudflare
+description: Route Kuest services through your own subdomains without exposing kuest.com in the frontend.
+sidebarTitle: Custom Domain
+icon: globe
+---
+
+<Info>
+This setup keeps the frontend pointed at subdomains you control while Kuest services stay behind a Cloudflare proxy.
+</Info>
+
+<Steps titleSize="h3">
+  <Step title="Create proxied DNS records">
+    In **Cloudflare Dashboard > Your Domain > DNS > Records**, create the CNAME records below and keep **Proxy ON**.
+
+    - `relayer.yourdomain.com` → `relayer.kuest.com`
+    - `clob.yourdomain.com` → `clob.kuest.com`
+    - `data-api.yourdomain.com` → `data-api.kuest.com`
+    - `user-pnl-api.yourdomain.com` → `user-pnl-api.kuest.com`
+    - `community.yourdomain.com` → `community.kuest.com`
+    - `create-market.yourdomain.com` → `create-market.kuest.com`
+    - `price-reference.yourdomain.com` → `price-reference.kuest.com`
+    - `ws-live-data.yourdomain.com` → `ws-live-data.kuest.com`
+    - `ws-subscriptions-clob.yourdomain.com` → `ws-subscriptions-clob.kuest.com`
+  </Step>
+  <Step title="Create the Cloudflare Worker">
+    In **Workers & Pages**, create a Worker and paste this script after replacing `yourdomain.com`.
+
+    ```js
+    const ORIGINS = {
+      'relayer.yourdomain.com': 'https://relayer.kuest.com',
+      'clob.yourdomain.com': 'https://clob.kuest.com',
+      'data-api.yourdomain.com': 'https://data-api.kuest.com',
+      'user-pnl-api.yourdomain.com': 'https://user-pnl-api.kuest.com',
+      'community.yourdomain.com': 'https://community.kuest.com',
+      'create-market.yourdomain.com': 'https://create-market.kuest.com',
+      'price-reference.yourdomain.com': 'https://price-reference.kuest.com',
+      'ws-live-data.yourdomain.com': 'https://ws-live-data.kuest.com',
+      'ws-subscriptions-clob.yourdomain.com': 'https://ws-subscriptions-clob.kuest.com',
+    }
+
+    export default {
+      async fetch(request) {
+        const incomingUrl = new URL(request.url)
+        const targetBase = ORIGINS[incomingUrl.hostname]
+
+        if (!targetBase) {
+          return new Response('Unknown host', { status: 404 })
+        }
+
+        const targetUrl = new URL(request.url)
+        const targetOrigin = new URL(targetBase)
+        targetUrl.protocol = targetOrigin.protocol
+        targetUrl.hostname = targetOrigin.hostname
+
+        const headers = new Headers(request.headers)
+        headers.set('Host', targetOrigin.hostname)
+        headers.set('X-Forwarded-Host', incomingUrl.hostname)
+
+        const init = { method: request.method, headers, redirect: 'manual' }
+        if (request.method !== 'GET' && request.method !== 'HEAD') {
+          init.body = request.body
+        }
+
+        return fetch(new Request(targetUrl.toString(), init))
+      },
+    }
+    ```
+  </Step>
+  <Step title="Attach Worker routes">
+    In **Worker > Settings > Triggers > Routes** or **Domains & Routes**, add these routes:
+
+    - `relayer.yourdomain.com/*`
+    - `clob.yourdomain.com/*`
+    - `data-api.yourdomain.com/*`
+    - `user-pnl-api.yourdomain.com/*`
+    - `community.yourdomain.com/*`
+    - `create-market.yourdomain.com/*`
+    - `price-reference.yourdomain.com/*`
+    - `ws-live-data.yourdomain.com/*`
+    - `ws-subscriptions-clob.yourdomain.com/*`
+  </Step>
+  <Step title="Update production environment variables">
+    In your hosting provider, point the app to your new subdomains:
+
+    ```bash
+    CREATE_MARKET_URL=https://create-market.yourdomain.com
+    DATA_URL=https://data-api.yourdomain.com
+    CLOB_URL=https://clob.yourdomain.com
+    RELAYER_URL=https://relayer.yourdomain.com
+    USER_PNL_URL=https://user-pnl-api.yourdomain.com
+    COMMUNITY_URL=https://community.yourdomain.com
+    PRICE_REFERENCE_URL=https://price-reference.yourdomain.com
+    WS_LIVE_DATA_URL=wss://ws-live-data.yourdomain.com
+    WS_CLOB_URL=wss://ws-subscriptions-clob.yourdomain.com
+    ```
+  </Step>
+</Steps>
+
+<Info>
+Keep these exact environment variable names. The frontend already exposes them to the client through `next.config.ts`.
+</Info>
+
+<Check>
+After this setup, users stay on your domain while traffic is proxied to the Kuest services behind Cloudflare.
+</Check>

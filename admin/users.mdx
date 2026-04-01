@@ -1,0 +1,24 @@
+---
+title: Users
+description: Search and review user accounts, admin badges, referral sources, and account creation dates.
+icon: users
+---
+
+<Info>
+This page is mainly for review and support. It is not where admin access is granted.
+</Info>
+
+<AccordionGroup>
+  <Accordion title="Search, sort, and page through users" icon="search" defaultOpen>
+    You can search users and sort by username, email, or created date. This is useful for support checks when you need to confirm whether someone has already signed up or when the account was created.
+  </Accordion>
+  <Accordion title="What each row shows" icon="table-properties">
+    Each row shows the public profile identity, admin badge when applicable, email icon, referral source, and account creation time. The profile cell uses the same identity logic the site uses publicly, so usernames and wallets stay recognizable.
+  </Accordion>
+  <Accordion title="Referral column" icon="badge-percent">
+    The referral column helps when a user asks who referred them or when you need to inspect affiliate attribution. If there is no referral source, the row stays empty there.
+  </Accordion>
+  <Accordion title="What this page does not change" icon="shield-off">
+    Table selection does not grant permissions. Admin access is still controlled by `ADMIN_WALLETS` and the actual admin auth logic, not by editing rows on this screen.
+  </Accordion>
+</AccordionGroup>

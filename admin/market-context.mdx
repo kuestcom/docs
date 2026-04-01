@@ -1,0 +1,24 @@
+---
+title: Market Context
+description: Turn on AI-generated market context and control the prompt template used to produce it.
+icon: sparkles
+---
+
+<Info>
+OpenRouter API key and model configuration live in [General](/admin/general).
+</Info>
+
+<AccordionGroup>
+  <Accordion title="Enable market context" icon="toggle-right" defaultOpen>
+    This switch turns market context on or off across the site. If OpenRouter is not configured in General, enabling it here will not help.
+  </Accordion>
+  <Accordion title="Prompt template" icon="file-text">
+    This is the instruction sent to the model. Keep it clear, neutral, and short enough to stay focused. Good prompts explain the job. Bad prompts try to predict outcomes or push users toward a side.
+  </Accordion>
+  <Accordion title="Available variables" icon="braces">
+    The page lets you insert live placeholders such as event title, description, main tag, creator, market title, probability, price, 24h volume, total volume, and outcomes. These placeholders are replaced before the request is sent.
+  </Accordion>
+  <Accordion title="What good output looks like" icon="star">
+    Use market context for helpful explanation, not persuasion. Good output summarizes what the market is about and the relevant context. It should not sound like investment advice or tell users what to buy.
+  </Accordion>
+</AccordionGroup>

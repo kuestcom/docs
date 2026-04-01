@@ -1,0 +1,102 @@
+---
+title: VPS
+description: Run Kuest on a Linux VPS with either native Node.js or Docker Compose.
+icon: monitor
+---
+
+## Prerequisites
+
+- Ubuntu 22.04 or newer
+- Public IPv4
+- Domain already pointed to the VPS IP
+- SSH user with `sudo`
+- Base values from [Environment Variables](/configuration/environment-variables)
+- A storage profile from [Manual Installation Overview](/manual-installation/overview)
+
+## Shared server baseline
+
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo timedatectl set-timezone UTC
+
+sudo ufw allow OpenSSH
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw --force enable
+```
+
+## Option A: Node.js + systemd + Nginx
+
+<Steps>
+  <Step title="Install runtime packages">
+    ```bash
+    curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+    sudo apt install -y nodejs build-essential git nginx certbot python3-certbot-nginx
+    ```
+  </Step>
+  <Step title="Clone the repository and create .env">
+    ```bash
+    sudo mkdir -p /opt/kuest
+    sudo chown \"$USER\":\"$USER\" /opt/kuest
+    cd /opt/kuest
+    git clone https://github.com/<your-org>/prediction-market.git
+    cd prediction-market
+    cp .env.example .env
+    ```
+  </Step>
+  <Step title="Build and migrate">
+    ```bash
+    npm ci
+    npm run build
+    npm run db:push
+    ```
+  </Step>
+  <Step title="Create the systemd service and Nginx site">
+    Set the service working directory to `/opt/kuest/prediction-market`, proxy Nginx to port `3000`, then issue TLS with Certbot.
+  </Step>
+</Steps>
+
+## Option B: Docker Compose + Caddy
+
+<Steps>
+  <Step title="Install Docker Engine and Compose">
+    Install Docker Engine, Compose plugin, and Git on the server.
+  </Step>
+  <Step title="Clone the repository and create .env">
+    Use the same `/opt/kuest/prediction-market` layout as the Node.js path.
+  </Step>
+  <Step title="Set domain variables">
+    Add:
+
+    ```env
+    CADDY_DOMAIN=markets.example.com
+    SITE_URL=https://markets.example.com
+    ```
+  </Step>
+  <Step title="Start production compose">
+    ```bash
+    docker compose --env-file .env -f infra/docker/docker-compose.production.yml up -d --build
+    ```
+  </Step>
+  <Step title="Run database migrations">
+    ```bash
+    docker compose --env-file .env -f infra/docker/docker-compose.production.yml exec web npm run db:push
+    ```
+  </Step>
+</Steps>
+
+## Scheduler on VPS
+
+If you are not using Supabase mode, create Linux cron jobs that follow [Scheduled Jobs](/manual-installation/scheduler-jobs).
+
+```cron
+1-59/3 * * * * curl -fsS -H "Authorization: Bearer replace-me" "https://markets.example.com/api/sync/events" >/dev/null 2>&1
+0,30 * * * * curl -fsS -H "Authorization: Bearer replace-me" "https://markets.example.com/api/sync/event-creations" >/dev/null 2>&1
+2-56/6 * * * * curl -fsS -H "Authorization: Bearer replace-me" "https://markets.example.com/api/sync/resolution" >/dev/null 2>&1
+16,46 * * * * curl -fsS -H "Authorization: Bearer replace-me" "https://markets.example.com/api/sync/volume" >/dev/null 2>&1
+13,37 * * * * curl -fsS -H "Authorization: Bearer replace-me" "https://markets.example.com/api/sync/translations" >/dev/null 2>&1
+```
+
+<Warning>
+Keep only one scheduler backend active for `/api/sync/*`.
+</Warning>

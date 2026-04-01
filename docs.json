@@ -1,0 +1,139 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Kuest Owner Docs",
+  "description": "Launch and operate your own Kuest site.",
+  "colors": {
+    "primary": "#0E1117",
+    "light": "#CDFF00",
+    "dark": "#23292F"
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "interaction": {
+    "drilldown": false
+  },
+  "background": {
+    "color": {
+      "dark": "#181A1F"
+    }
+  },
+  "navigation": {
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Status",
+          "icon": "satellite-dish",
+          "href": "https://kuest.instatus.com"
+        },
+        {
+          "anchor": "X (Twitter)",
+          "icon": "twitter",
+          "href": "https://x.com/kuest"
+        },
+        {
+          "anchor": "Discord",
+          "icon": "discord",
+          "href": "https://discord.gg/kuest"
+        }
+      ]
+    },
+    "groups": [
+      {
+        "group": "Owner Guide",
+        "pages": [
+          "index"
+        ]
+      },
+      {
+        "group": "Guided Installation",
+        "pages": [
+          "launch/overview"
+        ]
+      },
+      {
+        "group": "Manual Installation",
+        "pages": [
+          "manual-installation/overview",
+          {
+            "group": "Deployment Targets",
+            "icon": "boxes",
+            "expanded": false,
+            "pages": [
+              "manual-installation/vercel",
+              "manual-installation/docker-compose",
+              "manual-installation/cloud-run",
+              "manual-installation/fly-io",
+              "manual-installation/digitalocean",
+              "manual-installation/vps",
+              "manual-installation/kubernetes",
+              "manual-installation/terraform"
+            ]
+          },
+          "configuration/environment-variables",
+          "manual-installation/scheduler-jobs"
+        ]
+      },
+      {
+        "group": "Site Customization",
+        "pages": [
+          {
+            "group": "Admin Panel",
+            "icon": "shield",
+            "expanded": false,
+            "pages": [
+              "admin/general",
+              "admin/theme",
+              "admin/locales",
+              "admin/categories",
+              "admin/market-context",
+              "admin/affiliate",
+              "admin/events",
+              "admin/create-market",
+              "admin/users"
+            ]
+          },
+          "configuration/custom-domain"
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@kuest.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Kuest Home",
+      "href": "https://kuest.com"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/kuestcom",
+      "discord": "https://discord.gg/kuest",
+      "twitter": "https://x.com/kuest"
+    }
+  }
+}

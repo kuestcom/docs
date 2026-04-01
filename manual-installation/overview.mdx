@@ -1,0 +1,59 @@
+---
+title: Overview
+sidebarTitle: Overview
+description: Manual installation guide for developers launching a prediction market on their own servers.
+icon: wrench
+---
+
+<Info>
+Use this path if you want to install your prediction market manually on your own infrastructure, not through the guided `/launch` flow.
+</Info>
+
+Choose the deployment target below. Each guide explains the platform-specific setup, the environment values it needs, and whether it also needs scheduled jobs.
+
+<AccordionGroup>
+  <Accordion title="Vercel + Supabase" icon="cloud" defaultOpen>
+    Fastest manual setup if you still want hosted services and low ops work.
+
+    Guide: [Vercel + Supabase](/manual-installation/vercel)
+  </Accordion>
+  <Accordion title="Docker Compose" icon="container">
+    Good for single-server installs where simplicity matters more than scaling.
+
+    Guide: [Docker Compose](/manual-installation/docker-compose)
+  </Accordion>
+  <Accordion title="Cloud Run" icon="cloudy">
+    Managed runtime on GCP with less server maintenance.
+
+    Guide: [Cloud Run](/manual-installation/cloud-run)
+  </Accordion>
+  <Accordion title="Fly.io" icon="plane">
+    Useful if you want app hosting on Fly and already know that platform.
+
+    Guide: [Fly.io](/manual-installation/fly-io)
+  </Accordion>
+  <Accordion title="DigitalOcean App Platform" icon="app-window">
+    Managed PaaS on DigitalOcean with less setup than raw VPS hosting.
+
+    Guide: [DigitalOcean](/manual-installation/digitalocean)
+  </Accordion>
+  <Accordion title="VPS" icon="monitor">
+    Best for teams that want direct control over a Linux server.
+
+    Guide: [VPS](/manual-installation/vps)
+  </Accordion>
+  <Accordion title="Kubernetes" icon="network">
+    Best when you already run a cluster and want to manage rollout and scaling there.
+
+    Guide: [Kubernetes](/manual-installation/kubernetes)
+  </Accordion>
+  <Accordion title="Terraform stacks" icon="blocks">
+    Useful when your team provisions infrastructure through code.
+
+    Guide: [Terraform](/manual-installation/terraform)
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+External scheduler jobs for `/api/sync/*` are required only for non-Supabase deployments. Use [Scheduled Jobs](/manual-installation/scheduler-jobs) only when your chosen target needs an external scheduler.
+</Warning>

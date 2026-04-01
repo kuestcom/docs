@@ -1,0 +1,51 @@
+---
+title: DigitalOcean
+description: Deploy Kuest on DigitalOcean using either App Platform or a VPS.
+icon: app-window
+---
+
+## Choose your path
+
+<AccordionGroup>
+  <Accordion title="VPS on a Droplet">
+    If you want a Linux server you manage directly, follow [VPS](/manual-installation/vps).
+  </Accordion>
+  <Accordion title="App Platform">
+    Use this when you want a managed PaaS flow on DigitalOcean.
+  </Accordion>
+</AccordionGroup>
+
+## App Platform flow
+
+<Steps>
+  <Step title="Create the project">
+    In the DigitalOcean dashboard, create a new project and then create an app from GitHub.
+  </Step>
+  <Step title="Point the build to the Dockerfile">
+    Use a Web Service component with `infra/docker/Dockerfile` as the Dockerfile path and `.` as the build context.
+  </Step>
+  <Step title="Set environment variables">
+    Add the shared values from [Environment Variables](/configuration/environment-variables) and the correct storage profile from [Manual Installation Overview](/manual-installation/overview). Mark secrets as encrypted.
+  </Step>
+  <Step title="Create resources and validate">
+    Deploy the app, wait for build completion, and validate the main route.
+  </Step>
+  <Step title="Set the final domain">
+    Add the production domain in App Platform and update `SITE_URL` to the final HTTPS URL.
+  </Step>
+</Steps>
+
+## Scheduler
+
+App Platform deployment does not replace the sync scheduler requirement. If you are not on Supabase mode, use an external scheduler that follows [Scheduled Jobs](/manual-installation/scheduler-jobs).
+
+## Optional Terraform
+
+```bash
+export DIGITALOCEAN_TOKEN=<your-token>
+cd infra/terraform/environments/production/digital-ocean
+cp terraform.tfvars.example terraform.tfvars
+terraform init
+terraform plan
+terraform apply
+```

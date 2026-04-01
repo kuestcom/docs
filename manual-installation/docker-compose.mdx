@@ -1,0 +1,70 @@
+---
+title: Docker Compose
+description: Run Kuest with Docker Compose for local parity or self-hosted production.
+icon: container
+---
+
+## Best fit
+
+- Single-host setups.
+- Teams that want Docker-based local and production parity.
+- Operators comfortable managing environment files and redeploying containers.
+
+## Local runtime
+
+Use `infra/docker/docker-compose.yml`:
+
+```bash
+docker compose --env-file .env -f infra/docker/docker-compose.yml up --build
+```
+
+If you also want a local Postgres container:
+
+```bash
+docker compose --env-file .env -f infra/docker/docker-compose.yml --profile local-postgres up --build
+```
+
+## Production runtime
+
+Use `infra/docker/docker-compose.production.yml`.
+
+Supabase mode:
+
+```bash
+docker compose --env-file .env -f infra/docker/docker-compose.production.yml up -d --build
+```
+
+Postgres + S3 mode with local Postgres:
+
+```bash
+docker compose --env-file .env -f infra/docker/docker-compose.production.yml --profile local-postgres up -d --build
+```
+
+## Required runtime values
+
+- Base values from [Environment Variables](/configuration/environment-variables)
+- `SITE_URL`
+- `CADDY_DOMAIN` for automatic TLS in production
+- One storage profile from [Manual Installation Overview](/manual-installation/overview)
+
+## After containers are up
+
+Run database migrations:
+
+```bash
+docker compose --env-file .env -f infra/docker/docker-compose.production.yml exec web npm run db:push
+```
+
+If you are using the local Postgres profile, wait for the database container to become healthy first.
+
+## Common operations
+
+```bash
+docker compose -f infra/docker/docker-compose.production.yml ps
+docker compose -f infra/docker/docker-compose.production.yml logs -f web
+docker compose -f infra/docker/docker-compose.production.yml logs -f caddy
+```
+
+<Tip>
+For a full VPS walkthrough using Docker Compose with domain and TLS setup, see [VPS](/manual-installation/vps).
+</Tip>

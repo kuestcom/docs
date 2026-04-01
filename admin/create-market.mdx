@@ -1,0 +1,117 @@
+---
+title: Create Market
+description: Tutorial to create and publish a prediction market manually from the admin.
+icon: square-plus
+---
+
+<Info>
+In the product, this flow lives under **Admin > Events > Calendar > Create Event**. The form itself has 5 steps.
+</Info>
+
+## Before you start
+
+<AccordionGroup>
+  <Accordion title="Wallet, USDC, and POL" icon="wallet" defaultOpen>
+    You need a connected EOA wallet. The flow checks both USDC and POL before it lets you continue.
+  </Accordion>
+  <Accordion title="UMA reward pool" icon="coins">
+    The app fetches the required creator funding from market config and falls back to `$5 USDC` per market. This reward pays the UMA proposer who resolves the question correctly.
+  </Accordion>
+  <Accordion title="Allowed creator wallet" icon="user-check">
+    Your wallet must be listed in the allowed creator sources from [General](/admin/general), otherwise the flow stops in the pre-sign step.
+  </Accordion>
+  <Accordion title="OpenRouter" icon="sparkles">
+    OpenRouter is required for the content checker and for the AI rules helper.
+  </Accordion>
+</AccordionGroup>
+
+## Step 1: Event
+
+<AccordionGroup>
+  <Accordion title="Basic event details" icon="file-text" defaultOpen>
+    Add the event image, title, slug, resolution date, creator wallet, and categories.
+  </Accordion>
+  <Accordion title="Recurring events" icon="repeat">
+    Recurring events use title and slug templates, plus cadence. The resolution date shown in the form is always the date for the occurrence being generated.
+  </Accordion>
+  <Accordion title="Sports extra fields" icon="trophy">
+    When the main category is `sports`, extra fields appear: Games or Props, game start time, sport slug, league slug, home and away teams, abbreviations, and team logos.
+  </Accordion>
+  <Accordion title="Sports categories" icon="tags">
+    Sports categories are generated automatically from the sports selections, so you do not manage them the same way as a regular event.
+  </Accordion>
+</AccordionGroup>
+
+## Step 2: Market Structure
+
+<AccordionGroup>
+  <Accordion title="Regular event types" icon="layout-grid" defaultOpen>
+    Choose Binary, Multi-market with multiple true outcomes, or Multi-market with a single true outcome.
+  </Accordion>
+  <Accordion title="Sports templates" icon="trophy">
+    Sports events unlock templates such as Standard game lines, More Markets, Exact Score, Halftime Result, custom sports markets, and player props.
+  </Accordion>
+  <Accordion title="Custom sports markets" icon="sliders-horizontal">
+    The custom mode lets you choose market type, question, title, short name, slug override, outcomes, line, group title, and optional team icon.
+  </Accordion>
+  <Accordion title="Player props" icon="users">
+    Props let you add player name, stat type, and line. Each prop becomes one generated market with Over and Under outcomes.
+  </Accordion>
+</AccordionGroup>
+
+## Step 3: Resolution
+
+<AccordionGroup>
+  <Accordion title="Resolution source URL" icon="link" defaultOpen>
+    Optional, but useful when you already know the official source you want to cite.
+  </Accordion>
+  <Accordion title="Resolution rules" icon="scroll-text">
+    Keep these clear and deterministic. Define source, UTC cutoff, tie handling, cancellation handling, and fallback logic.
+  </Accordion>
+  <Accordion title="Generate with AI" icon="sparkles">
+    The AI helper can draft rules, but you still need to review all text manually before publishing.
+  </Accordion>
+  <Accordion title="Recurring preview" icon="eye">
+    Recurring events also show preview samples for title, slug, and rules across occurrences, plus warnings when text looks too repetitive.
+  </Accordion>
+</AccordionGroup>
+
+## Step 4: Pre-sign checks
+
+<AccordionGroup>
+  <Accordion title="USDC reward check" icon="coins" defaultOpen>
+    The app checks whether the connected wallet has enough USDC for the UMA reward pool. The total grows with the number of markets being created, so multi-market events need more than a single binary market.
+  </Accordion>
+  <Accordion title="POL gas check" icon="fuel">
+    The same wallet also needs POL for the market creation transactions.
+  </Accordion>
+  <Accordion title="Allowed creator wallet check" icon="user-check">
+    If the wallet is missing from your allowed creator sources, the flow offers a shortcut back to fix it.
+  </Accordion>
+  <Accordion title="Slug, OpenRouter, and content checks" icon="shield-check">
+    Before signing, the app checks slug availability, confirms OpenRouter is active, and runs the content AI checker for language, rules, and consistency issues.
+  </Accordion>
+</AccordionGroup>
+
+## Step 5: Sign & Create
+
+<AccordionGroup>
+  <Accordion title="Auth challenge" icon="file-signature" defaultOpen>
+    First sign the EIP-712 auth challenge so the server can prepare the transaction plan.
+  </Accordion>
+  <Accordion title="Transaction plan" icon="list-checks">
+    Then approve the transactions required to create and register the markets.
+  </Accordion>
+  <Accordion title="Finalize" icon="check-circle-2">
+    After signatures are done, the server finalizes and registers the markets.
+  </Accordion>
+</AccordionGroup>
+
+<AccordionGroup>
+  <Accordion title="If the flow gets blocked" icon="triangle-alert">
+    Allowed creator wallet errors usually point back to [General](/admin/general). OpenRouter errors usually point to [General](/admin/general) too. Recurring events also require a configured server signer.
+  </Accordion>
+  <Accordion title="What matters most in practice" icon="star">
+    Keep the title and rules unambiguous, confirm the right creator wallet, and check the preview before you sign.
+  </Accordion>
+</AccordionGroup>

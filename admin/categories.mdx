@@ -1,0 +1,23 @@
+---
+title: Categories
+description: Control category visibility, main-category placement, translations, and event hiding rules.
+icon: tags
+---
+
+<AccordionGroup>
+  <Accordion title="Search, filters, and active events" icon="search" defaultOpen>
+    The table lets you search categories and sort by category name or active event count. The active event count is important because it shows how much content a category change might affect before you flip any switches.
+  </Accordion>
+  <Accordion title="Main category" icon="layout-grid">
+    Turn this on when a tag should appear as a top-level discovery category. Once you filter to main categories, the admin also unlocks the sort tool so you can choose their display order.
+  </Accordion>
+  <Accordion title="Hide Category vs Hide Events" icon="eye-off">
+    `Hide Category` removes the tag from category discovery surfaces. `Hide Events` is stronger and hides every event carrying that category from the public site. Use `Hide Events` carefully because it impacts event visibility, not just navigation.
+  </Accordion>
+  <Accordion title="Translations" icon="languages">
+    The language button opens translation inputs for the non-English locales. English stays the source label. Use this when a category name should read naturally in German, Spanish, Portuguese, French, or Chinese.
+  </Accordion>
+  <Accordion title="Sports category behavior" icon="trophy">
+    Sports event categories are generated automatically during [Create Market](/admin/create-market) when you choose the sports fields. That means sports categories are not maintained exactly like regular manual tags.
+  </Accordion>
+</AccordionGroup>

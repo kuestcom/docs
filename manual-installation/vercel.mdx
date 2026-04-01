@@ -1,0 +1,43 @@
+---
+title: Vercel + Supabase
+description: The fastest path to launch a Kuest site with hosted app runtime and managed database.
+icon: cloud
+---
+
+<Info>
+This is the recommended path for most operators. It matches the same Vercel and Supabase stack used by the guided `/launch` flow.
+</Info>
+
+## Before you start
+
+- Review [Environment Variables](/configuration/environment-variables).
+- If you are using the guided flow, pre-read [Launch Overview](/launch/overview).
+
+## Manual deploy flow
+
+<Steps>
+  <Step title="Prepare the repository">
+    Add the codebase to your GitHub account so Vercel can import it. If you are using `/launch`, that GitHub step is already covered in [Launch Overview](/launch/overview).
+  </Step>
+  <Step title="Set the shared environment variables">
+    Start from `.env.example` and fill the base values documented in [Environment Variables](/configuration/environment-variables).
+  </Step>
+  <Step title="Create the Vercel project">
+    In Vercel, create a new project from your GitHub repository, import the environment variables, and deploy.
+  </Step>
+  <Step title="Attach Supabase">
+    In the Vercel project dashboard, open **Storage**, create a Supabase integration with default settings, and connect it to the project.
+  </Step>
+  <Step title="Redeploy and finish setup">
+    Trigger a redeploy, then open [General](/admin/general) to set company name, branding, fee wallet, and support links.
+  </Step>
+</Steps>
+
+## What you still need after deploy
+
+- Confirm the admin wallet can sign in.
+- Review [Theme](/admin/theme), [Locales](/admin/locales), and [Categories](/admin/categories).
+
+<Check>
+If you want the same experience but without doing the setup manually, use the guided `/launch` flow and keep [Launch Overview](/launch/overview) open while filling it.
+</Check>

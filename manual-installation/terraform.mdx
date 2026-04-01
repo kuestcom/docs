@@ -1,0 +1,50 @@
+---
+title: Terraform
+description: Provision supported deployment targets declaratively with Terraform.
+icon: blocks
+---
+
+## Available environments
+
+- `production/gke`
+- `production/kubernetes`
+- `production/cloud-run`
+- `production/fly`
+- `production/digital-ocean`
+
+## Typical workflow
+
+```bash
+cd infra/terraform/environments/production/<target>
+cp terraform.tfvars.example terraform.tfvars
+terraform init
+terraform plan
+terraform apply
+```
+
+## Target notes
+
+<AccordionGroup>
+  <Accordion title="GKE Autopilot">
+    Creates the Kubernetes cluster itself. After apply, fetch credentials with `gcloud container clusters get-credentials`.
+  </Accordion>
+  <Accordion title="Kubernetes">
+    Deploys app resources into an existing cluster, such as one created by the GKE target.
+  </Accordion>
+  <Accordion title="Cloud Run">
+    Requires Secret Manager secrets to exist before apply.
+  </Accordion>
+  <Accordion title="Fly.io">
+    Uses `flyctl deploy` via Terraform `local-exec`. Secrets are still managed manually in Fly.io.
+  </Accordion>
+  <Accordion title="DigitalOcean">
+    Requires `DIGITALOCEAN_TOKEN` and repository access configured in App Platform.
+  </Accordion>
+</AccordionGroup>
+
+## General rules
+
+- Use immutable image refs whenever possible.
+- Point `SITE_URL` to the public canonical endpoint.
+- For Cloud Run, Kubernetes, and DigitalOcean, provide core secrets plus exactly one storage profile.
+- Keep scheduler behavior aligned with [Scheduled Jobs](/manual-installation/scheduler-jobs).

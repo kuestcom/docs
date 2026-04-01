@@ -1,0 +1,122 @@
+---
+title: Launch Overview
+description: Step-by-step tutorial to launch your prediction market with the guided `/launch` flow.
+icon: rocket
+---
+
+<Info>
+Use this page while filling `/launch`. It follows the same three steps shown in the product and helps you launch your prediction market quickly.
+</Info>
+
+<Columns cols={3}>
+  <Card title="Step 1: Site + Wallet" icon="wallet" href="#step-1" cta="Open step" arrow="true">
+    Name, admin wallet, email and nonce.
+  </Card>
+  <Card title="Step 2: Connections" icon="plug" href="#step-2" cta="Open step" arrow="true">
+    GitHub, Vercel, Reown and Supabase.
+  </Card>
+  <Card title="Step 3: Deploy" icon="rocket" href="#step-3" cta="Open step" arrow="true">
+    Deploy, progress and result links.
+  </Card>
+</Columns>
+
+<div id="step-1" />
+
+## Step 1: Site + Wallet
+
+<AccordionGroup>
+  <Accordion title="Site name" icon="type" defaultOpen>
+    Use the public name users should see on the site.
+  </Accordion>
+  <Accordion title="Admin wallet" icon="wallet">
+    Connect the wallet that should become the first admin. One signature creates the Kuest credentials.
+  </Accordion>
+  <Accordion title="Email (optional)" icon="mail">
+    Add it only if you want a contact email saved with the generated API key.
+  </Accordion>
+  <Accordion title="Nonce (optional)" icon="hash">
+    Keep `0` unless support tells you to change it.
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+No funds move in this step. No balance is required. The connected wallet becomes the first admin wallet.
+</Info>
+
+<div id="step-2" />
+
+## Step 2: Connections
+
+<AccordionGroup>
+  <Accordion title="GitHub" icon="github" defaultOpen>
+    Connect GitHub so Kuest can create or use your repository.
+  </Accordion>
+  <Accordion title="Vercel Access Token" icon="key-round">
+    Paste a Vercel token and let the form verify it. Get it from [vercel.com/account/tokens](https://vercel.com/account/tokens).
+  </Accordion>
+  <Accordion title="Connect Vercel to GitHub" icon="link">
+    If prompted, allow Vercel to import the repository from your GitHub account.
+  </Accordion>
+  <Accordion title="Reown Project ID" icon="wallet-cards">
+    Paste the project ID used for wallet login. Get it from [cloud.reown.com](https://cloud.reown.com).
+  </Accordion>
+  <Accordion title="Supabase database" icon="database">
+    Choose **Create new** for a fresh site, or reuse an existing database only if that is intentional.
+  </Accordion>
+</AccordionGroup>
+
+### Advanced options
+
+<AccordionGroup>
+  <Accordion title="Project slug override" icon="pen">
+    Use it only if you want a different project slug or final URL name.
+  </Accordion>
+  <Accordion title="Repository" icon="folder-git-2">
+    Use the `owner/repo` format. This is usually filled automatically after GitHub is connected.
+  </Accordion>
+  <Accordion title="Branch" icon="git-branch">
+    Keep `main` unless your production branch uses a different name.
+  </Accordion>
+  <Accordion title="Vercel Team ID" icon="building-2">
+    Leave it empty for a personal Vercel account. Fill it only for team-owned projects.
+  </Accordion>
+  <Accordion title="Supabase region" icon="map-pinned">
+    Usually the default is fine. Change it only if you want a different region.
+  </Accordion>
+  <Accordion title="BETTER_AUTH_SECRET" icon="shield-check">
+    You can leave it empty and let the setup generate one automatically.
+  </Accordion>
+  <Accordion title="CRON_SECRET" icon="timer">
+    You can leave it empty and let the setup generate one automatically.
+  </Accordion>
+  <Accordion title="SITE_URL override" icon="globe">
+    Fill it only if you already know the final public URL you want to use.
+  </Accordion>
+  <Accordion title="Extra env vars" icon="plus">
+    Use one `KEY=value` per line for optional services such as OpenRouter or Sentry.
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+Helpful pages: [Environment Variables](/configuration/environment-variables) and [Vercel + Supabase](/manual-installation/vercel).
+</Info>
+
+<div id="step-3" />
+
+## Step 3: Deploy
+
+<AccordionGroup>
+  <Accordion title="Deploy button" icon="rocket" defaultOpen>
+    Starts the launch with your site name, repository, branch, database choice, and environment values.
+  </Accordion>
+  <Accordion title="Timeline" icon="list-todo">
+    Shows validation, project setup, database attach, and deployment progress.
+  </Accordion>
+  <Accordion title="Result panel" icon="panel-top">
+    Shows the project URL, Vercel dashboard, Supabase dashboard, duration, and logs.
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+After install, go to [General](/admin/general) to set your brand, support link, fee wallet, and core settings.
+</Info>

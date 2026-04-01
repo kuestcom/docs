@@ -1,0 +1,86 @@
+---
+title: General
+description: Configure brand assets, public links, AI providers, funding integrations, fees, and allowed creator sources.
+icon: settings
+---
+
+<Info>
+Start here after install. This is the admin page that defines your site identity, AI setup, fee wallet, and who is allowed to create markets.
+</Info>
+
+## Brand identity
+
+<AccordionGroup>
+  <Accordion title="Company name and description" icon="type" defaultOpen>
+    `Company name` is required and should be the public brand users see across the site. `Company description` is also required and is used in metadata and wallet dialogs. Keep them short. The UI enforces up to `80` characters for the name and `180` for the description.
+  </Accordion>
+  <Accordion title="Logo icon upload" icon="image-up">
+    This is the main platform logo shown in the header and other branded surfaces. The form accepts `SVG`, `PNG`, `JPG`, and `WebP`, up to `2 MB`. SVG keeps sharp vector rendering. Raster uploads are processed and stored as PNG, so a square logo with transparent background works best.
+  </Accordion>
+  <Accordion title="PWA install icons" icon="smartphone">
+    Upload both `192x192` and `512x512` app icons. These are used when users install your prediction market on mobile or desktop. The same file formats are accepted, also up to `2 MB`. Use simple square artwork, not a full banner or wide logo.
+  </Accordion>
+</AccordionGroup>
+
+## Community and analytics
+
+<AccordionGroup>
+  <Accordion title="Google Analytics ID" icon="bar-chart-3" defaultOpen>
+    Paste your GA4 measurement ID in the format `G-XXXXXXXXXX`. If you do not use Google Analytics, leave it empty.
+  </Accordion>
+  <Accordion title="Social links" icon="link-2">
+    Discord, X, Facebook, Instagram, TikTok, LinkedIn, and YouTube fields expect a public URL. Paste the full link when possible, for example `https://x.com/yourbrand`. These links feed public trust and discovery surfaces, so only add profiles you actually maintain.
+  </Accordion>
+  <Accordion title="Support link" icon="life-buoy">
+    This field can be a public support URL such as Discord, Telegram, WhatsApp, or a direct email. If you type only an email address, the platform converts it to `mailto:` automatically. Use the contact channel your team really monitors.
+  </Accordion>
+</AccordionGroup>
+
+## OpenRouter integration
+
+<AccordionGroup>
+  <Accordion title="What it unlocks" icon="sparkles" defaultOpen>
+    OpenRouter powers three important admin features: [Market Context](/admin/market-context), automatic translations in [Locales](/admin/locales), and the AI helper in [Create Market](/admin/create-market). If you skip this setup, those features stay limited or unavailable.
+  </Accordion>
+  <Accordion title="API key" icon="key">
+    Generate the key at [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys). Paste it here and save. The app stores it encrypted. This is the field you need before refreshing the model list or enabling AI-powered admin features.
+  </Accordion>
+  <Accordion title="Preferred model" icon="cpu">
+    After adding the key, use the refresh button to load available models. You can leave the selector on automatic, or pin a model for more predictable behavior. The real admin UI recommends browsing-capable models such as `perplexity/sonar` when you want better web-aware results.
+  </Accordion>
+</AccordionGroup>
+
+## LI.FI integration
+
+<AccordionGroup>
+  <Accordion title="What LI.FI does on the site" icon="wallet-cards" defaultOpen>
+    LI.FI powers the wallet funding flow used by the site to load supported chains, tokens, wallet balances, swap or bridge quotes, and prepared execution steps. In practice, it helps users move funds from supported tokens and networks into the wallet flow without leaving your prediction market experience.
+  </Accordion>
+  <Accordion title="Integrator name" icon="badge-check">
+    This is your LI.FI integrator ID. In the product it accepts letters, numbers, dot, underscore, and hyphen only, with a max length of `120`. Example: `kuest-mainnet`. The form points users to [li.fi](https://li.fi), and LI.FI documents its partner onboarding through the [Partner Portal](https://portal.li.fi). If you leave the field empty, the app falls back to LI.FI's default integrator name, which is fine for testing but not ideal for a branded production setup.
+  </Accordion>
+  <Accordion title="API key" icon="key-round">
+    This field is optional in practice. The site works with the integrator alone, but a LI.FI API key is useful when you want higher rate limits. LI.FI's official docs state that the API key is mainly needed for higher limits and should stay server-side, not in client code. In this product the key is stored encrypted and used through server routes. It must not contain spaces and the field allows up to `256` characters. See [LI.FI Rate Limits and API Authentication](https://docs.li.fi/api-reference/rate-limits).
+  </Accordion>
+</AccordionGroup>
+
+## Market and fee settings
+
+<AccordionGroup>
+  <Accordion title="Fee recipient wallet" icon="wallet" defaultOpen>
+    This field expects a Polygon `0x...` wallet address. It is the wallet that receives your platform fees. Use a treasury or operations wallet that your team controls. Do not use an exchange deposit address.
+  </Accordion>
+  <Accordion title="Allowed creator source: another Kuest site" icon="globe">
+    Use this when you want to import creator wallets automatically from another prediction market running on Kuest. Paste the public site URL, for example `https://markets.example.com`. The admin fetches that site's `/api/allowed-market-creators` endpoint and mirrors the wallets it exposes. The URL must be public and use `https`. Localhost, private IPs, and internal hosts are rejected.
+  </Accordion>
+  <Accordion title="Allowed creator source: manual wallet" icon="user-plus">
+    Use this when you want to approve a single creator directly. You add a display name plus a Polygon `0x...` wallet address. The display name can be up to `80` characters and is only there to help your team recognize the source later.
+  </Accordion>
+  <Accordion title="Why allowed creators matter" icon="shield-check">
+    The [Create Market](/admin/create-market) flow checks this list in pre-sign. If the connected wallet is not allowed, the user cannot finish market creation. This means General is not just a settings page. It is also part of your market creation permissions.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+If your team will create recurring markets, set up allowed creator sources and OpenRouter before testing [Create Market](/admin/create-market). Those two checks block the flow most often.
+</Tip>

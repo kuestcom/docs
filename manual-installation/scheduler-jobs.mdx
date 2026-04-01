@@ -1,0 +1,52 @@
+---
+title: Scheduled Jobs
+description: The cron calls your site needs when you run a manual installation outside the default scheduler.
+icon: timer
+---
+
+<Info>
+If you use Supabase mode, `npm run db:push` already sets up `pg_cron` with this same schedule.
+</Info>
+
+## What your scheduler should call
+
+- Method: `GET`
+- Header: `Authorization: Bearer <CRON_SECRET>`
+- Base URL: `SITE_URL`
+- Endpoints:
+  - `/api/sync/events`
+  - `/api/sync/event-creations`
+  - `/api/sync/resolution`
+  - `/api/sync/translations`
+  - `/api/sync/volume`
+
+Example:
+
+```bash
+curl -sS -X GET \
+  -H "Authorization: Bearer ${CRON_SECRET}" \
+  "${SITE_URL}/api/sync/events"
+```
+
+## Recommended cron schedule
+
+| Endpoint | Cron schedule | Notes |
+| --- | --- | --- |
+| `/api/sync/events` | `1-59/3 * * * *` | Every 3 minutes, offset by 1 minute |
+| `/api/sync/event-creations` | `0,30 * * * *` | Twice per hour |
+| `/api/sync/resolution` | `2-56/6 * * * *` | Every 6 minutes, offset by 2 minutes |
+| `/api/sync/volume` | `16,46 * * * *` | Twice per hour |
+| `/api/sync/translations` | `13,37 * * * *` | Twice per hour |
+
+Use UTC unless your team needs a strict local timezone.
+
+## Expected responses
+
+- `200`: accepted or completed
+- `401`: missing or invalid `CRON_SECRET`
+- `409`: sync already running, which can happen on locked routes
+- `500`: runtime failure that should be investigated in logs
+
+<Warning>
+Do not run duplicate schedulers at the same time. Use either `pg_cron` or your external cron jobs.
+</Warning>

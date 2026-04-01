@@ -1,0 +1,57 @@
+---
+title: Fly.io
+description: Deploy Kuest on Fly.io with immutable images and an external scheduler when needed.
+icon: plane
+---
+
+## Prerequisites
+
+- Fly.io account and organization
+- Existing Fly app
+- `flyctl` installed and authenticated
+- Base values from [Environment Variables](/configuration/environment-variables)
+- A storage profile from [Manual Installation Overview](/manual-installation/overview)
+
+## Deploy flow
+
+<Steps>
+  <Step title="Configure secrets and variables">
+    Set all required runtime values in Fly.io using the dashboard or `flyctl secrets set`.
+  </Step>
+  <Step title="Deploy an immutable image">
+    Deploy the application image with `infra/fly/fly.toml`.
+
+    ```bash
+    flyctl deploy \
+      --app <fly-app-name> \
+      --config infra/fly/fly.toml \
+      --image ghcr.io/kuestcom/prediction-market@sha256:<digest>
+    ```
+  </Step>
+  <Step title="Plan rollback before production traffic">
+    Keep the previous healthy digest ready so you can redeploy it quickly if needed.
+  </Step>
+</Steps>
+
+Rollback example:
+
+```bash
+flyctl deploy \
+  --app <fly-app-name> \
+  --config infra/fly/fly.toml \
+  --image ghcr.io/kuestcom/prediction-market@sha256:<previous-digest>
+```
+
+## Scheduler
+
+Fly.io deployment does not replace the sync scheduler requirement. If you are not using Supabase mode, implement [Scheduled Jobs](/manual-installation/scheduler-jobs) with an external scheduler such as GitHub Actions or Cloud Scheduler.
+
+## Optional Terraform
+
+```bash
+cd infra/terraform/environments/production/fly
+cp terraform.tfvars.example terraform.tfvars
+terraform init
+terraform plan
+terraform apply
+```

@@ -1,0 +1,46 @@
+---
+title: Kubernetes
+description: Deploy Kuest to a Kubernetes cluster with Kustomize, secrets, and optional CronJobs.
+icon: network
+---
+
+## Prerequisites
+
+- Working Kubernetes cluster and context
+- Ingress controller available
+- Base values from [Environment Variables](/configuration/environment-variables)
+- A storage profile from [Manual Installation Overview](/manual-installation/overview)
+
+## Baseline deploy
+
+```bash
+cp infra/kubernetes/secret.example.yaml infra/kubernetes/secret.yaml
+kubectl apply -k infra/kubernetes
+```
+
+## Important configuration points
+
+- `SITE_URL` must match the canonical public URL.
+- In `infra/kubernetes/secret.example.yaml`, set exactly one storage profile:
+  - Supabase with `SUPABASE_*`
+  - S3 with `S3_BUCKET`, `S3_ACCESS_KEY_ID`, and `S3_SECRET_ACCESS_KEY`
+
+## Scheduler
+
+If you are not using Supabase mode, edit `infra/kubernetes/cronjobs.yaml` for your namespace, secret name, and `SITE_URL`, then apply it:
+
+```bash
+kubectl apply -f infra/kubernetes/cronjobs.yaml
+```
+
+The jobs should follow [Scheduled Jobs](/manual-installation/scheduler-jobs).
+
+## Optional Terraform
+
+```bash
+cd infra/terraform/environments/production/kubernetes
+cp terraform.tfvars.example terraform.tfvars
+terraform init
+terraform plan
+terraform apply
+```

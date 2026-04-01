@@ -1,0 +1,48 @@
+---
+title: Environment Variables
+description: Production secrets and optional services used by manual prediction market deployments.
+icon: key
+---
+
+<Warning>
+If the `KUEST_*` credentials are missing or invalid, users can browse markets but trading auth and proxy wallet flows will fail.
+</Warning>
+
+## Required for production
+
+| Variable | Why it matters | How to obtain it |
+| --- | --- | --- |
+| `KUEST_ADDRESS`<br />`KUEST_API_KEY`<br />`KUEST_API_SECRET`<br />`KUEST_PASSPHRASE` | Powers proxy wallet setup and authenticated trading requests. | Generate credentials at [auth.kuest.com](https://auth.kuest.com/) by connecting your Polygon wallet. |
+| `ADMIN_WALLETS` | Grants access to the admin dashboard. | Use a comma-separated list of wallet addresses for trusted operators. |
+| `REOWN_APPKIT_PROJECT_ID` | Enables wallet logins through Reown (WalletConnect). | Copy it from the [Reown dashboard](https://dashboard.reown.com/). |
+| `BETTER_AUTH_SECRET` | Protects Better Auth sessions and encrypted trading credentials. | Generate a 32-character value using the [Better Auth installation guide](https://www.better-auth.com/docs/installation#set-environment-variables). |
+| `CRON_SECRET` | Secures scheduled jobs. | Create any random string with at least 16 characters. |
+
+<Info>
+Optional in `.env.example` means the variable is not always filled manually. Some deployment targets still require one database connection and one storage profile.
+</Info>
+
+## Optional variables from `.env.example`
+
+| Variable | Where it is used | When to use it | Format or example |
+| --- | --- | --- | --- |
+| `DISABLE_IMAGE_OPTIMIZATION` | Affects image rendering across market cards, event covers, category icons, and uploaded brand assets. | Set it to `true` if your host, reverse proxy, or CDN breaks Next.js image optimization, or if you already optimize images upstream. | `true` or `false` |
+| `POSTGRES_URL` | Main runtime database connection for users, admin settings, categories, events, markets, and migrations. | Required for manual installs unless your platform injects the database URL for you. | `postgresql://user:password@db.example.com:5432/kuest?sslmode=require` |
+| `SUPABASE_URL` | Server-side connection used for asset storage when the site uploads images to Supabase Storage. | Use it only if your deployment target runs in Supabase storage mode. It must be paired with `SUPABASE_SERVICE_ROLE_KEY`. | `https://project-ref.supabase.co` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only credential for uploads, signed URLs, and asset management in Supabase mode. | Fill it only together with `SUPABASE_URL`. Do not expose it in client-side tools. | `eyJhbGciOi...` |
+| `S3_BUCKET` | Bucket name used to store logos, event images, market covers, and other uploaded assets in S3 mode. | Use it when you choose S3-compatible storage instead of Supabase. | `kuest-assets` |
+| `S3_ENDPOINT` | Storage endpoint the app calls when uploading or reading files from S3-compatible storage. | Add it for providers such as Cloudflare R2, DigitalOcean Spaces, MinIO, or any non-default S3 endpoint. | `https://nyc3.digitaloceanspaces.com` |
+| `S3_REGION` | Region metadata used by the storage client when signing S3 requests. | Fill it when your provider requires an explicit region or signature region. | `us-east-1` |
+| `S3_ACCESS_KEY_ID` | Server credential used to authenticate uploads and file operations in S3 mode. | Required whenever you use S3-compatible storage. | `DO00ABC123EXAMPLE` |
+| `S3_SECRET_ACCESS_KEY` | Secret paired with `S3_ACCESS_KEY_ID` for server-side storage access. | Required whenever you use S3-compatible storage. Keep it server-side only. | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY` |
+| `S3_PUBLIC_URL` | Public asset base shown to users when the site renders uploaded files. | Use it when your images should load from a CDN or custom files domain instead of the raw bucket endpoint. | `https://cdn.example.com/assets` |
+| `S3_FORCE_PATH_STYLE` | Changes how the storage client builds S3 URLs and signed requests. | Keep `true` when your provider needs path-style requests. Switch to `false` if your provider expects virtual-host style URLs. | `true` or `false` |
+| `SENTRY_DSN` | Runtime error reporting for both the app server and the user-facing site. | Add it if you want crashes and production errors sent to Sentry. | `https://abc123@o12345.ingest.us.sentry.io/67890` |
+| `SENTRY_ORG` | Build or release integration with Sentry, not the core app runtime. | Use it only if your deployment pipeline also uploads source maps or creates releases in Sentry. | `kuest` |
+| `SENTRY_PROJECT` | Identifies which Sentry project should receive build-time release artifacts. | Use it together with `SENTRY_ORG` when your build integrates with Sentry releases. | `prediction-market` |
+| `SENTRY_AUTH_TOKEN` | Server-side token for build tooling that pushes releases or source maps to Sentry. | Needed only for build-time Sentry integration. It is not required for basic runtime error capture with `SENTRY_DSN`. | `sntrys_...` |
+| `EVENT_CREATION_SIGNER_PRIVATE_KEYS` | Used by recurring or scheduled market creation flows in the admin calendar. The server loads these keys to sign automated event creation. | Needed only if you plan to use recurring events or server-driven scheduled creation. It accepts comma-separated keys or a JSON array. | `0xabc...,0xdef...` or `["0xabc...","0xdef..."]` |
+
+<Info>
+Choose one storage profile only. Use `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`, or use `S3_BUCKET` + `S3_ACCESS_KEY_ID` + `S3_SECRET_ACCESS_KEY`.
+</Info>

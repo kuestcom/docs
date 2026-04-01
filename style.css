@@ -1,0 +1,23 @@
+html.dark,
+html.dark body,
+html.dark #navbar,
+html.dark #sidebar,
+html.dark #content-area,
+html.dark #content-container,
+html.dark #body-content,
+html.dark #footer {
+  background-color: #181A1F !important;
+}
+
+html.dark #root,
+html.dark #__next,
+html.dark main {
+  background-color: transparent !important;
+}
+
+html.dark sidebar-title,
+html.dark .sidebar-title,
+html.dark #sidebar h5,
+html.dark #sidebar h6 {
+  color: #E9ECEF !important;
+}

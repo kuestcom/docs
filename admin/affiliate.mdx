@@ -1,0 +1,31 @@
+---
+title: Affiliate
+description: Configure your trading fee and how much of that fee is shared with affiliates.
+icon: badge-percent
+---
+
+<Info>
+This page controls how your prediction market splits trading fees between your platform and affiliates.
+</Info>
+
+<AccordionGroup>
+  <Accordion title="Trading fee (%)" icon="percent" defaultOpen>
+    This is the platform fee charged on executions. The field accepts decimals such as `2.00`. In the real admin, the form enforces the current minimum onchain base fee and will not let you go below it. The visible max in the UI is `9%`.
+  </Accordion>
+  <Accordion title="Affiliate share (%)" icon="hand-coins">
+    This is not a percent of trade volume. It is the percent of your configured trading fee that gets shared with affiliates. Example input: `50` means affiliates receive half of your trading fee.
+  </Accordion>
+  <Accordion title="How the calculation works" icon="calculator">
+    Use this mental model: `affiliate payout = trading fee x affiliate share`. The platform keeps the remainder of that configured fee. The exchange base fee still comes out first under the hood, so do not treat the admin percentage as pure platform revenue.
+  </Accordion>
+  <Accordion title="Default example" icon="coins">
+    With `2.00%` trading fee and `50%` affiliate share, a `$100` trade targets `$2.00` in platform fee. The affiliate target is `$1.00` and the platform target is `$1.00`, before the exchange base fee is applied.
+  </Accordion>
+  <Accordion title="Overview cards and performance table" icon="table-properties">
+    The page also shows who is actually sending traffic and earning. Expect totals for referrals, trading volume, and affiliate fees, plus a performance table with avatar, affiliate code, referrals, volume, and fees per partner.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+Affiliate commission is taken from the trading fee at execution, not directly from traded volume.
+</Warning>
