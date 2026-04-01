@@ -32,9 +32,9 @@ curl -sS -X GET \
 
 | Endpoint | Cron schedule | Notes |
 | --- | --- | --- |
-| `/api/sync/events` | `1-59/3 * * * *` | Every 3 minutes, offset by 1 minute |
+| `/api/sync/events` | `2,11,20,29,38,47,56 * * * *` | Seven times per hour, spaced to reduce overlap |
 | `/api/sync/event-creations` | `0,30 * * * *` | Twice per hour |
-| `/api/sync/resolution` | `2-56/6 * * * *` | Every 6 minutes, offset by 2 minutes |
+| `/api/sync/resolution` | `5-55/10 * * * *` | Every 10 minutes, offset by 5 minutes |
 | `/api/sync/volume` | `16,46 * * * *` | Twice per hour |
 | `/api/sync/translations` | `13,37 * * * *` | Twice per hour |
 
