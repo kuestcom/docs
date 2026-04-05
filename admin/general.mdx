@@ -1,11 +1,11 @@
 ---
 title: General
-description: Configure brand assets, public links, AI providers, funding integrations, fees, and allowed creator sources.
+description: Configure brand assets, social links, support channels, analytics, AI providers, funding integrations, custom scripts, fees, and allowed creator sources.
 icon: settings
 ---
 
 <Info>
-Start here after install. This is the admin page that defines your site identity, AI setup, fee wallet, and who is allowed to create markets.
+Start here after install. This is the admin page that defines your site identity, public community links, third-party integrations, fee wallet, and who is allowed to create markets.
 </Info>
 
 ## Brand identity
@@ -22,45 +22,33 @@ Start here after install. This is the admin page that defines your site identity
   </Accordion>
 </AccordionGroup>
 
-## Community and analytics
+## Social & Community
+
+<AccordionGroup>
+  <Accordion title="Social links" icon="link-2" defaultOpen>
+    Discord, X, Facebook, Instagram, TikTok, LinkedIn, and YouTube fields expect a public URL. Paste the full link when possible, for example `https://x.com/yourbrand`. These links feed public trust and discovery surfaces, so only add profiles you actually maintain. All of these fields are optional.
+  </Accordion>
+  <Accordion title="Support link" icon="life-buoy">
+    This field can be a public support URL such as Discord, Telegram, or WhatsApp, or a direct email address. If you type only an email address, the platform converts it to `mailto:` automatically. Use the contact channel your team really monitors.
+  </Accordion>
+</AccordionGroup>
+
+## Integrations
 
 <AccordionGroup>
   <Accordion title="Google Analytics ID" icon="bar-chart-3" defaultOpen>
     Paste your GA4 measurement ID in the format `G-XXXXXXXXXX`. If you do not use Google Analytics, leave it empty.
   </Accordion>
-  <Accordion title="Social links" icon="link-2">
-    Discord, X, Facebook, Instagram, TikTok, LinkedIn, and YouTube fields expect a public URL. Paste the full link when possible, for example `https://x.com/yourbrand`. These links feed public trust and discovery surfaces, so only add profiles you actually maintain.
+  <Accordion title="OpenRouter integration" icon="sparkles">
+    OpenRouter powers three important admin features: [Market Context](/admin/market-context), automatic translations in [Locales](/admin/locales), and the AI helper in [Create Market](/admin/create-market). Add your API key from [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys), save it, then use the refresh button next to `Preferred OpenRouter model` to load the available models. You can leave the selector on automatic or pin a model for more predictable behavior. The app stores the API key encrypted.
   </Accordion>
-  <Accordion title="Support link" icon="life-buoy">
-    This field can be a public support URL such as Discord, Telegram, WhatsApp, or a direct email. If you type only an email address, the platform converts it to `mailto:` automatically. Use the contact channel your team really monitors.
+  <Accordion title="LI.FI integration" icon="wallet-cards">
+    LI.FI powers the wallet funding flow used by the site to load supported chains, tokens, wallet balances, swap or bridge quotes, and prepared execution steps. `Integrator name` accepts letters, numbers, dot, underscore, and hyphen only, with a max length of `120`. Example: `kuest-mainnet`. The API key is optional in practice, but useful for higher rate limits. The key is stored encrypted and used through server routes. See [LI.FI Rate Limits and API Authentication](https://docs.li.fi/api-reference/rate-limits).
   </Accordion>
-</AccordionGroup>
+  <Accordion title="Custom Integrations" icon="code">
+    Use this section for external scripts such as support chat, analytics, tracking, and similar tools. You can add up to `12` integrations. Each entry needs a `Name` for your admin team plus a snippet. The snippet field accepts raw JavaScript or a trusted provider snippet with one or more `<script>` tags.
 
-## OpenRouter integration
-
-<AccordionGroup>
-  <Accordion title="What it unlocks" icon="sparkles" defaultOpen>
-    OpenRouter powers three important admin features: [Market Context](/admin/market-context), automatic translations in [Locales](/admin/locales), and the AI helper in [Create Market](/admin/create-market). If you skip this setup, those features stay limited or unavailable.
-  </Accordion>
-  <Accordion title="API key" icon="key">
-    Generate the key at [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys). Paste it here and save. The app stores it encrypted. This is the field you need before refreshing the model list or enabling AI-powered admin features.
-  </Accordion>
-  <Accordion title="Preferred model" icon="cpu">
-    After adding the key, use the refresh button to load available models. You can leave the selector on automatic, or pin a model for more predictable behavior. The real admin UI recommends browsing-capable models such as `perplexity/sonar` when you want better web-aware results.
-  </Accordion>
-</AccordionGroup>
-
-## LI.FI integration
-
-<AccordionGroup>
-  <Accordion title="What LI.FI does on the site" icon="wallet-cards" defaultOpen>
-    LI.FI powers the wallet funding flow used by the site to load supported chains, tokens, wallet balances, swap or bridge quotes, and prepared execution steps. In practice, it helps users move funds from supported tokens and networks into the wallet flow without leaving your prediction market experience.
-  </Accordion>
-  <Accordion title="Integrator name" icon="badge-check">
-    This is your LI.FI integrator ID. In the product it accepts letters, numbers, dot, underscore, and hyphen only, with a max length of `120`. Example: `kuest-mainnet`. The form points users to [li.fi](https://li.fi), and LI.FI documents its partner onboarding through the [Partner Portal](https://portal.li.fi). If you leave the field empty, the app falls back to LI.FI's default integrator name, which is fine for testing but not ideal for a branded production setup.
-  </Accordion>
-  <Accordion title="API key" icon="key-round">
-    This field is optional in practice. The site works with the integrator alone, but a LI.FI API key is useful when you want higher rate limits. LI.FI's official docs state that the API key is mainly needed for higher limits and should stay server-side, not in client code. In this product the key is stored encrypted and used through server routes. It must not contain spaces and the field allows up to `256` characters. See [LI.FI Rate Limits and API Authentication](https://docs.li.fi/api-reference/rate-limits).
+    `Disable on` lets you block an integration on specific page groups: home `/`, event pages `/event/*`, `/portfolio`, `/settings`, `/docs`, and `/admin`. Enabled integrations load only after the visitor's first interaction on the page, which helps keep the initial page load lighter.
   </Accordion>
 </AccordionGroup>
 
