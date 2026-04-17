@@ -1,63 +1,81 @@
 ---
 title: General
-description: Configure brand assets, social links, global announcement banner, legal and geoblocking options, integrations, fees, and allowed creator sources.
+description: Configure every field from Admin -> General, including brand, links, legal, geoblocking, integrations, and market fee settings.
 icon: settings
 ---
 
 <Info>
-Start here after install. This is the admin page that defines your site identity, public community links, third-party integrations, fee wallet, and who is allowed to create markets.
+This page mirrors the exact cards shown in <code>Admin -> General</code>. Each item below matches a setting in the form.
 </Info>
 
 ## Brand identity
 
 <AccordionGroup>
-  <Accordion title="Company name and description" icon="type" defaultOpen>
-    `Company name` is required and should be the public brand users see across the site. `Company description` is also required and is used in metadata and wallet dialogs. Keep them short. The UI enforces up to `80` characters for the name and `180` for the description.
+  <Accordion title="Logo icon" icon="image-up" defaultOpen>
+    Upload the main platform logo. Accepted formats: `SVG`, `PNG`, `JPG`, `WebP`.
   </Accordion>
-  <Accordion title="Logo icon upload" icon="image-up">
-    This is the main platform logo shown in the header and other branded surfaces. The form accepts `SVG`, `PNG`, `JPG`, and `WebP`, up to `2 MB`. SVG keeps sharp vector rendering. Raster uploads are processed and stored as PNG, so a square logo with transparent background works best.
+  <Accordion title="Company name" icon="type">
+    Public brand name shown across the site.
   </Accordion>
-  <Accordion title="PWA install icons" icon="smartphone">
-    Upload both `192x192` and `512x512` app icons. These are used when users install your prediction market on mobile or desktop. The same file formats are accepted, also up to `2 MB`. Use simple square artwork, not a full banner or wide logo.
+  <Accordion title="Company description" icon="text-quote">
+    Short description used in metadata and wallet dialogs.
+  </Accordion>
+  <Accordion title="App install icon (PWA)" icon="smartphone">
+    Upload both icons used when users install your app: `Icon 192x192` and `Icon 512x512`.
   </Accordion>
 </AccordionGroup>
 
 ## Social & Community
 
 <AccordionGroup>
-  <Accordion title="Social links" icon="link-2" defaultOpen>
-    Discord, X, Facebook, Instagram, TikTok, LinkedIn, and YouTube fields expect a public URL. Paste the full link when possible, for example `https://x.com/yourbrand`. These links feed public trust and discovery surfaces, so only add profiles you actually maintain. All of these fields are optional.
+  <Accordion title="Discord community link" icon="link-2" defaultOpen>
+    Public Discord invite URL.
+  </Accordion>
+  <Accordion title="X / Twitter link" icon="link-2">
+    Public X profile URL.
+  </Accordion>
+  <Accordion title="Facebook link" icon="link-2">
+    Public Facebook page URL.
+  </Accordion>
+  <Accordion title="Instagram link" icon="link-2">
+    Public Instagram profile URL.
+  </Accordion>
+  <Accordion title="TikTok link" icon="link-2">
+    Public TikTok profile URL.
+  </Accordion>
+  <Accordion title="LinkedIn link" icon="link-2">
+    Public LinkedIn page URL.
+  </Accordion>
+  <Accordion title="YouTube link" icon="link-2">
+    Public YouTube channel URL.
   </Accordion>
   <Accordion title="Support link" icon="life-buoy">
-    This field can be a public support URL such as Discord, Telegram, or WhatsApp, or a direct email address. If you type only an email address, the platform converts it to `mailto:` automatically. Use the contact channel your team really monitors.
+    Support contact URL or email (for example Discord, Telegram, WhatsApp, or `support@...`).
   </Accordion>
 </AccordionGroup>
 
 ## Global announcement banner
 
 <AccordionGroup>
-  <Accordion title="Message and optional URL" icon="megaphone" defaultOpen>
-    Use this banner for short campaigns or notices shown in the website header. You can add a message and an optional URL. Leave the message empty to hide the banner.
+  <Accordion title="Message" icon="megaphone" defaultOpen>
+    Banner text shown at the top of the site. Leave empty to hide the banner.
   </Accordion>
-  <Accordion title="Disable on specific pages" icon="layout-template">
-    You can hide the announcement banner on selected routes. This is useful when you need the banner only on discovery pages and not on trading-focused pages.
+  <Accordion title="URL (optional)" icon="link">
+    Optional link opened when users click the banner.
   </Accordion>
-  <Accordion title="Suggested usage" icon="info">
-    Keep the message concise and time-bound. Use a clear call to action only when needed.
+  <Accordion title="Disable on" icon="layout-template">
+    Choose routes where the banner should not appear.
   </Accordion>
 </AccordionGroup>
 
 ## Legal & Geoblocking
 
 <AccordionGroup>
-  <Accordion title="Terms of Use PDF upload" icon="file-text" defaultOpen>
-    In `Legal & Geoblocking`, upload a custom Terms of Use PDF to replace the default `/tos` page content. The form accepts PDF only and enforces the size limit shown in the admin UI.
+  <Accordion title="Terms of Use PDF" icon="file-text" defaultOpen>
+    Upload a PDF to replace the default `/tos` page content. You can open or remove the current uploaded file from this same card.
   </Accordion>
   <Accordion title="Blocked countries" icon="shield-ban">
-    Use `Blocked countries` to select regions where users should not be able to access the platform. If no countries are selected, access remains available globally.
-  </Accordion>
-  <Accordion title="How geoblocking is evaluated" icon="globe">
-    The frontend checks geoblock status using the configured site URL and the visitor IP country. Keep this list aligned with your legal requirements and target markets.
+    Select countries that should be blocked from accessing the platform. If none are selected, access stays available for all regions.
   </Accordion>
 </AccordionGroup>
 
@@ -65,38 +83,26 @@ Start here after install. This is the admin page that defines your site identity
 
 <AccordionGroup>
   <Accordion title="Google Analytics ID" icon="bar-chart-3" defaultOpen>
-    Paste your GA4 measurement ID in the format `G-XXXXXXXXXX`. If you do not use Google Analytics, leave it empty.
+    GA4 measurement ID (format `G-XXXXXXXXXX`).
   </Accordion>
   <Accordion title="OpenRouter integration" icon="sparkles">
-    OpenRouter powers three important admin features: [Market Context](/admin/market-context), automatic translations in [Locales](/admin/locales), and the AI helper in [Create Market](/admin/create-market). Add your API key from [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys), save it, then use the refresh button next to `Preferred OpenRouter model` to load the available models. You can leave the selector on automatic or pin a model for more predictable behavior. The app stores the API key encrypted.
+    Configure `API key` and `Preferred OpenRouter model`. Used by Market Context, Locales translation, and Create Market AI helper.
   </Accordion>
   <Accordion title="LI.FI integration" icon="wallet-cards">
-    LI.FI powers the wallet funding flow used by the site to load supported chains, tokens, wallet balances, swap or bridge quotes, and prepared execution steps. `Integrator name` accepts letters, numbers, dot, underscore, and hyphen only, with a max length of `120`. Example: `kuest-mainnet`. The API key is optional in practice, but useful for higher rate limits. The key is stored encrypted and used through server routes. See [LI.FI Rate Limits and API Authentication](https://docs.li.fi/api-reference/rate-limits).
+    Configure `Integrator name` and optional `API key` for funding/swap flows.
   </Accordion>
   <Accordion title="Custom Integrations" icon="code">
-    Use this section for external scripts such as support chat, analytics, tracking, and similar tools. You can add up to `12` integrations. Each entry needs a `Name` for your admin team plus a snippet. The snippet field accepts raw JavaScript or a trusted provider snippet with one or more `<script>` tags.
-
-    `Disable on` lets you block an integration on specific page groups: home `/`, event pages `/event/*`, `/portfolio`, `/settings`, `/docs`, and `/admin`. Enabled integrations load only after the visitor's first interaction on the page, which helps keep the initial page load lighter.
+    Add external scripts. Each integration has `Name`, `Snippet`, and `Disable on` route options.
   </Accordion>
 </AccordionGroup>
 
 ## Market and fee settings
 
 <AccordionGroup>
-  <Accordion title="Fee recipient wallet" icon="wallet" defaultOpen>
-    This field expects a Polygon `0x...` wallet address. It is the wallet that receives your platform fees. Use a treasury or operations wallet that your team controls. Do not use an exchange deposit address.
+  <Accordion title="Your Polygon wallet address to receive transaction fees" icon="wallet" defaultOpen>
+    Wallet that receives platform transaction fees.
   </Accordion>
-  <Accordion title="Allowed creator source: another Kuest site" icon="globe">
-    Use this when you want to import creator wallets automatically from another prediction market running on Kuest. Paste the public site URL, for example `https://markets.example.com`. The admin fetches that site's `/api/allowed-market-creators` endpoint and mirrors the wallets it exposes. The URL must be public and use `https`. Localhost, private IPs, and internal hosts are rejected.
-  </Accordion>
-  <Accordion title="Allowed creator source: manual wallet" icon="user-plus">
-    Use this when you want to approve a single creator directly. You add a display name plus a Polygon `0x...` wallet address. The display name can be up to `80` characters and is only there to help your team recognize the source later.
-  </Accordion>
-  <Accordion title="Why allowed creators matter" icon="shield-check">
-    The [Create Market](/admin/create-market) flow checks this list in pre-sign. If the connected wallet is not allowed, the user cannot finish market creation. This means General is not just a settings page. It is also part of your market creation permissions.
+  <Accordion title="Allowed mirrored market sources" icon="users">
+    Manage who can create markets by adding a Kuest site URL (to mirror wallets) or a manual wallet with display name.
   </Accordion>
 </AccordionGroup>
-
-<Tip>
-If your team will create recurring markets, set up allowed creator sources and OpenRouter before testing [Create Market](/admin/create-market). Those two checks block the flow most often.
-</Tip>
