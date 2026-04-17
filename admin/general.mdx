@@ -1,6 +1,6 @@
 ---
 title: General
-description: Configure brand assets, legal and geoblocking options, social links, support channels, analytics, AI providers, funding integrations, custom scripts, fees, and allowed creator sources.
+description: Configure brand assets, social links, global announcement banner, legal and geoblocking options, integrations, fees, and allowed creator sources.
 icon: settings
 ---
 
@@ -30,6 +30,34 @@ Start here after install. This is the admin page that defines your site identity
   </Accordion>
   <Accordion title="Support link" icon="life-buoy">
     This field can be a public support URL such as Discord, Telegram, or WhatsApp, or a direct email address. If you type only an email address, the platform converts it to `mailto:` automatically. Use the contact channel your team really monitors.
+  </Accordion>
+</AccordionGroup>
+
+## Global announcement banner
+
+<AccordionGroup>
+  <Accordion title="Message and optional URL" icon="megaphone" defaultOpen>
+    Use this banner for short campaigns or notices shown in the website header. You can add a message and an optional URL. Leave the message empty to hide the banner.
+  </Accordion>
+  <Accordion title="Disable on specific pages" icon="layout-template">
+    You can hide the announcement banner on selected routes. This is useful when you need the banner only on discovery pages and not on trading-focused pages.
+  </Accordion>
+  <Accordion title="Suggested usage" icon="info">
+    Keep the message concise and time-bound. Use a clear call to action only when needed.
+  </Accordion>
+</AccordionGroup>
+
+## Legal & Geoblocking
+
+<AccordionGroup>
+  <Accordion title="Terms of Use PDF upload" icon="file-text" defaultOpen>
+    In `Legal & Geoblocking`, upload a custom Terms of Use PDF to replace the default `/tos` page content. The form accepts PDF only and enforces the size limit shown in the admin UI.
+  </Accordion>
+  <Accordion title="Blocked countries" icon="shield-ban">
+    Use `Blocked countries` to select regions where users should not be able to access the platform. If no countries are selected, access remains available globally.
+  </Accordion>
+  <Accordion title="How geoblocking is evaluated" icon="globe">
+    The frontend checks geoblock status using the configured site URL and the visitor IP country. Keep this list aligned with your legal requirements and target markets.
   </Accordion>
 </AccordionGroup>
 
@@ -66,17 +94,6 @@ Start here after install. This is the admin page that defines your site identity
   </Accordion>
   <Accordion title="Why allowed creators matter" icon="shield-check">
     The [Create Market](/admin/create-market) flow checks this list in pre-sign. If the connected wallet is not allowed, the user cannot finish market creation. This means General is not just a settings page. It is also part of your market creation permissions.
-  </Accordion>
-</AccordionGroup>
-
-## Legal & Geoblocking
-
-<AccordionGroup>
-  <Accordion title="Terms of Service PDF upload" icon="file-text" defaultOpen>
-    In `Legal & Geoblocking`, you can upload a custom Terms of Service PDF to replace the default terms shown by the platform. Keep one current file and update it whenever your legal text changes.
-  </Accordion>
-  <Accordion title="Blocked countries" icon="shield-ban">
-    Use `Blocked countries` to select the regions where your platform should not be available. If no country is selected, the platform remains available in all regions.
   </Accordion>
 </AccordionGroup>
 
