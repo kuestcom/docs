@@ -20,6 +20,7 @@ This setup keeps the frontend pointed at subdomains you control while Kuest serv
     - `community.yourdomain.com` → `community.kuest.com`
     - `create-market.yourdomain.com` → `create-market.kuest.com`
     - `price-reference.yourdomain.com` → `price-reference.kuest.com`
+    - `geoblock.yourdomain.com` → `geoblock.kuest.com`
     - `ws-live-data.yourdomain.com` → `ws-live-data.kuest.com`
     - `ws-subscriptions-clob.yourdomain.com` → `ws-subscriptions-clob.kuest.com`
   </Step>
@@ -35,6 +36,7 @@ This setup keeps the frontend pointed at subdomains you control while Kuest serv
       'community.yourdomain.com': 'https://community.kuest.com',
       'create-market.yourdomain.com': 'https://create-market.kuest.com',
       'price-reference.yourdomain.com': 'https://price-reference.kuest.com',
+      'geoblock.yourdomain.com': 'https://geoblock.kuest.com',
       'ws-live-data.yourdomain.com': 'https://ws-live-data.kuest.com',
       'ws-subscriptions-clob.yourdomain.com': 'https://ws-subscriptions-clob.kuest.com',
     }
@@ -77,6 +79,7 @@ This setup keeps the frontend pointed at subdomains you control while Kuest serv
     - `community.yourdomain.com/*`
     - `create-market.yourdomain.com/*`
     - `price-reference.yourdomain.com/*`
+    - `geoblock.yourdomain.com/*`
     - `ws-live-data.yourdomain.com/*`
     - `ws-subscriptions-clob.yourdomain.com/*`
   </Step>
@@ -91,6 +94,7 @@ This setup keeps the frontend pointed at subdomains you control while Kuest serv
     USER_PNL_URL=https://user-pnl-api.yourdomain.com
     COMMUNITY_URL=https://community.yourdomain.com
     PRICE_REFERENCE_URL=https://price-reference.yourdomain.com
+    GEOBLOCK_URL=https://geoblock.yourdomain.com
     WS_LIVE_DATA_URL=wss://ws-live-data.yourdomain.com
     WS_CLOB_URL=wss://ws-subscriptions-clob.yourdomain.com
     ```
