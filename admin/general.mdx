@@ -1,6 +1,6 @@
 ---
 title: General
-description: Configure brand assets, social links, support channels, analytics, AI providers, funding integrations, custom scripts, fees, and allowed creator sources.
+description: Configure brand assets, legal and geoblocking options, social links, support channels, analytics, AI providers, funding integrations, custom scripts, fees, and allowed creator sources.
 icon: settings
 ---
 
@@ -66,6 +66,17 @@ Start here after install. This is the admin page that defines your site identity
   </Accordion>
   <Accordion title="Why allowed creators matter" icon="shield-check">
     The [Create Market](/admin/create-market) flow checks this list in pre-sign. If the connected wallet is not allowed, the user cannot finish market creation. This means General is not just a settings page. It is also part of your market creation permissions.
+  </Accordion>
+</AccordionGroup>
+
+## Legal & Geoblocking
+
+<AccordionGroup>
+  <Accordion title="Terms of Service PDF upload" icon="file-text" defaultOpen>
+    In `Legal & Geoblocking`, you can upload a custom Terms of Service PDF to replace the default terms shown by the platform. Keep one current file and update it whenever your legal text changes.
+  </Accordion>
+  <Accordion title="Blocked countries" icon="shield-ban">
+    Use `Blocked countries` to select the regions where your platform should not be available. If no country is selected, the platform remains available in all regions.
   </Accordion>
 </AccordionGroup>
 
