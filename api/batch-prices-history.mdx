@@ -1,0 +1,54 @@
+---
+title: Batch Prices History
+sidebarTitle: Batch Prices History
+description: Query historical midpoint prices for up to 20 markets in one request.
+icon: chart-line
+---
+
+<Info>
+`POST /batch-prices-history` is a public CLOB endpoint. It does not require L2 authentication headers.
+</Info>
+
+## Endpoint
+
+- Base URL: `https://clob.kuest.com`
+- Method: `POST`
+- Path: `/batch-prices-history`
+
+## Request Body
+
+```json
+{
+  "markets": ["token-yes", "token-no"],
+  "start_ts": 1713870000,
+  "end_ts": 1713873600,
+  "interval": "max",
+  "fidelity": 30
+}
+```
+
+- `markets`: required array of token ids. Maximum `20`.
+- `start_ts`: unix timestamp in seconds. Required when `interval` is omitted.
+- `end_ts`: unix timestamp in seconds. Defaults to the current server time when omitted.
+- `interval`: preset window. Supported values: `1m`, `5m`, `15m`, `1h`, `6h`, `1d`, `1w`, `max`, `all`.
+- `fidelity`: bucket size in minutes for explicit timestamps. Rounded up to the nearest supported step.
+
+## Response
+
+```json
+{
+  "history": {
+    "token-yes": [
+      { "t": 1713871800, "p": 0.42 },
+      { "t": 1713873600, "p": 0.44 }
+    ],
+    "token-no": [
+      { "t": 1713871800, "p": 0.58 },
+      { "t": 1713873600, "p": 0.56 }
+    ]
+  }
+}
+```
+
+- `history` is a map from token id to its price series.
+- Each point contains `t` (unix timestamp in seconds) and `p` (midpoint price).

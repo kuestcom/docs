@@ -101,6 +101,12 @@
           },
           "configuration/custom-domain"
         ]
+      },
+      {
+        "group": "API Reference",
+        "pages": [
+          "api/batch-prices-history"
+        ]
       }
     ]
   },
