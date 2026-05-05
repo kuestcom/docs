@@ -69,6 +69,7 @@
               "manual-installation/vercel",
               "manual-installation/docker-compose",
               "manual-installation/cloud-run",
+              "manual-installation/railway",
               "manual-installation/fly-io",
               "manual-installation/digitalocean",
               "manual-installation/vps",

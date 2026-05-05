@@ -1,0 +1,48 @@
+---
+title: Railway
+description: Deploy Kuest on Railway with GitHub-based builds and an external scheduler when needed.
+icon: train-front
+---
+
+## Prerequisites
+
+- Railway account and project
+- GitHub repository with your Kuest code
+- Base values from [Environment Variables](/configuration/environment-variables)
+- A storage profile from [Manual Installation Overview](/manual-installation/overview)
+
+## Deploy flow
+
+<Steps>
+  <Step title="Create a web service">
+    In Railway, create a new service from your GitHub repository.
+  </Step>
+  <Step title="Point Railway to the config file">
+    Because `railway.json` is not at repository root, set this in Railway service settings:
+
+    - Config file path: `/infra/railway/railway.json`
+
+    With that set, Railway reads build and deploy options from the file, including:
+
+    - Builder: `DOCKERFILE`
+    - Dockerfile path: `infra/docker/Dockerfile`
+    - Pre-deploy command: `npm run db:push`
+  </Step>
+  <Step title="Set environment variables and secrets">
+    Add the shared values from [Environment Variables](/configuration/environment-variables), then set exactly one storage profile from [Manual Installation Overview](/manual-installation/overview).
+  </Step>
+  <Step title="Generate a public domain and set SITE_URL">
+    In Networking, generate or attach a domain and set `SITE_URL` to that final HTTPS URL.
+  </Step>
+  <Step title="Deploy and verify migrations">
+    Trigger a deployment and confirm the pre-deploy step runs `npm run db:push` successfully in the Railway deploy logs before opening production traffic.
+  </Step>
+</Steps>
+
+## Scheduler
+
+Railway deployment does not replace the sync scheduler requirement. If you are not using Supabase mode, configure external jobs following [Scheduled Jobs](/manual-installation/scheduler-jobs).
+
+<Tip>
+Keep the app listening on `PORT` in Railway so health checks can pass consistently.
+</Tip>
