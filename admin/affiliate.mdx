@@ -10,13 +10,19 @@ This page controls how your prediction market splits trading fees between your p
 
 <AccordionGroup>
   <Accordion title="Trading fee (%)" icon="percent" defaultOpen>
-    This is the platform fee charged on executions. The field accepts decimals such as `2.00`. In the real admin, the form enforces the current minimum onchain base fee and will not let you go below it. The visible max in the UI is `9%`.
+    These are the on-chain platform fee settings for maker and taker orders. The field accepts decimals such as `2.00`. In the real admin, the form enforces the current minimum on-chain base fee and will not let you go below it. The UI shows the effective total after adding the live Kuest fee on top of your configured platform fee. The visible max in the UI is `9%`.
   </Accordion>
   <Accordion title="Affiliate share (%)" icon="hand-coins">
-    This is not a percent of trade volume. It is the percent of your configured trading fee that gets shared with affiliates. Example input: `50` means affiliates receive half of your trading fee.
+    This is not a percent of trade volume. It is the percent of your configured trading fee that gets shared with affiliates. Example input: `50` means affiliates receive half of your configured trading fee.
+  </Accordion>
+  <Accordion title="Fee wallet receiver" icon="wallet">
+    Set the Polygon address that receives claimable fees from this page. In the usual setup, this is the admin deposit wallet. Use <strong>Use my deposit wallet</strong> to copy the admin deposit wallet into the form.
   </Accordion>
   <Accordion title="How the calculation works" icon="calculator">
-    Use this mental model: `affiliate payout = trading fee x affiliate share`. The platform keeps the remainder of that configured fee. The exchange base fee still comes out first under the hood, so do not treat the admin percentage as pure platform revenue.
+    Use this mental model: `affiliate payout = trading fee x affiliate share`. The platform keeps the remainder of that configured fee. The exchange base fee still comes out first under the hood, so do not treat the admin percentage as pure platform revenue. The fee shown in the UI is the effective maker or taker total after adding the live Kuest fee.
+  </Accordion>
+  <Accordion title="Claimable fees" icon="coins">
+    The page also shows the claim card for the configured receiver. After fees accumulate on-chain, you can withdraw the claimable balance from the same admin area.
   </Accordion>
   <Accordion title="Default example" icon="coins">
     With `2.00%` trading fee and `50%` affiliate share, a `$100` trade targets `$2.00` in platform fee. The affiliate target is `$1.00` and the platform target is `$1.00`, before the exchange base fee is applied.
