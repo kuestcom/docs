@@ -5,7 +5,7 @@ icon: timer
 ---
 
 <Info>
-If you use Supabase mode, `npm run db:push` already sets up `pg_cron` with this same schedule.
+If you use Supabase mode, `npm run db:push` already sets up `pg_cron` with this same sync schedule.
 </Info>
 
 ## What your scheduler should call
@@ -15,9 +15,12 @@ If you use Supabase mode, `npm run db:push` already sets up `pg_cron` with this 
 - Base URL: `SITE_URL`
 - Endpoints:
   - `/api/sync/events`
+  - `/api/sync/event-creations/enqueue`
   - `/api/sync/event-creations`
-  - `/api/sync/resolution`
+  - `/api/sync/translations/enqueue`
   - `/api/sync/translations`
+  - `/api/sync/resolution`
+  - `/api/sync/volume/enqueue`
   - `/api/sync/volume`
 
 Example:
@@ -33,12 +36,17 @@ curl -sS -X GET \
 | Endpoint | Cron schedule | Notes |
 | --- | --- | --- |
 | `/api/sync/events` | `2,11,20,29,38,47,56 * * * *` | Seven times per hour, spaced to reduce overlap |
-| `/api/sync/event-creations` | `0,30 * * * *` | Twice per hour |
+| `/api/sync/event-creations/enqueue` | `0,30 * * * *` | Enqueues scheduled event creations twice per hour |
+| `/api/sync/event-creations` | `1,31 * * * *` | Processes event creation jobs after enqueue runs |
+| `/api/sync/translations/enqueue` | `17 * * * *` | Enqueues translation jobs hourly |
+| `/api/sync/translations` | `18 * * * *` | Processes translation jobs after enqueue runs |
 | `/api/sync/resolution` | `5-55/10 * * * *` | Every 10 minutes, offset by 5 minutes |
-| `/api/sync/volume` | `16,46 * * * *` | Twice per hour |
-| `/api/sync/translations` | `13,37 * * * *` | Twice per hour |
+| `/api/sync/volume/enqueue` | `*/10 * * * *` | Enqueues volume sync work every 10 minutes |
+| `/api/sync/volume` | `*/5 * * * *` | Processes volume jobs every 5 minutes |
 
 Use UTC unless your team needs a strict local timezone.
+
+Supabase mode also creates `clean-cron-details` at `0 0 * * *` and `clean-jobs` at `15 * * * *` as database maintenance jobs. External schedulers should only call the HTTP sync endpoints above.
 
 ## Expected responses
 
