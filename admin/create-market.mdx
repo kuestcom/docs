@@ -20,6 +20,9 @@ In the product, this flow lives under **Admin > Events > Calendar > Create Event
   <Accordion title="Allowed creator wallet" icon="user-check">
     Your wallet must be listed in the allowed creator sources from [General](/admin/general), otherwise the flow stops in the pre-sign step.
   </Accordion>
+  <Accordion title="Resolution proposers whitelist" icon="user-check">
+    The creator wallet also needs an on-chain proposer whitelist before creating markets. This controls who can propose outcomes for that creator's markets on UMA.
+  </Accordion>
   <Accordion title="OpenRouter" icon="sparkles">
     OpenRouter is required for the content checker and for the AI rules helper.
   </Accordion>
@@ -88,10 +91,46 @@ In the product, this flow lives under **Admin > Events > Calendar > Create Event
   <Accordion title="Allowed creator wallet check" icon="user-check">
     If the wallet is missing from your allowed creator sources, the flow offers a shortcut back to fix it.
   </Accordion>
+  <Accordion title="Resolution proposers whitelist" icon="user-check">
+    The flow checks whether the connected creator wallet already has a proposer whitelist. If it does not, click **Create whitelist** and sign with the creator wallet before continuing.
+  </Accordion>
   <Accordion title="Slug, OpenRouter, and content checks" icon="shield-check">
     Before signing, the app checks slug availability, confirms OpenRouter is active, and runs the content AI checker for language, rules, and consistency issues.
   </Accordion>
 </AccordionGroup>
+
+## Resolution proposers
+
+<Warning>
+Only add wallets you trust. A proposer can submit outcomes for markets created by that creator wallet.
+</Warning>
+
+Use **Admin > Events > Calendar > Proposers** to manage the wallets allowed to propose outcomes on UMA.
+
+<Steps>
+  <Step title="Create the whitelist">
+    Select the creator wallet and click **Create whitelist** if no whitelist exists yet. This deploys the creator-owned whitelist contract.
+  </Step>
+  <Step title="Register it on-chain">
+    The creator wallet registers that whitelist in the proposer whitelist registry. Market creation checks this registry before continuing.
+  </Step>
+  <Step title="Add proposer wallets">
+    Add the trusted wallets that will propose UMA outcomes for this creator. You can add or remove proposers later; open unresolved markets use the current on-chain list.
+  </Step>
+</Steps>
+
+The modal lets you:
+
+- Select a creator wallet from the allowed market creator wallets.
+- Create the creator's on-chain whitelist if it does not exist yet.
+- Add one wallet or many wallets at once, separated by commas.
+- Remove a wallet whenever you no longer want it proposing outcomes.
+
+The whitelist is read live on-chain when a market is resolved. If you add a proposer tomorrow, that wallet can also resolve older open markets created by the same creator wallet. If you remove a proposer, that wallet loses proposer access for unresolved markets from that creator.
+
+<Info>
+Proposers still need their own funds when using UMA: USDC for bond/final fee and POL for gas. In the current setup this is usually around `$750` in USDC locked as bond/final fee, with a `$5` reward per market when the answer is accepted as correct.
+</Info>
 
 ## Step 5: Sign & Create
 
