@@ -12,6 +12,7 @@ If the `KUEST_*` credentials are missing or invalid, users can browse markets bu
 
 | Variable | Why it matters | How to obtain it |
 | --- | --- | --- |
+| `SITE_URL` | Defines the canonical public origin used for redirects, generated links, and scheduled job callbacks. | Set it to the final HTTPS URL for your deployment, such as `https://markets.example.com`. Update it after attaching a custom domain. |
 | `KUEST_ADDRESS`<br />`KUEST_API_KEY`<br />`KUEST_API_SECRET`<br />`KUEST_PASSPHRASE` | Powers proxy wallet setup and authenticated trading requests. | Generate credentials at [auth.kuest.com](https://auth.kuest.com/) by connecting your Polygon wallet. |
 | `ADMIN_WALLETS` | Grants access to the admin dashboard. | Use a comma-separated list of wallet addresses for trusted operators. |
 | `REOWN_APPKIT_PROJECT_ID` | Enables wallet logins through Reown (WalletConnect). | Copy it from the [Reown dashboard](https://dashboard.reown.com/). |
