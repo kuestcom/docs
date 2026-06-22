@@ -78,7 +78,6 @@
             ]
           },
           "configuration/environment-variables",
-          "configuration/public-api-endpoints",
           "manual-installation/scheduler-jobs"
         ]
       },
