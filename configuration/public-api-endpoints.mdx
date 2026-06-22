@@ -10,20 +10,6 @@ Use these public endpoints when wiring an external site, analytics job, or integ
 
 | API | URL |
 | --- | --- |
-| Gamma API | `https://gamma-api.kuest.com` |
 | CLOB API | `https://clob.kuest.com` |
 | Community API | `https://community.kuest.com` |
 | Data API | `https://data-api.kuest.com` |
-
-## Gamma API
-
-The Gamma API serves market discovery from synced subgraph data, current CLOB snapshots, and Community-backed comments/profiles.
-
-| Group | Endpoints |
-| --- | --- |
-| Markets | `GET /markets`, `GET /markets/{id}`, `GET /markets/slug/{slug}`, `GET /markets/{id}/description`, `GET /markets/{id}/tags` |
-| Events | `GET /events`, `GET /events/{id}`, `GET /events/slug/{slug}`, `GET /events/{id}/tags`, `GET /events/creators`, `GET /events/creators/{id}`, `GET /events/{id}/comments/count` |
-| Tags/series/sports | `GET /tags`, `GET /tags/{id}`, `GET /tags/slug/{slug}`, `GET /series`, `GET /series/{id}/comments/count`, `GET /sports`, `GET /sports/market-types`, `GET /teams` |
-| Search | `GET /public-search` |
-| Comments/profiles | `GET /comments`, `GET /comments/{id}`, `GET /comments/user_address/{user_address}`, `GET /public-profile`, `GET /profiles/user_address/{user_address}` |
-| CLOB snapshots | `GET /book`, `GET /books`, `POST /books`, `GET /price`, `GET /prices`, `POST /prices`, `GET /midpoint`, `GET /midpoints`, `POST /midpoints`, `GET /spread`, `POST /spreads`, `GET /last-trade-price`, `GET /last-trades-prices`, `POST /last-trades-prices`, `GET /fee-rate`, `GET /tick-size`, `GET /neg-risk`, `GET /clob-markets/{condition_id}`, `GET /markets-by-token/{token_id}`, `GET /simplified-markets`, `GET /sampling-markets`, `GET /sampling-simplified-markets`, `GET /prices-history`, `POST /batch-prices-history` |
