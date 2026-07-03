@@ -1,0 +1,181 @@
+---
+title: Payloads
+description: Build valid payloads for binary, multi-market, and sports event creation.
+icon: braces
+---
+
+The `payload` field sent to `POST /prepare` is a JSON string. The same exact string must be hashed before `POST /prepare-auth` and then reused in multipart form-data.
+
+```ts
+import { keccak256, stringToHex } from "viem";
+
+const payloadJson = JSON.stringify(payload);
+const payloadHash = keccak256(stringToHex(payloadJson));
+```
+
+## Common Fields
+
+| Field | Required | Notes |
+| --- | --- | --- |
+| `chainId` | No | Defaults to the worker default chain. Use a value from `supportedChainIds`. |
+| `resolutionType` | No | `dro_moov2` or `uma_moov2`. Defaults to the worker default resolution type. |
+| `creator` | Yes | EVM address that signs auth and sends every transaction. |
+| `title` | Yes | Event title. |
+| `slug` | Yes | Event slug. The worker normalizes it before deriving market slugs. |
+| `endDateIso` | Yes | Future ISO timestamp for event resolution. |
+| `mainCategorySlug` | Yes | Main category slug. Sports payloads require `sports`. |
+| `categories` | Yes | At least 5 unique categories. Use strings or `{ "label": "...", "slug": "..." }` objects. |
+| `marketMode` | Yes | `binary`, `multi_multiple`, or `multi_unique`. |
+| `resolutionSource` | No | Optional URL for the primary resolution source. |
+| `resolutionRules` | Yes | At least 60 characters. Keep rules deterministic and source-based. |
+| `sports` | No | Required for sports-specific generated markets. Sports currently uses `marketMode: "multi_multiple"`. |
+
+## Binary Event
+
+Use `marketMode: "binary"` for one Yes/No market.
+
+```json
+{
+  "chainId": 80002,
+  "resolutionType": "dro_moov2",
+  "creator": "0x1111111111111111111111111111111111111111",
+  "title": "Will BTC close above 110000 USD on March 31, 2028?",
+  "slug": "btc-above-110000-march-31-2028",
+  "endDateIso": "2028-03-31T23:00:00.000Z",
+  "mainCategorySlug": "crypto",
+  "categories": [
+    { "label": "Crypto", "slug": "crypto" },
+    { "label": "Bitcoin", "slug": "bitcoin" },
+    { "label": "Price Action", "slug": "price-action" },
+    { "label": "March", "slug": "march" },
+    { "label": "Macro", "slug": "macro" }
+  ],
+  "marketMode": "binary",
+  "binaryQuestion": "Will BTC close above 110000 USD on March 31, 2028?",
+  "binaryOutcomeYes": "Yes",
+  "binaryOutcomeNo": "No",
+  "resolutionSource": "https://www.coinbase.com/price/bitcoin",
+  "resolutionRules": "Resolve YES if the BTC/USD spot price closes strictly above 110000.00 at 23:00:00 UTC on March 31, 2028 using the listed source. Resolve NO otherwise, including if the source is unavailable and the fallback source confirms a price at or below 110000.00."
+}
+```
+
+## Multi-Market Event
+
+Use `multi_multiple` when multiple options can resolve true independently. Use `multi_unique` when exactly one option should resolve true.
+
+```json
+{
+  "chainId": 80002,
+  "resolutionType": "dro_moov2",
+  "creator": "0x1111111111111111111111111111111111111111",
+  "title": "Which companies will announce spot ETH ETF products by June 30, 2028?",
+  "slug": "spot-eth-etf-products-june-2028",
+  "endDateIso": "2028-06-30T23:59:00.000Z",
+  "mainCategorySlug": "crypto",
+  "categories": [
+    { "label": "Crypto", "slug": "crypto" },
+    { "label": "Ethereum", "slug": "ethereum" },
+    { "label": "ETF", "slug": "etf" },
+    { "label": "Finance", "slug": "finance" },
+    { "label": "Institutions", "slug": "institutions" }
+  ],
+  "marketMode": "multi_multiple",
+  "options": [
+    {
+      "id": "blackrock",
+      "question": "Will BlackRock announce a spot ETH ETF product by June 30, 2028?",
+      "title": "BlackRock",
+      "shortName": "BlackRock",
+      "slug": "blackrock"
+    },
+    {
+      "id": "fidelity",
+      "question": "Will Fidelity announce a spot ETH ETF product by June 30, 2028?",
+      "title": "Fidelity",
+      "shortName": "Fidelity",
+      "slug": "fidelity"
+    }
+  ],
+  "resolutionSource": "https://www.sec.gov/newsroom",
+  "resolutionRules": "Each option resolves YES if the named company publicly announces a spot ETH ETF product on or before June 30, 2028. Each option resolves independently. Resolve NO for any company without a qualifying public announcement by the cutoff."
+}
+```
+
+## Sports Event
+
+Sports payloads require `mainCategorySlug: "sports"` and currently require `marketMode: "multi_multiple"`. For games, send exactly one home team and one away team. If a team does not include a `logo`, upload `teamLogo:home` or `teamLogo:away` in `POST /prepare`.
+
+```json
+{
+  "chainId": 80002,
+  "resolutionType": "dro_moov2",
+  "creator": "0x1111111111111111111111111111111111111111",
+  "title": "Arsenal vs Chelsea, May 1, 2028",
+  "slug": "arsenal-chelsea-may-1-2028",
+  "endDateIso": "2028-05-01T21:00:00.000Z",
+  "mainCategorySlug": "sports",
+  "categories": [
+    { "label": "Sports", "slug": "sports" },
+    { "label": "Soccer", "slug": "soccer" },
+    { "label": "Premier League", "slug": "premier-league" },
+    { "label": "Arsenal", "slug": "arsenal" },
+    { "label": "Chelsea", "slug": "chelsea" }
+  ],
+  "marketMode": "multi_multiple",
+  "resolutionSource": "https://www.premierleague.com/results",
+  "resolutionRules": "Resolve each market using the official Premier League match result for Arsenal vs Chelsea on May 1, 2028. If the match is postponed, use the rescheduled match result. If the match is canceled without replay, resolve according to the official league ruling.",
+  "sports": {
+    "section": "games",
+    "eventVariant": "custom",
+    "sportSlug": "soccer",
+    "leagueSlug": "premier-league",
+    "eventDate": "2028-05-01",
+    "startTime": "2028-05-01T19:00:00.000Z",
+    "teams": [
+      {
+        "name": "Arsenal",
+        "abbreviation": "ARS",
+        "host_status": "home"
+      },
+      {
+        "name": "Chelsea",
+        "abbreviation": "CHE",
+        "host_status": "away"
+      }
+    ],
+    "template": {
+      "includeDraw": false,
+      "includeBothTeamsToScore": false,
+      "includeSpreads": false,
+      "includeTotals": false,
+      "spreadLines": [],
+      "totalLines": []
+    },
+    "markets": [
+      {
+        "id": "arsenal-to-win",
+        "question": "Will Arsenal beat Chelsea on May 1, 2028?",
+        "title": "Arsenal to win",
+        "shortName": "Arsenal",
+        "slug": "arsenal-to-win",
+        "outcomes": ["Yes", "No"],
+        "sportsMarketType": "moneyline",
+        "iconAssetKey": "home"
+      }
+    ]
+  }
+}
+```
+
+## Image Fields
+
+| Multipart field | Required | Notes |
+| --- | --- | --- |
+| `eventImage` | Yes | Event cover image. Accepted formats are PNG, JPG/JPEG, and WebP. |
+| `optionImage:<optionId>` | No | Image for a specific multi-market option key. |
+| `optionImages` or `optionImages[]` | No | Fallback option images matched by option order. |
+| `teamLogo:home` | Conditional | Required for sports home team if `sports.teams[].logo` is empty. |
+| `teamLogo:away` | Conditional | Required for sports away team if `sports.teams[].logo` is empty. |
+
+Images are normalized by the worker according to `imagePolicy` from `GET /market-config`.
+

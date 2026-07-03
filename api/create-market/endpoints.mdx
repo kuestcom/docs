@@ -1,0 +1,353 @@
+---
+title: Endpoints
+description: Reference for the Create Market API endpoints in the order used by automation.
+icon: route
+---
+
+All endpoints return JSON except `POST /prepare`, which receives `multipart/form-data` and returns JSON. Error responses use this shape:
+
+```json
+{
+  "error": {
+    "code": "validation_error",
+    "message": "requestId is invalid",
+    "details": null
+  }
+}
+```
+
+## 1. GET /market-config
+
+Reads runtime configuration for the worker.
+
+```bash
+curl "https://create-market.kuest.com/market-config"
+```
+
+Use this response to choose the chain, validate images, display required funding, and know which contracts the returned transaction plan will target.
+
+Important fields:
+
+| Field | Meaning |
+| --- | --- |
+| `defaultChainId` | Chain used when `payload.chainId` is omitted. |
+| `defaultResolutionType` | Default resolution stack, usually `dro_moov2`. |
+| `supportedChainIds` | Chain IDs accepted by the worker. |
+| `requiredCreatorFundingUsdc` | Minimum practical USDC funding hint for the creator. |
+| `directNormalMarketFeeUsdc` | Direct resolution fee for normal markets. |
+| `directNegRiskQuestionFeeUsdc` | Direct resolution fee per negative-risk question. |
+| `imagePolicy` | Upload and normalized image limits. |
+| `chains` | Per-chain contract addresses and resolution stacks. |
+
+## 2. POST /prepare-auth
+
+Creates a short-lived EIP-712 challenge for the exact payload hash.
+
+```json
+{
+  "creator": "0x1111111111111111111111111111111111111111",
+  "chainId": 80002,
+  "payloadHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}
+```
+
+Response:
+
+```json
+{
+  "requestId": "8b583ebd-1f8f-46fa-b31b-06643f58d457",
+  "nonce": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "expiresAt": 1846000000000,
+  "creator": "0x1111111111111111111111111111111111111111",
+  "chainId": 80002,
+  "payloadHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "domain": {
+    "name": "Create Market",
+    "version": "1",
+    "verifyingContract": "0x0000000000000000000000000000000000000000"
+  },
+  "primaryType": "CreateMarketAuth",
+  "types": {
+    "CreateMarketAuth": [
+      { "name": "requestId", "type": "string" },
+      { "name": "creator", "type": "address" },
+      { "name": "payloadHash", "type": "bytes32" },
+      { "name": "nonce", "type": "bytes32" },
+      { "name": "expiresAt", "type": "uint256" },
+      { "name": "chainId", "type": "uint256" }
+    ]
+  }
+}
+```
+
+When signing, include `chainId` in the EIP-712 domain:
+
+```ts
+const signature = await walletClient.signTypedData({
+  account,
+  domain: {
+    ...auth.domain,
+    chainId: auth.chainId
+  },
+  types: auth.types,
+  primaryType: "CreateMarketAuth",
+  message: {
+    requestId: auth.requestId,
+    creator: auth.creator,
+    payloadHash: auth.payloadHash,
+    nonce: auth.nonce,
+    expiresAt: BigInt(auth.expiresAt),
+    chainId: BigInt(auth.chainId)
+  }
+});
+```
+
+## 3. POST /prepare
+
+Validates the signed payload, processes images, uploads draft metadata to Irys, checks for existing initialized questions, and starts background preparation.
+
+Required multipart fields:
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `payload` | string | Exact JSON string used to compute `payloadHash`. |
+| `auth` | string | JSON string with `requestId`, `nonce`, `expiresAt`, `payloadHash`, and `signature`. |
+| `eventImage` | file | Required event image. |
+| `optionImage:<optionId>` | file | Optional keyed option image. |
+| `optionImages[]` | file | Optional fallback option images by order. |
+| `teamLogo:home` / `teamLogo:away` | file | Required for sports teams that do not include `logo` in the payload. |
+
+```bash
+curl -X POST "https://create-market.kuest.com/prepare" \
+  -F 'payload={"chainId":80002,"creator":"0x1111111111111111111111111111111111111111","title":"Will BTC close above 110000 USD on March 31, 2028?","slug":"btc-above-110000-march-31-2028","endDateIso":"2028-03-31T23:00:00.000Z","mainCategorySlug":"crypto","categories":["crypto","bitcoin","price-action","march","macro"],"marketMode":"binary","binaryQuestion":"Will BTC close above 110000 USD on March 31, 2028?","binaryOutcomeYes":"Yes","binaryOutcomeNo":"No","resolutionRules":"Resolve YES if BTC/USD closes strictly above 110000.00 at the cutoff using the listed source. Resolve NO otherwise."}' \
+  -F 'auth={"requestId":"8b583ebd-1f8f-46fa-b31b-06643f58d457","nonce":"0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","expiresAt":1846000000000,"payloadHash":"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","signature":"0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}' \
+  -F "eventImage=@./event.webp"
+```
+
+Accepted response:
+
+```json
+{
+  "requestId": "8b583ebd-1f8f-46fa-b31b-06643f58d457",
+  "chainId": 80002,
+  "creator": "0x1111111111111111111111111111111111111111",
+  "status": "prepare_in_progress"
+}
+```
+
+After this response, poll `GET /pending` until `request.prepared.txPlan` is available.
+
+## 4. GET /pending
+
+Returns a resumable request by `requestId` or the latest resumable request for a creator.
+
+```bash
+curl "https://create-market.kuest.com/pending?requestId=8b583ebd-1f8f-46fa-b31b-06643f58d457&creator=0x1111111111111111111111111111111111111111&chainId=80002"
+```
+
+Query parameters:
+
+| Parameter | Required | Notes |
+| --- | --- | --- |
+| `requestId` | No | Recommended once you have it. |
+| `creator` | No | Required if `requestId` is omitted. When both are sent, the request must belong to this creator. |
+| `chainId` | No | Optional filter. |
+
+Prepared response shape:
+
+```json
+{
+  "request": {
+    "requestId": "8b583ebd-1f8f-46fa-b31b-06643f58d457",
+    "payloadHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "status": "prepared",
+    "creator": "0x1111111111111111111111111111111111111111",
+    "chainId": 80002,
+    "expiresAt": 1846000000000,
+    "updatedAt": 1845999000000,
+    "errorMessage": null,
+    "prepared": {
+      "requestId": "8b583ebd-1f8f-46fa-b31b-06643f58d457",
+      "chainId": 80002,
+      "creator": "0x1111111111111111111111111111111111111111",
+      "txPlan": [
+        {
+          "id": "approve-direct-resolution-fee",
+          "to": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
+          "value": "0",
+          "data": "0x095ea7b3...",
+          "description": "Approve 5 USDC for direct resolution fees"
+        },
+        {
+          "id": "initialize-market-1",
+          "to": "0x53C979C9818fC24d1fc5FFc3618bd289a8b10111",
+          "value": "0",
+          "data": "0x1f7a6ad6...",
+          "description": "Initialize market \"Will BTC close above 110000 USD on March 31, 2028?\"",
+          "marketKey": "binary"
+        }
+      ]
+    },
+    "txs": [],
+    "registerResults": [],
+    "metadataUpdates": [],
+    "metadataUpdateTxPlan": []
+  }
+}
+```
+
+Send each `txPlan` item from the creator wallet:
+
+```ts
+const hash = await walletClient.sendTransaction({
+  account: creatorAccount,
+  to: tx.to,
+  value: BigInt(tx.value),
+  data: tx.data
+});
+```
+
+## 5. POST /tx-confirm
+
+Persists transaction hashes so the flow can resume. This endpoint checks that transaction IDs belong to the saved plan. Final validation of sender, target, calldata, value, and receipt happens during `POST /finalize`.
+
+```json
+{
+  "requestId": "8b583ebd-1f8f-46fa-b31b-06643f58d457",
+  "creator": "0x1111111111111111111111111111111111111111",
+  "txs": [
+    {
+      "id": "approve-direct-resolution-fee",
+      "hash": "0xdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    },
+    {
+      "id": "initialize-market-1",
+      "hash": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    }
+  ]
+}
+```
+
+Response:
+
+```json
+{
+  "requestId": "8b583ebd-1f8f-46fa-b31b-06643f58d457",
+  "status": "prepared",
+  "confirmedTxs": [
+    {
+      "id": "approve-direct-resolution-fee",
+      "hash": "0xdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    },
+    {
+      "id": "initialize-market-1",
+      "hash": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    }
+  ]
+}
+```
+
+## 6. POST /finalize
+
+Starts or resumes finalization. Send all hashes you have, including hashes already confirmed through `POST /tx-confirm`.
+
+```json
+{
+  "requestId": "8b583ebd-1f8f-46fa-b31b-06643f58d457",
+  "creator": "0x1111111111111111111111111111111111111111",
+  "txs": [
+    {
+      "id": "approve-direct-resolution-fee",
+      "hash": "0xdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    },
+    {
+      "id": "initialize-market-1",
+      "hash": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    }
+  ]
+}
+```
+
+Possible responses:
+
+```json
+{
+  "requestId": "8b583ebd-1f8f-46fa-b31b-06643f58d457",
+  "status": "finalize_in_progress"
+}
+```
+
+```json
+{
+  "requestId": "8b583ebd-1f8f-46fa-b31b-06643f58d457",
+  "status": "metadata_update_pending",
+  "creatorTxCount": 2,
+  "registerResults": [
+    {
+      "key": "binary",
+      "conditionId": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "exchange": "0xaCd95F4F42322c7bE215C170362EEc57Ef4E78c2",
+      "tokenA": "78849133110239156497695610160414324368604052631638211845571054319779561887178",
+      "tokenB": "74971562590235665669963598240180085947836206808199917948309517561307482247352",
+      "alreadyRegistered": true,
+      "txHash": null
+    }
+  ],
+  "metadataUpdates": [
+    {
+      "key": "binary",
+      "conditionId": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "metadataTxId": "7N8t5fb6X9uP2zv4rYjYkJ8V8EuCthXtp",
+      "metadataUri": "irys://7N8t5fb6X9uP2zv4rYjYkJ8V8EuCthXtp",
+      "updateTxHash": null
+    }
+  ],
+  "metadataUpdateTxPlan": [
+    {
+      "id": "update-metadata-1",
+      "to": "0x4682048725865bf17067bd85fF518527A262A9C7",
+      "value": "0",
+      "data": "0x...",
+      "description": "Start market btc-above-110000-march-31-2028",
+      "marketKey": "binary"
+    }
+  ]
+}
+```
+
+When the status is `metadata_update_pending`, execute every item in `metadataUpdateTxPlan`, call `POST /tx-confirm` with the new hashes, then call `POST /finalize` again.
+
+Final response:
+
+```json
+{
+  "requestId": "8b583ebd-1f8f-46fa-b31b-06643f58d457",
+  "status": "finalized",
+  "creatorTxCount": 3,
+  "registerResults": [
+    {
+      "key": "binary",
+      "conditionId": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "exchange": "0xaCd95F4F42322c7bE215C170362EEc57Ef4E78c2",
+      "tokenA": "78849133110239156497695610160414324368604052631638211845571054319779561887178",
+      "tokenB": "74971562590235665669963598240180085947836206808199917948309517561307482247352",
+      "alreadyRegistered": true,
+      "txHash": null
+    }
+  ],
+  "metadataUpdates": [
+    {
+      "key": "binary",
+      "conditionId": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "metadataTxId": "7N8t5fb6X9uP2zv4rYjYkJ8V8EuCthXtp",
+      "metadataUri": "irys://7N8t5fb6X9uP2zv4rYjYkJ8V8EuCthXtp",
+      "updateTxHash": "0x9999999999999999999999999999999999999999999999999999999999999999"
+    }
+  ]
+}
+```
+
+## Optional Health Check
+
+`GET /` returns `"OK"` when the worker is reachable.
+

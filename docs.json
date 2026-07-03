@@ -102,6 +102,14 @@
           },
           "configuration/custom-domain"
         ]
+      },
+      {
+        "group": "Create Market API",
+        "pages": [
+          "api/create-market/overview",
+          "api/create-market/payloads",
+          "api/create-market/endpoints"
+        ]
       }
     ]
   },

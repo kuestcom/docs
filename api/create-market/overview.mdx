@@ -1,0 +1,95 @@
+---
+title: Create Market API
+description: Automate event and market creation through the create-market worker.
+icon: workflow
+---
+
+Use the Create Market API when you want to create events and markets outside the admin UI. The API prepares metadata, images, on-chain calldata, and final registration, while your integration signs and sends the wallet transactions from the creator EOA.
+
+<Info>
+Production base URL: `https://create-market.kuest.com`. Self-hosted deployments can point the app to another worker with `CREATE_MARKET_URL`.
+</Info>
+
+## Prerequisites
+
+<AccordionGroup>
+  <Accordion title="Creator EOA" icon="wallet" defaultOpen>
+    The same EOA address must be used in the payload, EIP-712 signature, transaction sender, and finalize calls.
+  </Accordion>
+  <Accordion title="Creator policy and proposer whitelist" icon="user-check">
+    The prediction-market admin and scheduler can enforce your allowed creator policy before calling this API. The create-market worker itself requires the creator to have an on-chain proposer whitelist registered before preparation can complete.
+  </Accordion>
+  <Accordion title="Funding" icon="coins">
+    The creator needs POL for gas and the required USDC funding shown by `GET /market-config`. The transaction plan may include USDC approvals and fee or reward payments.
+  </Accordion>
+  <Accordion title="Images" icon="image">
+    `POST /prepare` requires an event image. Optional option images and sports team logos can also be uploaded in the same multipart request.
+  </Accordion>
+</AccordionGroup>
+
+## Creation Sequence
+
+<Steps>
+  <Step title="Fetch runtime config">
+    Call `GET /market-config` to read the default chain, supported chains, contract addresses, funding requirements, and image limits.
+  </Step>
+  <Step title="Build the prepare payload">
+    Create the JSON payload for the event and markets. Serialize it once, then compute `payloadHash = keccak256(stringToHex(payloadJson))`.
+  </Step>
+  <Step title="Request an auth challenge">
+    Call `POST /prepare-auth` with `creator`, `chainId`, and `payloadHash`.
+  </Step>
+  <Step title="Sign EIP-712">
+    Sign the returned challenge from the creator EOA. The signed message binds `requestId`, `creator`, `payloadHash`, `nonce`, `expiresAt`, and `chainId`.
+  </Step>
+  <Step title="Prepare the request">
+    Call `POST /prepare` as `multipart/form-data` with the exact `payloadJson`, the signed auth envelope, and image files. The API returns `prepare_in_progress`.
+  </Step>
+  <Step title="Poll until prepared">
+    Call `GET /pending?requestId=...&creator=...&chainId=...` until `request.prepared.txPlan` is present.
+  </Step>
+  <Step title="Execute the transaction plan">
+    Send every item in `txPlan` from the creator wallet using the returned `to`, `value`, and `data`.
+  </Step>
+  <Step title="Persist transaction hashes">
+    Call `POST /tx-confirm` after each transaction or once with the full list. This makes the flow resumable.
+  </Step>
+  <Step title="Finalize">
+    Call `POST /finalize` with the confirmed hashes. If the response is `metadata_update_pending`, execute `metadataUpdateTxPlan`, confirm those hashes, and call `POST /finalize` again.
+  </Step>
+</Steps>
+
+## Request Statuses
+
+| Status | Meaning | Next action |
+| --- | --- | --- |
+| `auth_pending` | Challenge exists but `POST /prepare` has not accepted it yet. | Submit the signed multipart prepare request. |
+| `prepare_running` | Images and metadata are being processed. | Poll `GET /pending`. |
+| `prepared` | `txPlan` is ready. | Send creator transactions, confirm hashes, then finalize. |
+| `finalize_running` | Registration and final metadata are being processed. | Poll `GET /pending` or retry `POST /finalize`. |
+| `metadata_update_pending` | Final metadata exists, but metadata update transactions still need to be signed. | Execute `metadataUpdateTxPlan`, confirm hashes, finalize again. |
+| `finalized` | Markets are registered and final metadata is attached. | Store `registerResults` and `metadataUpdates`. |
+| `failed` | The worker stored an error. | Read `errorMessage`, fix the input or funding issue, and start a new request if needed. |
+
+## Security Model
+
+<AccordionGroup>
+  <Accordion title="Preparation requires creator consent" icon="file-signature" defaultOpen>
+    `POST /prepare` only accepts a challenge signed by the creator EOA. The signature expires after 30 minutes and is bound to the exact payload hash.
+  </Accordion>
+  <Accordion title="Allowed creator policy lives outside this worker" icon="shield">
+    The worker validates creator signatures and on-chain proposer whitelist state. If you expose direct automation to third parties, enforce any site-specific allowed creator policy in your integration layer before calling `POST /prepare-auth` and `POST /prepare`.
+  </Accordion>
+  <Accordion title="Finalization validates on-chain transactions" icon="shield-check">
+    `POST /finalize` validates submitted hashes against the saved transaction plan. It checks transaction sender, target, calldata, value, and successful receipt before advancing.
+  </Accordion>
+  <Accordion title="Status is resumable, not private data" icon="history">
+    `GET /pending` can return operational details for a known `requestId` or creator address, including transaction plan, hashes, status, and error messages. Treat request IDs as operational identifiers and avoid posting them publicly.
+  </Accordion>
+  <Accordion title="Rate-limit public entry points" icon="traffic-cone">
+    `POST /prepare-auth` creates resumable request rows, and `POST /prepare` processes uploads. Public deployments should configure allowed origins and edge rate limits according to the audience they intend to support.
+  </Accordion>
+  <Accordion title="Use server-side automation for private keys" icon="server">
+    Scheduled or recurring automation should sign from a server-side wallet store. Never expose private keys in browser code or public environment variables.
+  </Accordion>
+</AccordionGroup>
