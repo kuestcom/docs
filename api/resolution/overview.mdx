@@ -1,0 +1,846 @@
+---
+title: DRO Resolution API
+description: Resolve DRO markets through the on-chain direct resolution contracts.
+icon: square-check-big
+---
+
+The DRO Resolution API is an on-chain contract API. There is no public REST endpoint that submits a final result. A proposer wallet reads the DRO adapter request, signs a transaction with its private key, and calls the Direct Resolution Oracle contract.
+
+<Warning>
+DRO resolution is final for approved proposers. Always verify the market rules and the listed resolution source before signing.
+</Warning>
+
+## When to use DRO
+
+A market is a DRO market when its metadata has `resolution_type: "dro_moov2"` or when its resolver/oracle address is one of the configured DRO contracts.
+
+| Contract | Address |
+| --- | --- |
+| Direct Resolution Oracle | `0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c` |
+| Standard DRO CTF Adapter | `0x53C979C9818fC24d1fc5FFc3618bd289a8b10111` |
+| Neg-risk DRO CTF Adapter | `0x54e82621460F19a5eFe49f0562A8F16D107F767a` |
+| Neg-risk Operator | `0xe13B5F29dCF6Ee81C659D839de30047F65541036` |
+
+## Required inputs
+
+| Input | Standard DRO | Neg-risk DRO |
+| --- | --- | --- |
+| `adapterAddress` | `metadata.resolution_adapter_address`, then `condition.oracle`, then standard adapter fallback. | `metadata.resolution_adapter_address`, then `condition.oracle`, then neg-risk adapter fallback. |
+| `adapterQuestionId` | `market.question_id` | `market.neg_risk_request_id` |
+| `negRiskOperatorQuestionId` | Not used | `market.question_id` |
+| `creator` | `event.creator` | `event.creator` |
+| `outcome` | `yes`, `no`, or `unknown` | `yes` or `no` |
+
+The proposer wallet must be listed in the creator's proposer whitelist. The platform checks that by reading:
+
+1. `CreatorProposerWhitelistRegistry.whitelistOf(creator)`
+2. `CreatorProposerWhitelist.getProposers()`
+
+## Outcome prices
+
+| Outcome | `proposedPrice` |
+| --- | --- |
+| `yes` | `1000000000000000000` |
+| `no` | `0` |
+| `unknown` | `500000000000000000` |
+
+`unknown` is only supported for standard DRO markets. Do not use it for neg-risk markets.
+
+## Resolution flow
+
+<Steps>
+  <Step title="Check proposer permission">
+    Read the creator's proposer whitelist and confirm the signer wallet is listed.
+  </Step>
+  <Step title="Read the adapter request">
+    Call `adapter.getQuestion(adapterQuestionId)` and use the returned `requestTimestamp` and `ancillaryData`.
+  </Step>
+  <Step title="Confirm request state">
+    Stop if `requestTimestamp` is `0`, `ancillaryData` is empty, or `resolved` is already true.
+  </Step>
+  <Step title="Submit the final result">
+    Call `proposeAndResolve` for standard DRO or `proposeAndResolveNegRisk` for neg-risk DRO.
+  </Step>
+  <Step title="Wait for sync">
+    After the transaction confirms, the protected resolution sync job reads the resolution subgraph and updates market status, outcome payouts, caches, and event state.
+  </Step>
+</Steps>
+
+## Contract calls
+
+Standard DRO:
+
+```text
+DirectResolutionOracle.proposeAndResolve(
+  adapterAddress,
+  adapterQuestionId,
+  YES_OR_NO_IDENTIFIER,
+  requestTimestamp,
+  ancillaryData,
+  proposedPrice
+)
+```
+
+Neg-risk DRO:
+
+```text
+DirectResolutionOracle.proposeAndResolveNegRisk(
+  adapterAddress,
+  negRiskOperatorAddress,
+  adapterQuestionId,
+  negRiskOperatorQuestionId,
+  YES_OR_NO_IDENTIFIER,
+  requestTimestamp,
+  ancillaryData,
+  proposedPrice
+)
+```
+
+`YES_OR_NO_IDENTIFIER` is:
+
+```text
+0x5945535f4f525f4e4f5f51554552590000000000000000000000000000000000
+```
+
+## Complete Scripts
+
+Each script uses the same environment variables:
+
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `PRIVATE_KEY` | Yes | Proposer wallet private key. Keep it server-side only. |
+| `RPC_URL` | Yes | Polygon or Amoy RPC URL for the target deployment. |
+| `ADAPTER_ADDRESS` | Yes | DRO adapter address for this market. |
+| `QUESTION_ID` | Yes | Standard market `question_id`, or neg-risk `neg_risk_request_id`. |
+| `OUTCOME` | Yes | `yes`, `no`, or `unknown`. |
+| `NEG_RISK` | No | Set to `true` for neg-risk markets. |
+| `NEG_RISK_OPERATOR_QUESTION_ID` | Conditional | Required when `NEG_RISK=true`; use `market.question_id`. |
+| `CHAIN_ID` | No | Used by the TypeScript script. Defaults to `80002`. |
+| `DRO_ORACLE_ADDRESS` | No | Defaults to `0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c`. |
+| `NEG_RISK_OPERATOR_ADDRESS` | No | Defaults to `0xe13B5F29dCF6Ee81C659D839de30047F65541036`. |
+
+<CodeGroup>
+
+```ts TypeScript
+// npm install viem
+import { privateKeyToAccount } from "viem/accounts";
+import { createPublicClient, createWalletClient, defineChain, http, parseAbi } from "viem";
+
+const DRO_ORACLE_ADDRESS = (process.env.DRO_ORACLE_ADDRESS ??
+  "0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c") as `0x${string}`;
+const NEG_RISK_OPERATOR_ADDRESS = (process.env.NEG_RISK_OPERATOR_ADDRESS ??
+  "0xe13B5F29dCF6Ee81C659D839de30047F65541036") as `0x${string}`;
+const YES_OR_NO_IDENTIFIER =
+  "0x5945535f4f525f4e4f5f51554552590000000000000000000000000000000000" as `0x${string}`;
+
+const adapterAddress = process.env.ADAPTER_ADDRESS as `0x${string}`;
+const questionId = process.env.QUESTION_ID as `0x${string}`;
+const negRiskOperatorQuestionId = process.env.NEG_RISK_OPERATOR_QUESTION_ID as `0x${string}` | undefined;
+const isNegRisk = process.env.NEG_RISK === "true";
+const outcome = (process.env.OUTCOME ?? "").toLowerCase();
+const rpcUrl = process.env.RPC_URL!;
+const chainId = Number(process.env.CHAIN_ID ?? 80002);
+
+if (!process.env.PRIVATE_KEY || !process.env.RPC_URL || !adapterAddress || !questionId) {
+  throw new Error("Missing PRIVATE_KEY, RPC_URL, ADAPTER_ADDRESS, or QUESTION_ID.");
+}
+if (isNegRisk && !negRiskOperatorQuestionId) {
+  throw new Error("NEG_RISK_OPERATOR_QUESTION_ID is required when NEG_RISK=true.");
+}
+if (isNegRisk && outcome === "unknown") {
+  throw new Error("Unknown outcome is not supported for neg-risk markets.");
+}
+
+function proposedPrice(value: string) {
+  if (value === "yes") return 1_000_000_000_000_000_000n;
+  if (value === "no") return 0n;
+  if (value === "unknown") return 500_000_000_000_000_000n;
+  throw new Error('OUTCOME must be "yes", "no", or "unknown".');
+}
+
+const adapterAbi = parseAbi([
+  "function getQuestion(bytes32 questionID) view returns ((uint256 requestTimestamp,uint256 reward,uint256 proposalBond,uint256 liveness,uint256 manualResolutionTimestamp,bool resolved,bool paused,bool reset,bool refund,address rewardToken,address creator,bytes ancillaryData) question)",
+]);
+const oracleAbi = parseAbi([
+  "function proposeAndResolve(address adapter,bytes32 questionId,bytes32 identifier,uint256 timestamp,bytes ancillaryData,int256 proposedPrice) returns (uint256 totalBond)",
+  "function proposeAndResolveNegRisk(address adapter,address negRiskOperator,bytes32 adapterQuestionId,bytes32 negRiskOperatorQuestionId,bytes32 identifier,uint256 timestamp,bytes ancillaryData,int256 proposedPrice) returns (uint256 totalBond)",
+]);
+
+const chain = defineChain({
+  id: chainId,
+  name: `chain-${chainId}`,
+  nativeCurrency: { name: "POL", symbol: "POL", decimals: 18 },
+  rpcUrls: { default: { http: [rpcUrl] } },
+});
+const account = privateKeyToAccount(process.env.PRIVATE_KEY as `0x${string}`);
+const publicClient = createPublicClient({ chain, transport: http(rpcUrl) });
+const walletClient = createWalletClient({ account, chain, transport: http(rpcUrl) });
+
+const question = await publicClient.readContract({
+  address: adapterAddress,
+  abi: adapterAbi,
+  functionName: "getQuestion",
+  args: [questionId],
+});
+
+if (question.requestTimestamp === 0n || question.ancillaryData === "0x") {
+  throw new Error("This market is not ready for DRO resolution.");
+}
+if (question.resolved) {
+  throw new Error("This market is already resolved.");
+}
+
+const hash = isNegRisk
+  ? await walletClient.writeContract({
+      address: DRO_ORACLE_ADDRESS,
+      abi: oracleAbi,
+      functionName: "proposeAndResolveNegRisk",
+      args: [
+        adapterAddress,
+        NEG_RISK_OPERATOR_ADDRESS,
+        questionId,
+        negRiskOperatorQuestionId!,
+        YES_OR_NO_IDENTIFIER,
+        question.requestTimestamp,
+        question.ancillaryData,
+        proposedPrice(outcome),
+      ],
+    })
+  : await walletClient.writeContract({
+      address: DRO_ORACLE_ADDRESS,
+      abi: oracleAbi,
+      functionName: "proposeAndResolve",
+      args: [
+        adapterAddress,
+        questionId,
+        YES_OR_NO_IDENTIFIER,
+        question.requestTimestamp,
+        question.ancillaryData,
+        proposedPrice(outcome),
+      ],
+    });
+
+console.log(`Submitted: ${hash}`);
+await publicClient.waitForTransactionReceipt({ hash });
+console.log("Confirmed.");
+```
+
+```js JavaScript
+// npm install ethers
+import { Contract, Wallet, JsonRpcProvider, encodeBytes32String } from "ethers";
+
+const DRO_ORACLE_ADDRESS = process.env.DRO_ORACLE_ADDRESS ??
+  "0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c";
+const NEG_RISK_OPERATOR_ADDRESS = process.env.NEG_RISK_OPERATOR_ADDRESS ??
+  "0xe13B5F29dCF6Ee81C659D839de30047F65541036";
+const YES_OR_NO_IDENTIFIER = encodeBytes32String("YES_OR_NO_QUERY");
+
+const adapterAddress = process.env.ADAPTER_ADDRESS;
+const questionId = process.env.QUESTION_ID;
+const negRiskOperatorQuestionId = process.env.NEG_RISK_OPERATOR_QUESTION_ID;
+const isNegRisk = process.env.NEG_RISK === "true";
+const outcome = (process.env.OUTCOME ?? "").toLowerCase();
+
+if (!process.env.PRIVATE_KEY || !process.env.RPC_URL || !adapterAddress || !questionId) {
+  throw new Error("Missing PRIVATE_KEY, RPC_URL, ADAPTER_ADDRESS, or QUESTION_ID.");
+}
+if (isNegRisk && !negRiskOperatorQuestionId) {
+  throw new Error("NEG_RISK_OPERATOR_QUESTION_ID is required when NEG_RISK=true.");
+}
+if (isNegRisk && outcome === "unknown") {
+  throw new Error("Unknown outcome is not supported for neg-risk markets.");
+}
+
+function proposedPrice(value) {
+  if (value === "yes") return 1000000000000000000n;
+  if (value === "no") return 0n;
+  if (value === "unknown") return 500000000000000000n;
+  throw new Error('OUTCOME must be "yes", "no", or "unknown".');
+}
+
+const adapterAbi = [
+  "function getQuestion(bytes32 questionID) view returns (tuple(uint256 requestTimestamp,uint256 reward,uint256 proposalBond,uint256 liveness,uint256 manualResolutionTimestamp,bool resolved,bool paused,bool reset,bool refund,address rewardToken,address creator,bytes ancillaryData) question)",
+];
+const oracleAbi = [
+  "function proposeAndResolve(address adapter,bytes32 questionId,bytes32 identifier,uint256 timestamp,bytes ancillaryData,int256 proposedPrice) returns (uint256 totalBond)",
+  "function proposeAndResolveNegRisk(address adapter,address negRiskOperator,bytes32 adapterQuestionId,bytes32 negRiskOperatorQuestionId,bytes32 identifier,uint256 timestamp,bytes ancillaryData,int256 proposedPrice) returns (uint256 totalBond)",
+];
+
+const provider = new JsonRpcProvider(process.env.RPC_URL);
+const wallet = new Wallet(process.env.PRIVATE_KEY, provider);
+const adapter = new Contract(adapterAddress, adapterAbi, provider);
+const oracle = new Contract(DRO_ORACLE_ADDRESS, oracleAbi, wallet);
+
+const question = await adapter.getQuestion(questionId);
+if (question.requestTimestamp === 0n || question.ancillaryData === "0x") {
+  throw new Error("This market is not ready for DRO resolution.");
+}
+if (question.resolved) {
+  throw new Error("This market is already resolved.");
+}
+
+const tx = isNegRisk
+  ? await oracle.proposeAndResolveNegRisk(
+      adapterAddress,
+      NEG_RISK_OPERATOR_ADDRESS,
+      questionId,
+      negRiskOperatorQuestionId,
+      YES_OR_NO_IDENTIFIER,
+      question.requestTimestamp,
+      question.ancillaryData,
+      proposedPrice(outcome),
+    )
+  : await oracle.proposeAndResolve(
+      adapterAddress,
+      questionId,
+      YES_OR_NO_IDENTIFIER,
+      question.requestTimestamp,
+      question.ancillaryData,
+      proposedPrice(outcome),
+    );
+
+console.log(`Submitted: ${tx.hash}`);
+await tx.wait();
+console.log("Confirmed.");
+```
+
+```python Python
+# pip install web3
+import os
+from web3 import Web3
+
+DRO_ORACLE_ADDRESS = os.getenv("DRO_ORACLE_ADDRESS", "0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c")
+NEG_RISK_OPERATOR_ADDRESS = os.getenv("NEG_RISK_OPERATOR_ADDRESS", "0xe13B5F29dCF6Ee81C659D839de30047F65541036")
+YES_OR_NO_IDENTIFIER = Web3.to_bytes(text="YES_OR_NO_QUERY").ljust(32, b"\x00")
+
+PRIVATE_KEY = os.getenv("PRIVATE_KEY")
+RPC_URL = os.getenv("RPC_URL")
+ADAPTER_ADDRESS = os.getenv("ADAPTER_ADDRESS")
+QUESTION_ID = os.getenv("QUESTION_ID")
+NEG_RISK_OPERATOR_QUESTION_ID = os.getenv("NEG_RISK_OPERATOR_QUESTION_ID")
+IS_NEG_RISK = os.getenv("NEG_RISK") == "true"
+OUTCOME = (os.getenv("OUTCOME") or "").lower()
+
+if not PRIVATE_KEY or not RPC_URL or not ADAPTER_ADDRESS or not QUESTION_ID:
+    raise SystemExit("Missing PRIVATE_KEY, RPC_URL, ADAPTER_ADDRESS, or QUESTION_ID.")
+if IS_NEG_RISK and not NEG_RISK_OPERATOR_QUESTION_ID:
+    raise SystemExit("NEG_RISK_OPERATOR_QUESTION_ID is required when NEG_RISK=true.")
+if IS_NEG_RISK and OUTCOME == "unknown":
+    raise SystemExit("Unknown outcome is not supported for neg-risk markets.")
+
+def proposed_price(value):
+    if value == "yes":
+        return 10**18
+    if value == "no":
+        return 0
+    if value == "unknown":
+        return 5 * 10**17
+    raise ValueError('OUTCOME must be "yes", "no", or "unknown".')
+
+adapter_abi = [{
+    "type": "function",
+    "name": "getQuestion",
+    "stateMutability": "view",
+    "inputs": [{"name": "questionID", "type": "bytes32"}],
+    "outputs": [{"name": "question", "type": "tuple", "components": [
+        {"name": "requestTimestamp", "type": "uint256"},
+        {"name": "reward", "type": "uint256"},
+        {"name": "proposalBond", "type": "uint256"},
+        {"name": "liveness", "type": "uint256"},
+        {"name": "manualResolutionTimestamp", "type": "uint256"},
+        {"name": "resolved", "type": "bool"},
+        {"name": "paused", "type": "bool"},
+        {"name": "reset", "type": "bool"},
+        {"name": "refund", "type": "bool"},
+        {"name": "rewardToken", "type": "address"},
+        {"name": "creator", "type": "address"},
+        {"name": "ancillaryData", "type": "bytes"},
+    ]}],
+}]
+oracle_abi = [
+    {
+        "type": "function",
+        "name": "proposeAndResolve",
+        "stateMutability": "nonpayable",
+        "inputs": [
+            {"name": "adapter", "type": "address"},
+            {"name": "questionId", "type": "bytes32"},
+            {"name": "identifier", "type": "bytes32"},
+            {"name": "timestamp", "type": "uint256"},
+            {"name": "ancillaryData", "type": "bytes"},
+            {"name": "proposedPrice", "type": "int256"},
+        ],
+        "outputs": [{"name": "totalBond", "type": "uint256"}],
+    },
+    {
+        "type": "function",
+        "name": "proposeAndResolveNegRisk",
+        "stateMutability": "nonpayable",
+        "inputs": [
+            {"name": "adapter", "type": "address"},
+            {"name": "negRiskOperator", "type": "address"},
+            {"name": "adapterQuestionId", "type": "bytes32"},
+            {"name": "negRiskOperatorQuestionId", "type": "bytes32"},
+            {"name": "identifier", "type": "bytes32"},
+            {"name": "timestamp", "type": "uint256"},
+            {"name": "ancillaryData", "type": "bytes"},
+            {"name": "proposedPrice", "type": "int256"},
+        ],
+        "outputs": [{"name": "totalBond", "type": "uint256"}],
+    },
+]
+
+w3 = Web3(Web3.HTTPProvider(RPC_URL))
+account = w3.eth.account.from_key(PRIVATE_KEY)
+adapter = w3.eth.contract(address=w3.to_checksum_address(ADAPTER_ADDRESS), abi=adapter_abi)
+oracle = w3.eth.contract(address=w3.to_checksum_address(DRO_ORACLE_ADDRESS), abi=oracle_abi)
+
+question = adapter.functions.getQuestion(QUESTION_ID).call()
+request_timestamp = question[0]
+resolved = question[5]
+ancillary_data = question[11]
+
+if request_timestamp == 0 or ancillary_data in (b"", "0x"):
+    raise SystemExit("This market is not ready for DRO resolution.")
+if resolved:
+    raise SystemExit("This market is already resolved.")
+
+function = (
+    oracle.functions.proposeAndResolveNegRisk(
+        w3.to_checksum_address(ADAPTER_ADDRESS),
+        w3.to_checksum_address(NEG_RISK_OPERATOR_ADDRESS),
+        QUESTION_ID,
+        NEG_RISK_OPERATOR_QUESTION_ID,
+        YES_OR_NO_IDENTIFIER,
+        request_timestamp,
+        ancillary_data,
+        proposed_price(OUTCOME),
+    )
+    if IS_NEG_RISK else
+    oracle.functions.proposeAndResolve(
+        w3.to_checksum_address(ADAPTER_ADDRESS),
+        QUESTION_ID,
+        YES_OR_NO_IDENTIFIER,
+        request_timestamp,
+        ancillary_data,
+        proposed_price(OUTCOME),
+    )
+)
+
+tx = function.build_transaction({
+    "from": account.address,
+    "nonce": w3.eth.get_transaction_count(account.address),
+    "chainId": w3.eth.chain_id,
+    "gasPrice": w3.eth.gas_price,
+})
+tx["gas"] = int(w3.eth.estimate_gas(tx) * 1.5)
+signed = account.sign_transaction(tx)
+tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
+print(f"Submitted: {tx_hash.hex()}")
+w3.eth.wait_for_transaction_receipt(tx_hash)
+print("Confirmed.")
+```
+
+```go Go
+// go mod init dro-resolve
+// go get github.com/ethereum/go-ethereum
+package main
+
+import (
+	"context"
+	"crypto/ecdsa"
+	"fmt"
+	"log"
+	"math/big"
+	"os"
+	"reflect"
+	"strings"
+
+	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
+)
+
+const adapterABIJSON = `[{"type":"function","name":"getQuestion","stateMutability":"view","inputs":[{"name":"questionID","type":"bytes32"}],"outputs":[{"name":"question","type":"tuple","components":[{"name":"requestTimestamp","type":"uint256"},{"name":"reward","type":"uint256"},{"name":"proposalBond","type":"uint256"},{"name":"liveness","type":"uint256"},{"name":"manualResolutionTimestamp","type":"uint256"},{"name":"resolved","type":"bool"},{"name":"paused","type":"bool"},{"name":"reset","type":"bool"},{"name":"refund","type":"bool"},{"name":"rewardToken","type":"address"},{"name":"creator","type":"address"},{"name":"ancillaryData","type":"bytes"}]}]}]`
+const oracleABIJSON = `[{"type":"function","name":"proposeAndResolve","stateMutability":"nonpayable","inputs":[{"name":"adapter","type":"address"},{"name":"questionId","type":"bytes32"},{"name":"identifier","type":"bytes32"},{"name":"timestamp","type":"uint256"},{"name":"ancillaryData","type":"bytes"},{"name":"proposedPrice","type":"int256"}],"outputs":[{"name":"totalBond","type":"uint256"}]},{"type":"function","name":"proposeAndResolveNegRisk","stateMutability":"nonpayable","inputs":[{"name":"adapter","type":"address"},{"name":"negRiskOperator","type":"address"},{"name":"adapterQuestionId","type":"bytes32"},{"name":"negRiskOperatorQuestionId","type":"bytes32"},{"name":"identifier","type":"bytes32"},{"name":"timestamp","type":"uint256"},{"name":"ancillaryData","type":"bytes"},{"name":"proposedPrice","type":"int256"}],"outputs":[{"name":"totalBond","type":"uint256"}]}]`
+
+func env(key, fallback string) string {
+	if value := strings.TrimSpace(os.Getenv(key)); value != "" {
+		return value
+	}
+	return fallback
+}
+
+func proposedPrice(outcome string) *big.Int {
+	switch strings.ToLower(outcome) {
+	case "yes":
+		return big.NewInt(0).Exp(big.NewInt(10), big.NewInt(18), nil)
+	case "no":
+		return big.NewInt(0)
+	case "unknown":
+		return big.NewInt(500000000000000000)
+	default:
+		log.Fatal(`OUTCOME must be "yes", "no", or "unknown".`)
+		return nil
+	}
+}
+
+func bytes32FromText(value string) common.Hash {
+	var out [32]byte
+	copy(out[:], []byte(value))
+	return common.BytesToHash(out[:])
+}
+
+func field(value interface{}, name string) reflect.Value {
+	v := reflect.ValueOf(value)
+	if v.Kind() == reflect.Pointer {
+		v = v.Elem()
+	}
+	return v.FieldByName(name)
+}
+
+func main() {
+	ctx := context.Background()
+	privateKeyHex := strings.TrimPrefix(os.Getenv("PRIVATE_KEY"), "0x")
+	rpcURL := os.Getenv("RPC_URL")
+	adapterAddress := common.HexToAddress(os.Getenv("ADAPTER_ADDRESS"))
+	questionID := common.HexToHash(os.Getenv("QUESTION_ID"))
+	oracleAddress := common.HexToAddress(env("DRO_ORACLE_ADDRESS", "0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c"))
+	negRiskOperatorAddress := common.HexToAddress(env("NEG_RISK_OPERATOR_ADDRESS", "0xe13B5F29dCF6Ee81C659D839de30047F65541036"))
+	negRiskQuestionID := common.HexToHash(os.Getenv("NEG_RISK_OPERATOR_QUESTION_ID"))
+	isNegRisk := os.Getenv("NEG_RISK") == "true"
+	outcome := os.Getenv("OUTCOME")
+
+	if privateKeyHex == "" || rpcURL == "" || adapterAddress == (common.Address{}) || questionID == (common.Hash{}) {
+		log.Fatal("Missing PRIVATE_KEY, RPC_URL, ADAPTER_ADDRESS, or QUESTION_ID.")
+	}
+	if isNegRisk && negRiskQuestionID == (common.Hash{}) {
+		log.Fatal("NEG_RISK_OPERATOR_QUESTION_ID is required when NEG_RISK=true.")
+	}
+	if isNegRisk && strings.ToLower(outcome) == "unknown" {
+		log.Fatal("Unknown outcome is not supported for neg-risk markets.")
+	}
+
+	client, err := ethclient.Dial(rpcURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	privateKey, err := crypto.HexToECDSA(privateKeyHex)
+	if err != nil {
+		log.Fatal(err)
+	}
+	publicKey := privateKey.Public().(*ecdsa.PublicKey)
+	from := crypto.PubkeyToAddress(*publicKey)
+
+	adapterABI, _ := abi.JSON(strings.NewReader(adapterABIJSON))
+	oracleABI, _ := abi.JSON(strings.NewReader(oracleABIJSON))
+	callData, _ := adapterABI.Pack("getQuestion", questionID)
+	rawQuestion, err := client.CallContract(ctx, ethereum.CallMsg{To: &adapterAddress, Data: callData}, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	values, err := adapterABI.Unpack("getQuestion", rawQuestion)
+	if err != nil {
+		log.Fatal(err)
+	}
+	question := values[0]
+	requestTimestamp := field(question, "RequestTimestamp").Interface().(*big.Int)
+	resolved := field(question, "Resolved").Bool()
+	ancillaryData := field(question, "AncillaryData").Bytes()
+
+	if requestTimestamp.Sign() == 0 || len(ancillaryData) == 0 {
+		log.Fatal("This market is not ready for DRO resolution.")
+	}
+	if resolved {
+		log.Fatal("This market is already resolved.")
+	}
+
+	identifier := bytes32FromText("YES_OR_NO_QUERY")
+	var data []byte
+	if isNegRisk {
+		data, err = oracleABI.Pack(
+			"proposeAndResolveNegRisk",
+			adapterAddress,
+			negRiskOperatorAddress,
+			questionID,
+			negRiskQuestionID,
+			identifier,
+			requestTimestamp,
+			ancillaryData,
+			proposedPrice(outcome),
+		)
+	} else {
+		data, err = oracleABI.Pack(
+			"proposeAndResolve",
+			adapterAddress,
+			questionID,
+			identifier,
+			requestTimestamp,
+			ancillaryData,
+			proposedPrice(outcome),
+		)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	chainID, _ := client.ChainID(ctx)
+	nonce, _ := client.PendingNonceAt(ctx, from)
+	gasPrice, _ := client.SuggestGasPrice(ctx)
+	gasLimit, err := client.EstimateGas(ctx, ethereum.CallMsg{From: from, To: &oracleAddress, Data: data})
+	if err != nil {
+		log.Fatal(err)
+	}
+	gasLimit = (gasLimit*3 + 1) / 2
+
+	tx := types.NewTransaction(nonce, oracleAddress, big.NewInt(0), gasLimit, gasPrice, data)
+	signedTx, err := types.SignTx(tx, types.LatestSignerForChainID(chainID), privateKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := client.SendTransaction(ctx, signedTx); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Submitted:", signedTx.Hash().Hex())
+}
+```
+
+```rust Rust
+// cargo add ethers tokio eyre serde_json
+use ethers::abi::Abi;
+use ethers::prelude::*;
+use std::{env, sync::Arc, time::Duration};
+
+const ADAPTER_ABI: &str = r#"[{"type":"function","name":"getQuestion","stateMutability":"view","inputs":[{"name":"questionID","type":"bytes32"}],"outputs":[{"name":"question","type":"tuple","components":[{"name":"requestTimestamp","type":"uint256"},{"name":"reward","type":"uint256"},{"name":"proposalBond","type":"uint256"},{"name":"liveness","type":"uint256"},{"name":"manualResolutionTimestamp","type":"uint256"},{"name":"resolved","type":"bool"},{"name":"paused","type":"bool"},{"name":"reset","type":"bool"},{"name":"refund","type":"bool"},{"name":"rewardToken","type":"address"},{"name":"creator","type":"address"},{"name":"ancillaryData","type":"bytes"}]}]}]"#;
+const ORACLE_ABI: &str = r#"[{"type":"function","name":"proposeAndResolve","stateMutability":"nonpayable","inputs":[{"name":"adapter","type":"address"},{"name":"questionId","type":"bytes32"},{"name":"identifier","type":"bytes32"},{"name":"timestamp","type":"uint256"},{"name":"ancillaryData","type":"bytes"},{"name":"proposedPrice","type":"int256"}],"outputs":[{"name":"totalBond","type":"uint256"}]},{"type":"function","name":"proposeAndResolveNegRisk","stateMutability":"nonpayable","inputs":[{"name":"adapter","type":"address"},{"name":"negRiskOperator","type":"address"},{"name":"adapterQuestionId","type":"bytes32"},{"name":"negRiskOperatorQuestionId","type":"bytes32"},{"name":"identifier","type":"bytes32"},{"name":"timestamp","type":"uint256"},{"name":"ancillaryData","type":"bytes"},{"name":"proposedPrice","type":"int256"}],"outputs":[{"name":"totalBond","type":"uint256"}]}]"#;
+
+fn env_or(key: &str, fallback: &str) -> String {
+    env::var(key).ok().filter(|v| !v.trim().is_empty()).unwrap_or_else(|| fallback.to_string())
+}
+
+fn proposed_price(outcome: &str) -> I256 {
+    match outcome {
+        "yes" => I256::from_raw(U256::exp10(18)),
+        "no" => I256::zero(),
+        "unknown" => I256::from_raw(U256::from_dec_str("500000000000000000").unwrap()),
+        _ => panic!("OUTCOME must be yes, no, or unknown"),
+    }
+}
+
+fn identifier() -> [u8; 32] {
+    let mut value = [0u8; 32];
+    value[..15].copy_from_slice(b"YES_OR_NO_QUERY");
+    value
+}
+
+#[tokio::main]
+async fn main() -> eyre::Result<()> {
+    let private_key = env::var("PRIVATE_KEY")?;
+    let rpc_url = env::var("RPC_URL")?;
+    let adapter_address: Address = env::var("ADAPTER_ADDRESS")?.parse()?;
+    let question_id: [u8; 32] = env::var("QUESTION_ID")?.parse::<H256>()?.0;
+    let is_neg_risk = env::var("NEG_RISK").unwrap_or_default() == "true";
+    let outcome = env::var("OUTCOME")?.to_lowercase();
+
+    if is_neg_risk && outcome == "unknown" {
+        eyre::bail!("Unknown outcome is not supported for neg-risk markets.");
+    }
+
+    let oracle_address: Address = env_or("DRO_ORACLE_ADDRESS", "0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c").parse()?;
+    let neg_risk_operator_address: Address =
+        env_or("NEG_RISK_OPERATOR_ADDRESS", "0xe13B5F29dCF6Ee81C659D839de30047F65541036").parse()?;
+    let neg_risk_operator_question_id: Option<[u8; 32]> = env::var("NEG_RISK_OPERATOR_QUESTION_ID")
+        .ok()
+        .map(|value| value.parse::<H256>().map(|hash| hash.0))
+        .transpose()?;
+
+    let provider = Provider::<Http>::try_from(rpc_url)?.interval(Duration::from_millis(1000));
+    let chain_id = provider.get_chainid().await?.as_u64();
+    let wallet: LocalWallet = private_key.parse::<LocalWallet>()?.with_chain_id(chain_id);
+    let client = Arc::new(SignerMiddleware::new(provider, wallet));
+
+    let adapter_abi: Abi = serde_json::from_str(ADAPTER_ABI)?;
+    let oracle_abi: Abi = serde_json::from_str(ORACLE_ABI)?;
+    let adapter = Contract::new(adapter_address, adapter_abi, client.clone());
+    let oracle = Contract::new(oracle_address, oracle_abi, client.clone());
+
+    type Question = (U256, U256, U256, U256, U256, bool, bool, bool, bool, Address, Address, Bytes);
+    let question: Question = adapter.method::<_, Question>("getQuestion", question_id)?.call().await?;
+    let request_timestamp = question.0;
+    let resolved = question.5;
+    let ancillary_data = question.11;
+
+    if request_timestamp.is_zero() || ancillary_data.0.is_empty() {
+        eyre::bail!("This market is not ready for DRO resolution.");
+    }
+    if resolved {
+        eyre::bail!("This market is already resolved.");
+    }
+
+    let pending_tx = if is_neg_risk {
+        oracle.method::<_, U256>(
+            "proposeAndResolveNegRisk",
+            (
+                adapter_address,
+                neg_risk_operator_address,
+                question_id,
+                neg_risk_operator_question_id.ok_or_else(|| eyre::eyre!("NEG_RISK_OPERATOR_QUESTION_ID is required"))?,
+                identifier(),
+                request_timestamp,
+                ancillary_data,
+                proposed_price(&outcome),
+            ),
+        )?.send().await?
+    } else {
+        oracle.method::<_, U256>(
+            "proposeAndResolve",
+            (
+                adapter_address,
+                question_id,
+                identifier(),
+                request_timestamp,
+                ancillary_data,
+                proposed_price(&outcome),
+            ),
+        )?.send().await?
+    };
+
+    println!("Submitted: {:?}", pending_tx.tx_hash());
+    pending_tx.await?;
+    println!("Confirmed.");
+    Ok(())
+}
+```
+
+```php PHP
+<?php
+// composer require web3p/web3.php web3p/ethereum-tx web3p/ethereum-util
+require "vendor/autoload.php";
+
+use Web3\Web3;
+use Web3\Contract;
+use Web3p\EthereumTx\Transaction;
+use Web3p\EthereumUtil\Util;
+
+$droOracle = getenv("DRO_ORACLE_ADDRESS") ?: "0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c";
+$negRiskOperator = getenv("NEG_RISK_OPERATOR_ADDRESS") ?: "0xe13B5F29dCF6Ee81C659D839de30047F65541036";
+$identifier = "0x5945535f4f525f4e4f5f51554552590000000000000000000000000000000000";
+
+$privateKey = preg_replace("/^0x/", "", getenv("PRIVATE_KEY") ?: "");
+$rpcUrl = getenv("RPC_URL");
+$adapterAddress = getenv("ADAPTER_ADDRESS");
+$questionId = getenv("QUESTION_ID");
+$negRiskQuestionId = getenv("NEG_RISK_OPERATOR_QUESTION_ID");
+$isNegRisk = getenv("NEG_RISK") === "true";
+$outcome = strtolower(getenv("OUTCOME") ?: "");
+
+if (!$privateKey || !$rpcUrl || !$adapterAddress || !$questionId) {
+    throw new RuntimeException("Missing PRIVATE_KEY, RPC_URL, ADAPTER_ADDRESS, or QUESTION_ID.");
+}
+if ($isNegRisk && !$negRiskQuestionId) {
+    throw new RuntimeException("NEG_RISK_OPERATOR_QUESTION_ID is required when NEG_RISK=true.");
+}
+if ($isNegRisk && $outcome === "unknown") {
+    throw new RuntimeException("Unknown outcome is not supported for neg-risk markets.");
+}
+
+function proposedPrice(string $outcome): string {
+    if ($outcome === "yes") return "1000000000000000000";
+    if ($outcome === "no") return "0";
+    if ($outcome === "unknown") return "500000000000000000";
+    throw new RuntimeException('OUTCOME must be "yes", "no", or "unknown".');
+}
+
+function rpc(Web3 $web3, string $method, array $params = []) {
+    $result = null;
+    $error = null;
+    $web3->provider->send($method, $params, function ($err, $res) use (&$result, &$error) {
+        $error = $err;
+        $result = $res;
+    });
+    if ($error) {
+        throw new RuntimeException($error->getMessage());
+    }
+    return $result;
+}
+
+$adapterAbi = '[{"type":"function","name":"getQuestion","stateMutability":"view","inputs":[{"name":"questionID","type":"bytes32"}],"outputs":[{"name":"question","type":"tuple","components":[{"name":"requestTimestamp","type":"uint256"},{"name":"reward","type":"uint256"},{"name":"proposalBond","type":"uint256"},{"name":"liveness","type":"uint256"},{"name":"manualResolutionTimestamp","type":"uint256"},{"name":"resolved","type":"bool"},{"name":"paused","type":"bool"},{"name":"reset","type":"bool"},{"name":"refund","type":"bool"},{"name":"rewardToken","type":"address"},{"name":"creator","type":"address"},{"name":"ancillaryData","type":"bytes"}]}]}]';
+$oracleAbi = '[{"type":"function","name":"proposeAndResolve","stateMutability":"nonpayable","inputs":[{"name":"adapter","type":"address"},{"name":"questionId","type":"bytes32"},{"name":"identifier","type":"bytes32"},{"name":"timestamp","type":"uint256"},{"name":"ancillaryData","type":"bytes"},{"name":"proposedPrice","type":"int256"}],"outputs":[{"name":"totalBond","type":"uint256"}]},{"type":"function","name":"proposeAndResolveNegRisk","stateMutability":"nonpayable","inputs":[{"name":"adapter","type":"address"},{"name":"negRiskOperator","type":"address"},{"name":"adapterQuestionId","type":"bytes32"},{"name":"negRiskOperatorQuestionId","type":"bytes32"},{"name":"identifier","type":"bytes32"},{"name":"timestamp","type":"uint256"},{"name":"ancillaryData","type":"bytes"},{"name":"proposedPrice","type":"int256"}],"outputs":[{"name":"totalBond","type":"uint256"}]}]';
+
+$web3 = new Web3($rpcUrl);
+$adapter = new Contract($web3->provider, $adapterAbi);
+$oracle = new Contract($web3->provider, $oracleAbi);
+$util = new Util();
+
+$question = null;
+$adapter->at($adapterAddress)->call("getQuestion", $questionId, function ($err, $res) use (&$question) {
+    if ($err) throw new RuntimeException($err->getMessage());
+    $question = $res[0];
+});
+
+$requestTimestamp = (string) $question["requestTimestamp"];
+$resolved = (bool) $question["resolved"];
+$ancillaryData = (string) $question["ancillaryData"];
+
+if ($requestTimestamp === "0" || $ancillaryData === "0x") {
+    throw new RuntimeException("This market is not ready for DRO resolution.");
+}
+if ($resolved) {
+    throw new RuntimeException("This market is already resolved.");
+}
+
+$from = $util->privateKeyToAddress($privateKey);
+if (!str_starts_with($from, "0x")) {
+    $from = "0x" . $from;
+}
+
+$data = $isNegRisk
+    ? $oracle->at($droOracle)->getData(
+        "proposeAndResolveNegRisk",
+        $adapterAddress,
+        $negRiskOperator,
+        $questionId,
+        $negRiskQuestionId,
+        $identifier,
+        $requestTimestamp,
+        $ancillaryData,
+        proposedPrice($outcome)
+    )
+    : $oracle->at($droOracle)->getData(
+        "proposeAndResolve",
+        $adapterAddress,
+        $questionId,
+        $identifier,
+        $requestTimestamp,
+        $ancillaryData,
+        proposedPrice($outcome)
+    );
+
+$nonce = rpc($web3, "eth_getTransactionCount", [$from, "pending"]);
+$gasPrice = rpc($web3, "eth_gasPrice");
+$chainId = hexdec(rpc($web3, "eth_chainId"));
+$gas = rpc($web3, "eth_estimateGas", [[
+    "from" => $from,
+    "to" => $droOracle,
+    "data" => $data,
+]]);
+
+$tx = new Transaction([
+    "nonce" => $nonce,
+    "gasPrice" => $gasPrice,
+    "gas" => $gas,
+    "to" => $droOracle,
+    "value" => "0x0",
+    "data" => $data,
+    "chainId" => $chainId,
+]);
+
+$signed = "0x" . $tx->sign($privateKey);
+$hash = rpc($web3, "eth_sendRawTransaction", [$signed]);
+echo "Submitted: " . $hash . PHP_EOL;
+```
+
+</CodeGroup>

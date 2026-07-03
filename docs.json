@@ -110,6 +110,12 @@
           "api/create-market/payloads",
           "api/create-market/endpoints"
         ]
+      },
+      {
+        "group": "Resolution API",
+        "pages": [
+          "api/resolution/overview"
+        ]
       }
     ]
   },
