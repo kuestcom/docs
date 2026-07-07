@@ -20,6 +20,7 @@ If you use Supabase mode, `npm run db:push` already sets up `pg_cron` with this 
   - `/api/sync/translations/enqueue`
   - `/api/sync/translations`
   - `/api/sync/resolution`
+  - `/api/sync/sports-scores`
   - `/api/sync/volume/enqueue`
   - `/api/sync/volume`
 
@@ -41,6 +42,7 @@ curl -sS -X GET \
 | `/api/sync/translations/enqueue` | `17 * * * *` | Enqueues translation jobs hourly |
 | `/api/sync/translations` | `18 * * * *` | Processes translation jobs after enqueue runs |
 | `/api/sync/resolution` | `5-55/10 * * * *` | Every 10 minutes, offset by 5 minutes |
+| `/api/sync/sports-scores` | `* * * * *` | Updates live and recently started sports scores every minute |
 | `/api/sync/volume/enqueue` | `*/10 * * * *` | Enqueues volume sync work every 10 minutes |
 | `/api/sync/volume` | `*/5 * * * *` | Processes volume jobs every 5 minutes |
 

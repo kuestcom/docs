@@ -103,7 +103,9 @@ Use `multi_multiple` when multiple options can resolve true independently. Use `
 
 ## Sports Event
 
-Sports payloads require `mainCategorySlug: "sports"` and currently require `marketMode: "multi_multiple"`. For games, send exactly one home team and one away team. If a team does not include a `logo`, upload `teamLogo:home` or `teamLogo:away` in `POST /prepare`.
+Sports payloads require `mainCategorySlug: "sports"` and currently require `marketMode: "multi_multiple"`. The recommended flow is to select a match from an independent sports data provider and send `sourceProvider` plus `sourceEventId` or `sourceGameId`. That single provider ID is enough for later score/status lookup; league, date, teams, and logos can be derived and remain optional overrides. Generated sports templates still need full game details because they create multiple standard markets.
+
+For manually supplied teams, send exactly one home team and one away team. If a team does not include a `logo`, upload `teamLogo:home` or `teamLogo:away` in `POST /prepare`.
 
 ```json
 {
@@ -127,6 +129,12 @@ Sports payloads require `mainCategorySlug: "sports"` and currently require `mark
   "sports": {
     "section": "games",
     "eventVariant": "custom",
+    "sourceProvider": "sportmonks",
+    "sourceEventId": "123456789",
+    "sourceLeagueId": "8",
+    "sourceLeagueLabel": "Premier League",
+    "sourceMatchConfidence": 0.94,
+    "livestreamUrl": "https://www.youtube.com/watch?v=example",
     "sportSlug": "soccer",
     "leagueSlug": "premier-league",
     "eventDate": "2028-05-01",
@@ -178,4 +186,3 @@ Sports payloads require `mainCategorySlug: "sports"` and currently require `mark
 | `teamLogo:away` | Conditional | Required for sports away team if `sports.teams[].logo` is empty. |
 
 Images are normalized by the worker according to `imagePolicy` from `GET /market-config`.
-
