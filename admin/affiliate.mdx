@@ -1,6 +1,6 @@
 ---
-title: Affiliate
-description: Configure your trading fee and how much of that fee is shared with affiliates.
+title: Affiliate & Fees
+description: Configure maker and taker operator fees, the fee wallet, affiliate sharing, and fee claims.
 icon: badge-percent
 ---
 
@@ -9,23 +9,23 @@ This page controls how your prediction market splits trading fees between your p
 </Info>
 
 <AccordionGroup>
-  <Accordion title="Trading fee (%)" icon="percent" defaultOpen>
-    These are the on-chain platform fee settings for maker and taker orders. The field accepts decimals such as `2.00`. In the real admin, the form enforces the current minimum on-chain base fee and will not let you go below it. The UI shows the effective total after adding the live Kuest fee on top of your configured platform fee. The visible max in the UI is `9%`.
+  <Accordion title="Maker and taker fees (%)" icon="percent" defaultOpen>
+    Configure the operator fee for maker and taker orders separately. Each field accepts decimals such as `2.00`, with a range from `0%` to `9%`. The helper text shows the live Kuest fee added to your configured operator fee.
   </Accordion>
   <Accordion title="Affiliate share (%)" icon="hand-coins">
     This is not a percent of trade volume. It is the percent of your configured trading fee that gets shared with affiliates. Example input: `50` means affiliates receive half of your configured trading fee.
   </Accordion>
   <Accordion title="Fee wallet receiver" icon="wallet">
-    Set the Polygon address that receives claimable fees from this page. In the usual setup, this is the admin deposit wallet. Use <strong>Use my deposit wallet</strong> to copy the admin deposit wallet into the form.
+    The Polygon fee wallet must match your deployed admin deposit wallet. The field is read-only; use <strong>Use my deposit wallet</strong> when the saved receiver has not been set yet.
   </Accordion>
   <Accordion title="How the calculation works" icon="calculator">
-    Use this mental model: `affiliate payout = trading fee x affiliate share`. The platform keeps the remainder of that configured fee. The exchange base fee still comes out first under the hood, so do not treat the admin percentage as pure platform revenue. The fee shown in the UI is the effective maker or taker total after adding the live Kuest fee.
+    Use this mental model: `affiliate payout = operator fee x affiliate share`. The platform keeps the remainder of the operator fee. The live Kuest fee is added separately and is not part of the affiliate split.
   </Accordion>
   <Accordion title="Claimable fees" icon="coins">
-    The page also shows the claim card for the configured receiver. After fees accumulate on-chain, you can withdraw the claimable balance from the same admin area.
+    The page shows the configured receiver's claimable balance across supported exchanges. Connect the receiver wallet and withdraw once at least `$1` is claimable. Deposit-wallet claims may ask for a trading signature first.
   </Accordion>
-  <Accordion title="Default example" icon="coins">
-    With `2.00%` trading fee and `50%` affiliate share, a `$100` trade targets `$2.00` in platform fee. The affiliate target is `$1.00` and the platform target is `$1.00`, before the exchange base fee is applied.
+  <Accordion title="Example" icon="coins">
+    For a `$100` taker order with a `2.00%` taker operator fee and `50%` affiliate share, the operator fee is `$2.00`. The affiliate target is `$1.00`, and the platform retains `$1.00` of that operator fee. The live Kuest taker fee is additional.
   </Accordion>
   <Accordion title="Overview cards and performance table" icon="table-properties">
     The page also shows who is actually sending traffic and earning. Expect totals for referrals, trading volume, and affiliate fees, plus a performance table with avatar, affiliate code, referrals, volume, and fees per partner.

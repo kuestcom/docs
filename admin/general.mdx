@@ -1,6 +1,6 @@
 ---
 title: General
-description: Configure every field from Admin -> General, including brand, links, legal, geoblocking, integrations, and market settings.
+description: Configure every card in Admin -> General, including brand, market context, featured markets, integrations, and synced sources.
 icon: settings
 ---
 
@@ -66,6 +66,43 @@ This page mirrors the exact cards shown in <code>Admin -> General</code>. Each i
   <Accordion title="Disable on" icon="layout-template">
     Choose routes where the banner should not appear.
   </Accordion>
+  <Accordion title="Disable Faucet Banner" icon="droplets">
+    Hide the test-mode faucet banner for everyone. This is separate from the custom announcement message above.
+  </Accordion>
+</AccordionGroup>
+
+## Market Context
+
+<AccordionGroup>
+  <Accordion title="Enable market context" icon="toggle-right" defaultOpen>
+    Turn AI-generated context on or off on event pages. This feature requires an OpenRouter API key and model in the Integrations card below.
+  </Accordion>
+  <Accordion title="Prompt template" icon="file-text">
+    Control the instruction sent to the model. Keep it neutral and use it to explain the market rather than predict an outcome or persuade users to trade.
+  </Accordion>
+  <Accordion title="Available variables" icon="braces">
+    Insert live placeholders for the event title, description, main tag, creator, creation time, estimated end date, focused market title, probability, YES price, 24-hour volume, total volume, and outcomes. The app replaces them before sending the prompt.
+  </Accordion>
+</AccordionGroup>
+
+## Featured markets
+
+<AccordionGroup>
+  <Accordion title="Enable the home carousel" icon="gallery-horizontal" defaultOpen>
+    Show or hide the featured-markets carousel below the main navigation. Manual picks keep their configured order.
+  </Accordion>
+  <Accordion title="Manual and AI selection" icon="sparkles">
+    Add up to eight active markets manually. When <strong>Use AI to highlight markets</strong> is enabled, manual picks stay first and AI can fill the remaining slots. Use <strong>Regenerate</strong> to refresh the AI selections.
+  </Accordion>
+  <Accordion title="Selection and context settings" icon="sliders-horizontal">
+    Set the maximum card count, default context mode (`Auto`, `News`, `Comments`, or `Hidden`), minimum 24-hour volume, and automatic inclusion of live/today sports or new events. You can also provide news-source hints and a comment blacklist.
+  </Accordion>
+  <Accordion title="Per-market context" icon="newspaper">
+    Each selected market can be enabled or disabled and given its own context mode. For news context, add article URLs manually or ask AI to find recent coverage from your configured source hints.
+  </Accordion>
+  <Accordion title="Side card" icon="panel-right">
+    Configure the compact card above Hot topics. Use a text card with title, text, CTA, icon, and optional AI generation, or upload a `PNG`/`JPG` image and provide hover text and a destination link.
+  </Accordion>
 </AccordionGroup>
 
 ## Legal & Geoblocking
@@ -86,7 +123,10 @@ This page mirrors the exact cards shown in <code>Admin -> General</code>. Each i
     GA4 measurement ID (format `G-XXXXXXXXXX`).
   </Accordion>
   <Accordion title="OpenRouter integration" icon="sparkles">
-    Configure `API key` and `Preferred OpenRouter model`. Used by Market Context, Locales translation, and Create Market AI helper.
+    Configure the `API key` and `Preferred OpenRouter model`, or let OpenRouter choose the model. These settings power Market Context, locale translations, Create Event AI tools, and AI-assisted featured markets.
+  </Accordion>
+  <Accordion title="Sports data providers" icon="trophy">
+    Add a TheSportsDB API key for sports and a PandaScore token for esports. Configured providers let the Events and Create Event screens find source matches, attach provider IDs, and automate score updates.
   </Accordion>
   <Accordion title="LI.FI integration" icon="wallet-cards">
     Configure `Integrator name` and optional `API key` for funding/swap flows.
@@ -100,6 +140,6 @@ This page mirrors the exact cards shown in <code>Admin -> General</code>. Each i
 
 <AccordionGroup>
   <Accordion title="Synced market sources" icon="users">
-    Manage who can create markets by adding a Kuest site URL (to mirror wallets) or a manual wallet with display name.
+    Manage allowed mirrored market creators. Add another Kuest site URL to import its creator wallets automatically, or add one wallet with a display name. These sources also determine which creator wallets pass the Create Event pre-sign check.
   </Accordion>
 </AccordionGroup>

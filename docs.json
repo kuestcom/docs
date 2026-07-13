@@ -93,10 +93,8 @@
               "admin/theme",
               "admin/locales",
               "admin/categories",
-              "admin/market-context",
               "admin/affiliate",
               "admin/events",
-              "admin/create-market",
               "admin/users"
             ]
           },
