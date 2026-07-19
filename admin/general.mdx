@@ -149,221 +149,64 @@ This page mirrors the exact cards shown in <code>Admin -> General</code>. Each i
 
 ## Identity verification and KYC
 
-Use this card to define who must complete identity checks, what information they must provide, how approval is decided, and which parts of the platform remain unavailable while verification is pending. Create separate programs when countries, user groups, or verification standards require different rules.
-
-<Warning>
-Collect only information that your organization is permitted and prepared to handle. Confirm the required fields, consent wording, retention periods, age rules, and review process for every country where your site operates before publishing a program.
-</Warning>
+Configure Sumsub at <strong>Admin → General → Integrations → Sumsub</strong>. The integration is disabled by default and does not change onboarding until it is enabled, fully configured, and set to `Observe only` or `Required`.
 
 <AccordionGroup>
-  <Accordion title="Module rollout" icon="toggle-right" defaultOpen>
-    <strong>Enable identity verification</strong> turns the published verification rules on for matching users. Publish and review at least one program before enabling it.
+  <Accordion title="Sumsub credentials" icon="scan-face" defaultOpen>
+    In the [Sumsub dashboard](https://cockpit.sumsub.com), create an App Token and Secret Key for the environment that will run this site. Copy the webhook secret from the webhook configuration and use the exact, case-sensitive name of the verification level created for the WebSDK.
 
-    <strong>Observe-only rollout</strong> shows how the rules would apply without restricting users. Use it before a full launch to confirm that the correct audience receives the correct program.
+    Fill these fields in the Sumsub block:
 
-    <strong>Policy revision</strong> identifies the currently active set of rules. It changes when the identity settings are updated and helps operators confirm that a policy change took effect.
+    - <strong>App Token</strong>: the Sumsub application token.
+    - <strong>Secret Key</strong>: the key used to sign API requests.
+    - <strong>Webhook Secret</strong>: the key used to verify webhook payloads.
+    - <strong>Verification Level Name</strong>: the exact Sumsub level used by the WebSDK.
 
-    Use <strong>Save identity settings</strong> for these rollout controls. Program, provider, review, and restricted-operation changes have their own buttons.
+    Secret fields are stored encrypted. Leaving an already configured secret field blank preserves its current value.
   </Accordion>
 
-  <Accordion title="Verification overview" icon="chart-no-axes-column">
-    The overview summarizes activity without displaying submitted identity details:
+  <Accordion title="Webhook configuration" icon="webhook">
+    In each Sumsub environment, create a webhook whose destination is the public URL of that deployment followed by:
 
-    - <strong>Average review time</strong>: typical time between submission and a manual decision.
-    - <strong>Pending erasures</strong>: user-data deletion requests still waiting to finish.
-    - <strong>Failed provider events</strong>: updates from an external verification service that need attention.
-    - <strong>Failed outbox events</strong>: verification updates that could not be delivered to their destination.
-    - <strong>Total submissions</strong>: all verification attempts, with a breakdown by status.
+    `POST /api/webhooks/sumsub`
 
-    Check this area after changing a program or provider and during daily operation. A rising failure count or review time usually means the provider or review queue needs attention.
+    For example, production might use `https://market.example.com/api/webhooks/sumsub`, while staging must use its own staging hostname and staging credentials. Subscribe to applicant creation/pending, on-hold, reset and reviewed/decision updates. Configure the same secret in Sumsub and in <strong>Webhook Secret</strong>.
+
+    The app validates signed webhook events before updating the user's verification status.
   </Accordion>
 
-  <Accordion title="Programs and who they apply to" icon="list-checks">
-    A program is a complete verification policy for a particular audience. For example, one program can request a national identifier from residents of one country while another requests a different document from residents elsewhere.
+  <Accordion title="Test connection" icon="plug-zap">
+    <strong>Test connection</strong> uses the values currently visible in the form, including unsaved App Token, Secret Key and level name. Blank masked secret fields are resolved from the saved encrypted values on the server.
 
-    - <strong>New program</strong>: starts an independent policy. Use the program selector to return to an existing draft.
-    - <strong>Stable program key</strong>: a permanent internal label such as `brazil_standard` or `europe_age_check`. Choose it carefully and do not reuse it for a different purpose.
-    - <strong>Administrative name</strong>: a recognizable name for your team.
-    - <strong>Purpose and description</strong>: explain why the program exists and which users it covers.
-    - <strong>Countries</strong>: enter two-letter country codes, such as `BR`, `US`, or `DE`. Leave the list empty only when the program should not be limited by country.
-    - <strong>Minimum age</strong>: requires users assigned to the program to meet the selected age threshold.
-    - <strong>Provider</strong>: selects the main external verification service when the program uses one.
-    - <strong>Fallback provider IDs</strong>: optional alternatives attempted when the main provider is unavailable. Use the identifiers of provider configurations already created in this card.
-    - <strong>Consent text</strong>: the message users must accept before submitting information. Complete it for every enabled language and update it whenever the purpose or data use changes.
+    A successful test confirms Sumsub API authentication and that an SDK access token can be created with the selected verification level. It does not claim to validate <strong>Webhook Secret</strong>; that secret is proven end to end only when a real signed webhook is received.
   </Accordion>
 
-  <Accordion title="Operation modes" icon="workflow">
-    Choose where verification takes place:
+  <Accordion title="Enforcement modes" icon="shield-check">
+    - <strong>Disabled</strong>: Sumsub is inactive. No verification step appears and no user operation is blocked.
+    - <strong>Observe only</strong>: the verification step and status appear in onboarding, but users may close it and continue. Deposit wallet creation, allowances, trading and SDK credentials remain available regardless of KYC status.
+    - <strong>Required</strong>: the user must be approved on the currently configured level before trading credentials, deposit wallet creation, allowances, SDK credential generation/reveal, arbitrage and new orders are allowed.
 
-    - <strong>Self-hosted (`self_hosted`)</strong>: your team creates the form, receives the submitted information, and decides the result. Use it when you have an internal review process and are prepared to protect and delete the collected data.
-    - <strong>Provider (`provider`)</strong>: an external verification service conducts the check and returns its decision. Use it when the provider supports the countries, document types, and assurance level you need.
-    - <strong>Hybrid (`hybrid`)</strong>: combines your own fields or review with an external provider. Use it when the provider covers the identity check but your organization must also collect declarations, consents, or country-specific information.
-
-    Provider and hybrid programs require an enabled provider configuration. Test the provider in its sandbox environment before using production.
+    In `Required`, not started, pending, on hold, rejected, an old level, unknown state, or a temporary status error all remain blocked. Existing wallets and allowances are not removed. Cancellation, withdrawals, redemption, settings, SDK key revocation and account deletion remain available.
   </Accordion>
 
-  <Accordion title="Decision policies" icon="badge-check">
-    The decision policy controls how a completed submission becomes approved or rejected:
+  <Accordion title="Onboarding and review state" icon="list-checks">
+    The onboarding order is username → email → Sumsub → trading authentication → deposit wallet → allowances. The WebSDK is loaded only when the verification step is opened and renews short-lived access tokens without reloading the page.
 
-    - <strong>Automatic on valid submission (`auto_on_valid_submission`)</strong>: approves when required answers are present and match the configured formats. This confirms form completion, not that the person or document is genuine. Use it for low-risk declarations rather than identity proof.
-    - <strong>Manual review (`manual_review`)</strong>: places each completed submission in the review queue. Use it when trained staff must inspect answers or documents before approval.
-    - <strong>Provider decision (`provider_decision`)</strong>: follows the result returned by the selected verification provider. Use it when that provider is your source of truth.
-    - <strong>Provider plus manual (`provider_plus_manual`)</strong>: requires a provider result and a decision from your team. Use it for higher-risk cases or when local rules require human oversight.
-    - <strong>Rules (`rules`)</strong>: decides according to the conditions configured for the program. Use it only when your approval criteria can be expressed consistently and have been tested against expected cases.
+    Completing the WebSDK does not mean approval. The UI remains pending until the server receives or confirms Sumsub's decision. In `Observe only`, closing the step does not reopen it in a loop. In `Required`, closing it leaves browsing and safe account actions available, but the requirement opens again when the user attempts a protected action. Approval resumes the pending action after the server confirms it.
   </Accordion>
 
-  <Accordion title="Required evidence" icon="file-check-2">
-    Required evidence describes the minimum proof expected before approval:
+  <Accordion title="KYC status in Admin → Users" icon="users">
+    When Sumsub is active in `Observe only` or `Required`, the users table adds a KYC column with a `ScanFaceIcon`:
 
-    - <strong>Self-declared (`self_declared`)</strong>: the user supplies answers without separate proof. Suitable for declarations and low-assurance checks.
-    - <strong>Document submitted (`document_submitted`)</strong>: the user uploads a document. Choose this when a document must be present even if the final decision is manual.
-    - <strong>Provider verified (`provider_verified`)</strong>: an external verification service must confirm the check.
-    - <strong>Manual verified (`manual_verified`)</strong>: an authorized administrator must complete the review.
+    - Gray: not started, pending, on hold, unavailable, or another non-approved state.
+    - Primary color: approved on the currently configured verification level.
+    - Red: rejected.
 
-    Match this setting to the selected decision policy. For example, `provider_verified` normally pairs with a provider-based decision, while `manual_verified` normally pairs with manual review.
+    Each icon includes an accessible status label. The column is hidden when Sumsub is disabled or incompletely configured.
   </Accordion>
 
-  <Accordion title="User access while verification is pending" icon="shield-check">
-    <strong>Grace period</strong> allows matching users to continue using restricted features for a selected number of days before approval becomes mandatory.
-
-    <strong>Approval validity</strong> controls how long an approval remains valid before reverification is required. Leave it without a value only when your policy permits approvals that do not expire.
-
-    <strong>Apply requirements to existing users</strong> includes accounts created before the program was published. Review the grace period before enabling this so existing users are not unexpectedly interrupted.
-
-    Under <strong>Capabilities blocked until approval</strong>, select only the actions that verified users may perform. Typical choices include creating a deposit wallet, depositing, approving tokens, trading, claiming affiliate rewards, creating API keys, or creating markets. Public browsing, account access, profile editing, order cancellation, redemption, and withdrawals remain available for safety and account access.
-
-    Use the status preview to confirm what users can do while not started, drafting, pending, under review, approved, rejected, awaiting resubmission, expired, or suspended.
-  </Accordion>
-
-  <Accordion title="Retention periods" icon="calendar-clock">
-    Set how many days each category should be kept. Use the shortest period that meets your operating and legal needs:
-
-    - <strong>draftDays</strong>: incomplete submissions.
-    - <strong>rejectedDays</strong>: rejected submissions.
-    - <strong>approvedDays</strong>: approved submissions and their recorded answers.
-    - <strong>expiredDays</strong>: approvals or submissions that are no longer valid.
-    - <strong>documentDays</strong>: uploaded files and identity documents.
-    - <strong>technicalEventDays</strong>: provider and delivery history used to follow the verification process.
-
-    A field can have a shorter retention period than the program. Review document retention separately because uploaded identity files usually carry greater privacy risk than ordinary form answers.
-  </Accordion>
-
-  <Accordion title="Form field types" icon="text-cursor-input">
-    Select the field type that best matches the information requested:
-
-    | Type | When to use it |
-    | --- | --- |
-    | `short_text` | Names, document numbers, occupation, or another short answer. |
-    | `long_text` | Explanations, declarations, or answers that may need several lines. |
-    | `integer` | Whole numbers, such as a count or completed years. |
-    | `decimal` | Numeric values that can contain decimals. |
-    | `date` | Birth date, document issue date, or expiration date. |
-    | `boolean` | A yes/no confirmation. |
-    | `single_select` | One choice from a dropdown when the list may be long. |
-    | `multi_select` | More than one choice from a list. |
-    | `radio` | One choice from a short list that should remain visible. |
-    | `country` | A country selected from standardized country choices. |
-    | `subdivision` | A state, province, region, or other first-level area. |
-    | `phone` | A telephone number. Use international format when users may be in different countries. |
-    | `email` | An email address collected as part of verification. |
-    | `national_identifier` | A country-specific identifier such as CPF or the equivalent required in another jurisdiction. Pair it with the correct format and validation rule for that country. |
-    | `address` | A postal or residential address. Define which address parts are required for the program's countries. |
-    | `file` | A supporting file that is not specifically an identity document. |
-    | `document` | An identity or compliance document that reviewers may need to inspect. |
-    | `heading` | A title that organizes the form and does not collect an answer. |
-    | `paragraph` | Explanatory text that does not collect an answer. |
-    | `notice` | An important instruction or warning shown in the form. |
-    | `separator` | A visual division between form sections. |
-
-    Use display-only types to make long forms easier to understand. Do not use a free-text field when a date, country, number, or controlled choice can collect the same information more consistently.
-  </Accordion>
-
-  <Accordion title="Field storage and sensitivity" icon="database-lock">
-    Choose storage separately for every collected field:
-
-    - <strong>Local encrypted (`local_encrypted`)</strong>: keeps an encrypted copy for your organization. Use it only when your team needs the value for review, support, reporting, or a legal obligation.
-    - <strong>Provider only (`provider_only`)</strong>: the external provider handles the value and your site keeps the verification outcome. Prefer this when your team does not need the original information.
-    - <strong>Forward only (`transient_forward_only`)</strong>: sends the value to the provider without retaining a normal local copy. Use it when the provider needs the answer but your organization should not keep it.
-    - <strong>Result only (`derived_result_only`)</strong>: keeps only a result or uses the item for form presentation. This is required for headings, paragraphs, notices, and separators.
-
-    Set <strong>Sensitivity</strong> according to the consequences of exposure: `public`, `personal`, `sensitive`, or `restricted`. National identifiers, document images, biometric-related results, and similarly high-impact information should normally be treated as sensitive or restricted.
-
-    <strong>Administrative visibility</strong> controls who may see the value: nobody, reviewers, or only administrators specifically permitted to view personal information. Give the narrowest access that still supports your review process.
-  </Accordion>
-
-  <Accordion title="Field labels, validation, and conditional questions" icon="list-tree">
-    For every field, configure:
-
-    - <strong>Stable key</strong>: a permanent identifier such as `national_id` or `date_of_birth`.
-    - <strong>Label, placeholder, and help text</strong>: what the user sees. Complete these for every enabled locale.
-    - <strong>Purpose</strong>: why this exact answer is needed.
-    - <strong>Legal basis or policy</strong>: the rule your organization relies on to request it.
-    - <strong>Required</strong>: prevents submission without an answer when enabled.
-    - <strong>Minimum and maximum length</strong>: limits text size.
-    - <strong>Display mask</strong>: guides formatting for identifiers or phone numbers without deciding whether the value is valid.
-    - <strong>Validation rule key</strong>: applies an available country-specific check, such as the configured CPF validation rule. Use a rule only for the country and document format it was designed for.
-    - <strong>Accepted format pattern</strong>: an advanced format rule for cases not covered by a standard validator. Test valid and invalid examples before publishing.
-    - <strong>Field retention</strong>: removes this answer sooner than the rest of the submission when appropriate.
-    - <strong>Conditional rules</strong>: shows the field only when an earlier answer matches the configured condition. Use this to request country-specific or risk-specific details without showing irrelevant questions to everyone.
-    - <strong>Duplicate detection</strong>: checks whether the same normalized value has already appeared without showing that value in search results. Use it only when duplicate identities or identifiers must be detected.
-
-    For `single_select`, `multi_select`, and `radio`, enter one `key=label` option per line. Keep the key stable and translate the label for each enabled locale.
-
-    For files and documents, choose the maximum size, accepted file types (`JPEG`, `PNG`, or `PDF`), number of files, and whether safe image metadata should be removed. Request only the file types reviewers can actually process.
-
-    The advanced JSON fields expose less common options. Leave them unchanged unless your policy needs a setting that is not available in the regular controls.
-  </Accordion>
-
-  <Accordion title="Preview, publish, import, and reuse" icon="send">
-    <strong>Responsive form preview</strong> shows the selected language and how the current draft will look. It also lists the areas that differ from the published version.
-
-    <strong>Save draft</strong> preserves work without changing the rules users receive. <strong>Publish</strong> makes that version available to the assignment rules; a published version is kept as a fixed record, and later edits form a new draft.
-
-    Use <strong>Export JSON</strong> to back up or transfer a program. Use <strong>Validate import</strong> before <strong>Import JSON</strong> to review problems without creating the program. <strong>Clone</strong> is useful when a new country or user group shares most settings with an existing program. Give the clone a new stable key and name.
-
-    <strong>Archive</strong> retires a program from future use. Confirm that another published program covers the intended users before archiving an active policy.
-  </Accordion>
-
-  <Accordion title="Verification providers" icon="plug-zap">
-    Add a provider when an external service will perform all or part of the verification:
-
-    You can save multiple provider configurations. Each verification program chooses one primary provider and may reference other saved configurations as fallbacks. The current release uses Kuest's <strong>Generic Webhook</strong> connector for all of them; entering a provider's name does not activate a built-in branded integration.
-
-    Services with hosted verification, an API, and result webhooks can be connected through a compatible integration bridge. Common examples include [Sumsub](https://docs.sumsub.com/reference/get-started-with-api), [Veriff](https://devdocs.veriff.com/apidocs/v1sessions), and [Persona](https://docs.withpersona.com/hosted-flow). These are examples of compatible integration models, not preinstalled connectors. Before selecting one in a live program, confirm that your deployment has a bridge for that service and that session creation, result updates, status checks, and deletion requests have been tested in its sandbox.
-
-    - <strong>Provider key</strong>: a stable identifier for this configuration.
-    - <strong>Display name</strong>: the name operators will recognize.
-    - <strong>Environment</strong>: use `sandbox` while configuring and testing; switch to `production` only with live provider credentials and approved rules.
-    - <strong>Verification URL</strong>: the provider destination used to begin a check.
-    - <strong>Status reconciliation URL</strong>: optional destination used to confirm a check's latest status if an update is delayed.
-    - <strong>Deletion URL</strong>: optional destination used to ask the provider to erase a user's information.
-    - <strong>Webhook secret</strong>: the secret supplied for authenticated status updates. Leaving the field blank keeps the existing secret.
-    - <strong>Status mapping</strong>: matches the provider's result names to your site's approved, rejected, pending, and other verification statuses.
-    - <strong>Coverage and service information</strong>: record supported countries, processing and storage regions, retention, subprocessors, and service expectations so operators can choose the correct provider.
-
-    Save the provider, run <strong>Test connection</strong>, and enable it only after the test succeeds. Removing a saved secret requires the provider to be disabled first.
-  </Accordion>
-
-  <Accordion title="Manual review queue" icon="clipboard-check">
-    The queue contains completed submissions waiting for an authorized decision. Open a submission to review its answers and scanned documents, then choose <strong>Approve</strong>, <strong>Reject</strong>, <strong>Request resubmission</strong>, or <strong>Suspend</strong>.
-
-    Add a clear public reason code whenever the user must understand or act on the decision. Use the internal note for information that should remain available only to authorized administrators. Viewing personal information requires the appropriate permission and two-factor authentication.
-  </Accordion>
-
-  <Accordion title="Permissions, erasure, and legal holds" icon="user-lock">
-    Restricted operations are intended for a small number of trusted administrators using two-factor authentication:
-
-    - <strong>Review</strong>: open the review queue and make decisions.
-    - <strong>View personal information</strong>: reveal submitted answers and documents.
-    - <strong>Export</strong>: create an identity-data export.
-    - <strong>Delete</strong>: process erasure requests.
-    - <strong>Audit</strong>: inspect the verification activity history.
-    - <strong>Manage legal holds</strong>: preserve information that must not be erased while a valid hold exists.
-
-    Grant each administrator only the permissions required for their role and revoke access when responsibilities change.
-
-    To create a legal hold, enter the subject user's ID, a specific reason, the authority or case reference, and a review deadline. Reassess the hold by that deadline and release it when it is no longer valid.
-
-    Use <strong>Retry erasure</strong> when a deletion request failed after the cause was corrected. Use <strong>Release hold</strong> only after confirming that the relevant authority or case no longer requires preservation. Both actions use the request or hold ID shown in the corresponding operational record.
-  </Accordion>
 </AccordionGroup>
+
+<Warning>
+Review your privacy policy, terms, supported countries, consent wording and retention obligations before enabling `Required` in production. Identity documents, selfies and biometric material remain with Sumsub; the platform stores only the minimum applicant association and normalized review state needed for enforcement.
+</Warning>
