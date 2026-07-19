@@ -327,6 +327,10 @@ Collect only information that your organization is permitted and prepared to han
   <Accordion title="Verification providers" icon="plug-zap">
     Add a provider when an external service will perform all or part of the verification:
 
+    You can save multiple provider configurations. Each verification program chooses one primary provider and may reference other saved configurations as fallbacks. The current release uses Kuest's <strong>Generic Webhook</strong> connector for all of them; entering a provider's name does not activate a built-in branded integration.
+
+    Services with hosted verification, an API, and result webhooks can be connected through a compatible integration bridge. Common examples include [Sumsub](https://docs.sumsub.com/reference/get-started-with-api), [Veriff](https://devdocs.veriff.com/apidocs/v1sessions), and [Persona](https://docs.withpersona.com/hosted-flow). These are examples of compatible integration models, not preinstalled connectors. Before selecting one in a live program, confirm that your deployment has a bridge for that service and that session creation, result updates, status checks, and deletion requests have been tested in its sandbox.
+
     - <strong>Provider key</strong>: a stable identifier for this configuration.
     - <strong>Display name</strong>: the name operators will recognize.
     - <strong>Environment</strong>: use `sandbox` while configuring and testing; switch to `production` only with live provider credentials and approved rules.
