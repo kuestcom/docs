@@ -18,7 +18,7 @@ icon: calendar-range
     Add or remove event-specific context shown in the Rules area. This is separate from the AI-generated Market Context configured in [General](/admin/general#market-context).
   </Accordion>
   <Accordion title="Sports final status and source matching" icon="trophy">
-    Sports moneyline events get a trophy action for the final score and ended state. When TheSportsDB or PandaScore is configured in [General](/admin/general#integrations), search for the source match, select a candidate, and review its provider IDs, league, confidence, score, and livestream data before saving. Synced source metadata is also used by sports-score automation.
+    Sports moneyline events get a trophy action for the final score and ended state. When TheSportsDB or PandaScore is configured in [Integrations](/admin/integrations), search for the source match, select a candidate, and review its provider IDs, league, confidence, score, and livestream data before saving. Synced source metadata is also used by sports-score automation.
   </Accordion>
   <Accordion title="Sync settings" icon="settings-2">
     The settings dialog controls whether newly synced events auto-deploy or stay manual until your team reviews them. Turn auto-deploy off if you want a human review step before new synced markets go live.
@@ -64,7 +64,7 @@ In the product, this flow starts from **Admin > Events > Create Event** and open
     Recurring events use title and slug templates, plus cadence. The resolution date shown in the form is always the date for the occurrence being generated.
   </Accordion>
   <Accordion title="Sports extra fields" icon="trophy">
-    When the main category is `sports` or `esports`, extra fields appear for Games or Props, start time, sport and league, teams, abbreviations, and logos. If a sports provider is configured in [General](/admin/general#integrations), search for a source match or enter its provider IDs manually so scores can sync later.
+    When the main category is `sports` or `esports`, extra fields appear for Games or Props, start time, sport and league, teams, abbreviations, and logos. If a sports provider is configured in [Integrations](/admin/integrations), search for a source match or enter its provider IDs manually so scores can sync later.
   </Accordion>
   <Accordion title="Sports categories" icon="tags">
     Sports categories are generated automatically from the sports selections, so you do not manage them the same way as a regular event.
@@ -177,7 +177,7 @@ The bond and reward requirements apply only when using UMA. UMA proposers need U
 
 <AccordionGroup>
   <Accordion title="If the flow gets blocked" icon="triangle-alert">
-    Allowed creator wallet errors usually point back to [General](/admin/general). OpenRouter errors usually point to [General](/admin/general) too. Recurring events also require a configured server signer.
+    Allowed creator wallet errors usually point back to [General](/admin/general). OpenRouter errors usually point to [Integrations](/admin/integrations#openrouter). Recurring events also require a configured server signer.
   </Accordion>
   <Accordion title="What matters most in practice" icon="star">
     Keep the title and rules unambiguous, confirm the right creator wallet, and check the preview before you sign.

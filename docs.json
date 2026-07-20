@@ -90,6 +90,7 @@
             "expanded": false,
             "pages": [
               "admin/general",
+              "admin/integrations",
               "admin/theme",
               "admin/locales",
               "admin/categories",

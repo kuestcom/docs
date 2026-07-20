@@ -1,6 +1,6 @@
 ---
 title: General
-description: Configure every card in Admin -> General, including brand, market context, featured markets, integrations, synced sources, legal controls, and identity verification.
+description: Configure the brand, market context, featured markets, synced sources, and legal controls in Admin -> General.
 icon: settings
 ---
 
@@ -75,7 +75,7 @@ This page mirrors the exact cards shown in <code>Admin -> General</code>. Each i
 
 <AccordionGroup>
   <Accordion title="Enable market context" icon="toggle-right" defaultOpen>
-    Turn AI-generated context on or off on event pages. This feature requires an OpenRouter API key and model in the Integrations card below.
+    Turn AI-generated context on or off on event pages. This feature requires an OpenRouter API key and model configured in [Integrations](/admin/integrations#openrouter).
   </Accordion>
   <Accordion title="Prompt template" icon="file-text">
     Control the instruction sent to the model. Keep it neutral and use it to explain the market rather than predict an outcome or persuade users to trade.
@@ -105,29 +105,6 @@ This page mirrors the exact cards shown in <code>Admin -> General</code>. Each i
   </Accordion>
 </AccordionGroup>
 
-## Integrations
-
-<AccordionGroup>
-  <Accordion title="Google Analytics ID" icon="bar-chart-3" defaultOpen>
-    GA4 measurement ID (format `G-XXXXXXXXXX`).
-  </Accordion>
-  <Accordion title="OpenRouter integration" icon="sparkles">
-    Configure the `API key` and `Preferred OpenRouter model`, or let OpenRouter choose the model. These settings power Market Context, locale translations, Create Event AI tools, and AI-assisted featured markets.
-  </Accordion>
-  <Accordion title="Sports data providers" icon="trophy">
-    Add a TheSportsDB API key for sports and a PandaScore token for esports. Configured providers let the Events and Create Event screens find source matches, attach provider IDs, and automate score updates.
-  </Accordion>
-  <Accordion title="LI.FI integration" icon="wallet-cards">
-    Configure `Integrator name` and optional `API key` for funding/swap flows.
-  </Accordion>
-  <Accordion title="Polymarket arbitrage" icon="arrow-left-right">
-    Enable <strong>Arbitrage with Polymarket</strong> to show cross-platform arbitrage. To let users connect a different Polymarket wallet, also enable <strong>Separate Polymarket wallets</strong>. This requires a Reown Pro or Enterprise plan <strong>and</strong> Multi-Wallet enabled for the project in [Reown Cloud](https://cloud.reown.com); the paid plan alone does not activate it. Without this option, users must use the same wallet on both sites.
-  </Accordion>
-  <Accordion title="Custom Integrations" icon="code">
-    Add external scripts. Each integration has `Name`, `Snippet`, and `Disable on` route options.
-  </Accordion>
-</AccordionGroup>
-
 ## Synced market sources
 
 <AccordionGroup>
@@ -146,67 +123,3 @@ This page mirrors the exact cards shown in <code>Admin -> General</code>. Each i
     Select countries that should be blocked from accessing the platform. If none are selected, access stays available for all regions.
   </Accordion>
 </AccordionGroup>
-
-## Identity verification and KYC
-
-Configure Sumsub at <strong>Admin → General → Integrations → Sumsub</strong>. The integration is disabled by default and does not change onboarding until it is enabled, fully configured, and set to `Observe only` or `Required`.
-
-<AccordionGroup>
-  <Accordion title="Sumsub credentials" icon="scan-face" defaultOpen>
-    In the [Sumsub dashboard](https://cockpit.sumsub.com), create an App Token and Secret Key for the environment that will run this site. Copy the webhook secret from the webhook configuration and use the exact, case-sensitive name of the verification level created for the WebSDK.
-
-    Fill these fields in the Sumsub block:
-
-    - <strong>App Token</strong>: the Sumsub application token.
-    - <strong>Secret Key</strong>: the key used to sign API requests.
-    - <strong>Webhook Secret</strong>: the key used to verify webhook payloads.
-    - <strong>Verification Level Name</strong>: the exact Sumsub level used by the WebSDK.
-
-    Secret fields are stored encrypted. Leaving an already configured secret field blank preserves its current value.
-  </Accordion>
-
-  <Accordion title="Webhook configuration" icon="webhook">
-    In each Sumsub environment, create a webhook whose destination is the public URL of that deployment followed by:
-
-    `POST /api/webhooks/sumsub`
-
-    For example, production might use `https://market.example.com/api/webhooks/sumsub`, while staging must use its own staging hostname and staging credentials. Subscribe to applicant creation/pending, on-hold, reset and reviewed/decision updates. Configure the same secret in Sumsub and in <strong>Webhook Secret</strong>.
-
-    The app validates signed webhook events before updating the user's verification status.
-  </Accordion>
-
-  <Accordion title="Test connection" icon="plug-zap">
-    <strong>Test connection</strong> uses the values currently visible in the form, including unsaved App Token, Secret Key and level name. Blank masked secret fields are resolved from the saved encrypted values on the server.
-
-    A successful test confirms Sumsub API authentication and that an SDK access token can be created with the selected verification level. It does not claim to validate <strong>Webhook Secret</strong>; that secret is proven end to end only when a real signed webhook is received.
-  </Accordion>
-
-  <Accordion title="Enforcement modes" icon="shield-check">
-    - <strong>Disabled</strong>: Sumsub is inactive. No verification step appears and no user operation is blocked.
-    - <strong>Observe only</strong>: the verification step and status appear in onboarding, but users may close it and continue. Deposit wallet creation, allowances, trading and SDK credentials remain available regardless of KYC status.
-    - <strong>Required</strong>: the user must be approved on the currently configured level before trading credentials, deposit wallet creation, allowances, SDK credential generation/reveal, arbitrage and new orders are allowed.
-
-    In `Required`, not started, pending, on hold, rejected, an old level, unknown state, or a temporary status error all remain blocked. Existing wallets and allowances are not removed. Cancellation, withdrawals, redemption, settings, SDK key revocation and account deletion remain available.
-  </Accordion>
-
-  <Accordion title="Onboarding and review state" icon="list-checks">
-    The onboarding order is username → email → Sumsub → trading authentication → deposit wallet → allowances. The WebSDK is loaded only when the verification step is opened and renews short-lived access tokens without reloading the page.
-
-    Completing the WebSDK does not mean approval. The UI remains pending until the server receives or confirms Sumsub's decision. In `Observe only`, closing the step does not reopen it in a loop. In `Required`, closing it leaves browsing and safe account actions available, but the requirement opens again when the user attempts a protected action. Approval resumes the pending action after the server confirms it.
-  </Accordion>
-
-  <Accordion title="KYC status in Admin → Users" icon="users">
-    When Sumsub is active in `Observe only` or `Required`, the users table adds a KYC column with a `ScanFaceIcon`:
-
-    - Gray: not started, pending, on hold, unavailable, or another non-approved state.
-    - Primary color: approved on the currently configured verification level.
-    - Red: rejected.
-
-    Each icon includes an accessible status label. The column is hidden when Sumsub is disabled or incompletely configured.
-  </Accordion>
-
-</AccordionGroup>
-
-<Warning>
-Review your privacy policy, terms, supported countries, consent wording and retention obligations before enabling `Required` in production. Identity documents, selfies and biometric material remain with Sumsub; the platform stores only the minimum applicant association and normalized review state needed for enforcement.
-</Warning>

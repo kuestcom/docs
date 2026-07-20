@@ -1,0 +1,118 @@
+---
+title: Integrations
+description: Connect analytics, AI, KYC, sports data, funding, arbitrage, and custom scripts from Admin -> Integrations.
+icon: plug
+---
+
+<Info>
+Each section below matches a card in <code>Admin → Integrations</code>. Open a card to configure that provider.
+</Info>
+
+## Google Analytics
+
+Measure site traffic and user activity with Google Analytics 4.
+
+<AccordionGroup>
+  <Accordion title="Configuration" icon="bar-chart-3" defaultOpen>
+    Create or open a property in [Google Analytics](https://analytics.google.com), then enter its GA4 Measurement ID in the `G-XXXXXXXXXX` format.
+  </Accordion>
+</AccordionGroup>
+
+## OpenRouter
+
+Provides the AI models used by market context, translations, event creation, and featured-market tools.
+
+<AccordionGroup>
+  <Accordion title="Configuration" icon="sparkles" defaultOpen>
+    Create an API key in [OpenRouter](https://openrouter.ai/settings/keys), then configure the `API key` and `Preferred OpenRouter model`. You can also let OpenRouter choose the model.
+  </Accordion>
+</AccordionGroup>
+
+## Sumsub
+
+Provides the KYC application used to verify user identities.
+
+<AccordionGroup>
+  <Accordion title="Credentials" icon="scan-face" defaultOpen>
+    In the [Sumsub dashboard](https://cockpit.sumsub.com), create the credentials for the environment that will run this site, then configure:
+
+    - <strong>App Token</strong>
+    - <strong>Secret Key</strong>
+    - <strong>Webhook Secret</strong>
+    - <strong>Verification Level Name</strong>
+
+    Sumsub is disabled by default. Use <strong>Test connection</strong> to validate the App Token, Secret Key, and verification level before enabling it.
+  </Accordion>
+
+  <Accordion title="Webhook" icon="webhook">
+    Create a webhook in Sumsub using the public URL of your deployment followed by:
+
+    `POST /api/webhooks/sumsub`
+
+    Configure the same webhook secret in Sumsub and in the integration card so signed status updates can be processed.
+  </Accordion>
+
+  <Accordion title="Enforcement" icon="shield-check">
+    - <strong>Disabled</strong>: KYC is inactive.
+    - <strong>Observe only</strong>: users can complete the verification flow and its status is tracked without blocking onboarding or user actions.
+    - <strong>Required</strong>: KYC approval is required before creating the deposit wallet, configuring allowances, and enabling trading.
+  </Accordion>
+
+  <Accordion title="Admin status" icon="users">
+    When Sumsub is active and configured, <strong>Admin → Users</strong> shows each user's KYC status: gray for not validated, the primary color for approved, and red for rejected.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+Review your privacy policy, terms, supported countries, consent wording, and retention obligations before enabling required KYC in production.
+</Warning>
+
+## TheSportsDB
+
+Provides sports events, teams, scores, and source IDs for event creation and score synchronization.
+
+<AccordionGroup>
+  <Accordion title="Configuration" icon="trophy" defaultOpen>
+    Get an API key from [TheSportsDB](https://www.thesportsdb.com/api.php), then enter it in the integration card.
+  </Accordion>
+</AccordionGroup>
+
+## PandaScore
+
+Provides esports matches, teams, scores, and source IDs for event creation and score synchronization.
+
+<AccordionGroup>
+  <Accordion title="Configuration" icon="gamepad-2" defaultOpen>
+    Create an account and API token in [PandaScore](https://app.pandascore.co), then enter the token in the integration card.
+  </Accordion>
+</AccordionGroup>
+
+## LI.FI
+
+Provides cross-chain funding and swap routes for deposits.
+
+<AccordionGroup>
+  <Accordion title="Configuration" icon="wallet-cards" defaultOpen>
+    Register with [LI.FI](https://portal.li.fi), then configure the `Integrator name` and optional `API key`.
+  </Accordion>
+</AccordionGroup>
+
+## Polymarket arbitrage
+
+Shows cross-platform arbitrage opportunities and supports an optional separate Polymarket wallet.
+
+<AccordionGroup>
+  <Accordion title="Configuration" icon="arrow-left-right" defaultOpen>
+    Enable <strong>Arbitrage with Polymarket</strong> to display opportunities sourced from [Polymarket](https://polymarket.com). Enabling <strong>Separate Polymarket wallets</strong> also requires a Pro or Enterprise project with Multi-Wallet enabled in [Reown Cloud](https://cloud.reown.com).
+  </Accordion>
+</AccordionGroup>
+
+## Custom Integrations
+
+Adds external scripts for chat, analytics, tracking, and other provider-specific features.
+
+<AccordionGroup>
+  <Accordion title="Configuration" icon="file-braces" defaultOpen>
+    Add a `Name`, the provider's `Snippet`, and the routes where it should be disabled. Get the snippet from the official documentation of the service you are connecting.
+  </Accordion>
+</AccordionGroup>
