@@ -89,6 +89,7 @@
             "icon": "shield",
             "expanded": false,
             "pages": [
+              "admin/dashboard",
               "admin/general",
               "admin/integrations",
               "admin/theme",

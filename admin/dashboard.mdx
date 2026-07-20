@@ -1,0 +1,53 @@
+---
+title: Dashboard
+description: Monitor operational alerts, user growth, site trading volume, and claimable fees from the Admin landing page.
+icon: layout-dashboard
+---
+
+<Info>
+The Dashboard opens at <code>/admin</code>. Platform settings remain available under <strong>Admin → General</strong> at <code>/admin/general</code>.
+</Info>
+
+The Dashboard brings the most important operational signals into one compact view, so you can spot events that need attention and follow recent platform activity.
+
+<CardGroup cols={2}>
+  <Card title="Event attention" icon="volleyball" href="/admin/events">
+    Find active sports events missing a provider ID and past-due markets still awaiting resolution.
+  </Card>
+  <Card title="User growth" icon="users" href="/admin/users">
+    See total registered users and daily registrations in a compact interactive chart.
+  </Card>
+  <Card title="Site trading volume" icon="chart-no-axes-combined" href="/admin/events">
+    Follow accepted orders submitted through this site, with a daily volume history.
+  </Card>
+  <Card title="Claimable fees" icon="hand-coins" href="/admin/affiliate">
+    Check the amount currently available for the configured fee receiver to withdraw.
+  </Card>
+</CardGroup>
+
+## What the cards show
+
+<AccordionGroup>
+  <Accordion title="Sports events missing an ID" icon="volleyball" defaultOpen>
+    Counts visible, active sports and esports events that are not connected to TheSportsDB or PandaScore. Open the card to go to Events with the matching attention filter already applied.
+  </Accordion>
+  <Accordion title="Markets awaiting resolution" icon="gavel">
+    Counts visible, active events whose end date has passed while at least one active market remains unresolved. Open the card to inspect the matching events directly.
+  </Accordion>
+  <Accordion title="Registered users" icon="users">
+    Shows the total number of registered users. The chart plots new registrations per day, making quiet days and growth spikes easy to compare. Hover over it to inspect the date and value.
+  </Accordion>
+  <Accordion title="Site trading volume" icon="chart-no-axes-combined">
+    Shows the value of accepted orders submitted through the current site and its daily history. Trades sent directly through the SDK are not included.
+  </Accordion>
+  <Accordion title="Claimable fees" icon="hand-coins">
+    Reads the fee receiver balance available to withdraw on-chain.
+  </Accordion>
+  <Accordion title="Kuest Message" icon="message-square-text">
+    Displays a short Kuest announcement with relevant product news or operational information for site owners.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+Site trading volume represents accepted local orders, not confirmed filled volume. Hidden or inactive events are excluded from the operational attention counts.
+</Warning>
