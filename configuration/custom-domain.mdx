@@ -1,95 +1,62 @@
 ---
-title: Custom Domain with Cloudflare
-description: Route Kuest services through your own subdomains without exposing kuest.com in the frontend.
+title: Custom Domain
+description: Route Kuest services through subdomains you control.
 sidebarTitle: Custom Domain
 icon: globe
 ---
 
-<Info>
-This setup keeps the frontend pointed at subdomains you control while Kuest services stay behind a Cloudflare proxy.
-</Info>
+Use a reverse proxy to keep Kuest service URLs under your domain.
 
 <Steps titleSize="h3">
-  <Step title="Create proxied DNS records">
-    In **Cloudflare Dashboard > Your Domain > DNS > Records**, create the CNAME records below and keep **Proxy ON**.
+  <Step title="Create the service proxies">
+    <Tabs sync={false}>
+      <Tab title="Deploy to Cloudflare" icon="cloud">
+        Recommended. Enter your domain when Cloudflare asks for `DOMAIN`; the deployment creates the Worker, DNS records, and certificates.
 
-    - `relayer.yourdomain.com` → `relayer.kuest.com`
-    - `clob.yourdomain.com` → `clob.kuest.com`
-    - `data-api.yourdomain.com` → `data-api.kuest.com`
-    - `user-pnl-api.yourdomain.com` → `user-pnl-api.kuest.com`
-    - `community.yourdomain.com` → `community.kuest.com`
-    - `create-market.yourdomain.com` → `create-market.kuest.com`
-    - `gamma-api.yourdomain.com` → `gamma-api.kuest.com`
-    - `price-reference.yourdomain.com` → `price-reference.kuest.com`
-    - `geoblock.yourdomain.com` → `geoblock.kuest.com`
-    - `sdk-download.yourdomain.com` → `sdk-download.kuest.com`
-    - `ws-live-data.yourdomain.com` → `ws-live-data.kuest.com`
-    - `ws-subscriptions-clob.yourdomain.com` → `ws-subscriptions-clob.kuest.com`
+        <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/kuestcom/custom-domain">
+          <img src="https://deploy.workers.cloudflare.com/button" alt="Deploy to Cloudflare" />
+        </a>
+
+        Use the root domain without `https://`, such as `example.com`.
+      </Tab>
+
+      <Tab title="Manual setup" icon="settings">
+        <AccordionGroup>
+          <Accordion title="Cloudflare dashboard">
+            Create a Worker with a `DOMAIN` variable, then attach these hostnames under **Settings > Domains & Routes > Add > Custom Domain**:
+
+            ```text
+            relayer.yourdomain.com
+            clob.yourdomain.com
+            data-api.yourdomain.com
+            user-pnl-api.yourdomain.com
+            community.yourdomain.com
+            create-market.yourdomain.com
+            gamma-api.yourdomain.com
+            price-reference.yourdomain.com
+            geoblock.yourdomain.com
+            sdk-download.yourdomain.com
+            ws-live-data.yourdomain.com
+            ws-subscriptions-clob.yourdomain.com
+            ```
+
+            Paste the [dashboard Worker](https://github.com/kuestcom/custom-domain/blob/main/examples/dashboard-worker.js) into the Cloudflare editor.
+          </Accordion>
+
+          <Accordion title="Other providers">
+            Create the same 12 subdomains as reverse proxies. Each hostname must forward its path, query, headers, body, and WebSocket upgrades to the matching `*.kuest.com` hostname listed in [`services.json`](https://github.com/kuestcom/custom-domain/blob/main/services.json).
+          </Accordion>
+        </AccordionGroup>
+      </Tab>
+    </Tabs>
   </Step>
-  <Step title="Create the Cloudflare Worker">
-    In **Workers & Pages**, create a Worker and paste this script after replacing `yourdomain.com`.
 
-    ```js
-    const ORIGINS = {
-      'relayer.yourdomain.com': 'https://relayer.kuest.com',
-      'clob.yourdomain.com': 'https://clob.kuest.com',
-      'data-api.yourdomain.com': 'https://data-api.kuest.com',
-      'user-pnl-api.yourdomain.com': 'https://user-pnl-api.kuest.com',
-      'community.yourdomain.com': 'https://community.kuest.com',
-      'create-market.yourdomain.com': 'https://create-market.kuest.com',
-      'gamma-api.yourdomain.com': 'https://gamma-api.kuest.com',
-      'price-reference.yourdomain.com': 'https://price-reference.kuest.com',
-      'geoblock.yourdomain.com': 'https://geoblock.kuest.com',
-      'sdk-download.yourdomain.com': 'https://sdk-download.kuest.com',
-      'ws-live-data.yourdomain.com': 'https://ws-live-data.kuest.com',
-      'ws-subscriptions-clob.yourdomain.com': 'https://ws-subscriptions-clob.kuest.com',
-    }
-
-    export default {
-      async fetch(request) {
-        const incomingUrl = new URL(request.url)
-        const targetBase = ORIGINS[incomingUrl.hostname]
-
-        if (!targetBase) {
-          return new Response('Unknown host', { status: 404 })
-        }
-
-        const targetUrl = new URL(request.url)
-        const targetOrigin = new URL(targetBase)
-        targetUrl.protocol = targetOrigin.protocol
-        targetUrl.hostname = targetOrigin.hostname
-
-        const headers = new Headers(request.headers)
-        headers.set('Host', targetOrigin.hostname)
-        headers.set('X-Forwarded-Host', incomingUrl.hostname)
-
-        const init = { method: request.method, headers, redirect: 'manual' }
-        if (request.method !== 'GET' && request.method !== 'HEAD') {
-          init.body = request.body
-        }
-
-        return fetch(new Request(targetUrl.toString(), init))
-      },
-    }
-    ```
+  <Step title="Verify the proxy">
+    Open `https://clob.yourdomain.com` and confirm it reaches the Kuest CLOB service.
   </Step>
-  <Step title="Attach Worker routes">
-    In **Worker > Settings > Triggers > Routes** or **Domains & Routes**, add these routes:
 
-    - `relayer.yourdomain.com/*`
-    - `clob.yourdomain.com/*`
-    - `data-api.yourdomain.com/*`
-    - `user-pnl-api.yourdomain.com/*`
-    - `community.yourdomain.com/*`
-    - `create-market.yourdomain.com/*`
-    - `price-reference.yourdomain.com/*`
-    - `geoblock.yourdomain.com/*`
-    - `sdk-download.yourdomain.com/*`
-    - `ws-live-data.yourdomain.com/*`
-    - `ws-subscriptions-clob.yourdomain.com/*`
-  </Step>
-  <Step title="Update production environment variables">
-    In your hosting provider, point the app to your new subdomains:
+  <Step title="Update environment variables">
+    In Vercel or your hosting provider, replace `yourdomain.com` and save:
 
     ```bash
     CREATE_MARKET_URL=https://create-market.yourdomain.com
@@ -105,13 +72,7 @@ This setup keeps the frontend pointed at subdomains you control while Kuest serv
     WS_LIVE_DATA_URL=wss://ws-live-data.yourdomain.com
     WS_CLOB_URL=wss://ws-subscriptions-clob.yourdomain.com
     ```
+
+    Redeploy the application after saving the variables.
   </Step>
 </Steps>
-
-<Info>
-Keep these exact environment variable names. The frontend already exposes them to the client through `next.config.ts`.
-</Info>
-
-<Check>
-After this setup, users stay on your domain while traffic is proxied to the Kuest services behind Cloudflare.
-</Check>
