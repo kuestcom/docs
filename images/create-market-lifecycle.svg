@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 470" role="img" aria-labelledby="title desc">
+  <title id="title">Create Market API lifecycle</title>
+  <desc id="desc">Payload preparation, creator authorization, worker preparation, wallet transactions, and finalization.</desc>
+  <style>
+    .bg{fill:#f7f8fa}.card{fill:#fff;stroke:#d9dee5;stroke-width:2}.accent{fill:#cdff00;stroke:#8eae00;stroke-width:2}.line{fill:none;stroke:#69717c;stroke-width:3}.arrow{fill:#69717c}.title{fill:#101419;font:700 24px ui-sans-serif,system-ui,sans-serif}.num{fill:#101419;font:800 15px ui-sans-serif,system-ui,sans-serif}.label{fill:#101419;font:700 16px ui-sans-serif,system-ui,sans-serif}.copy{fill:#4d5662;font:500 13px ui-sans-serif,system-ui,sans-serif}
+    .on-accent{fill:#101419}
+  </style>
+  <rect class="bg" width="1200" height="470" rx="28"/>
+  <text class="title" x="52" y="54">Create Market: resumable transaction lifecycle</text>
+
+  <g transform="translate(52 108)">
+    <rect class="card" width="190" height="220" rx="20"/><circle class="accent" cx="32" cy="32" r="20"/><text class="num" x="32" y="37" text-anchor="middle">1</text>
+    <text class="label" x="24" y="92">Build payload</text><text class="copy" x="24" y="124">Serialize once and</text><text class="copy" x="24" y="144">compute payloadHash.</text>
+  </g>
+  <g transform="translate(278 108)">
+    <rect class="card" width="190" height="220" rx="20"/><circle class="accent" cx="32" cy="32" r="20"/><text class="num" x="32" y="37" text-anchor="middle">2</text>
+    <text class="label" x="24" y="92">Authorize</text><text class="copy" x="24" y="124">Request challenge and</text><text class="copy" x="24" y="144">sign EIP-712.</text>
+  </g>
+  <g transform="translate(504 108)">
+    <rect class="card" width="190" height="220" rx="20"/><circle class="accent" cx="32" cy="32" r="20"/><text class="num" x="32" y="37" text-anchor="middle">3</text>
+    <text class="label" x="24" y="92">Prepare</text><text class="copy" x="24" y="124">Upload images and poll</text><text class="copy" x="24" y="144">until txPlan is ready.</text>
+  </g>
+  <g transform="translate(730 108)">
+    <rect class="card" width="190" height="220" rx="20"/><circle class="accent" cx="32" cy="32" r="20"/><text class="num" x="32" y="37" text-anchor="middle">4</text>
+    <text class="label" x="24" y="92">Execute</text><text class="copy" x="24" y="124">Send each planned tx</text><text class="copy" x="24" y="144">from the creator EOA.</text>
+  </g>
+  <g transform="translate(956 108)">
+    <rect class="card" width="190" height="220" rx="20"/><circle class="accent" cx="32" cy="32" r="20"/><text class="num" x="32" y="37" text-anchor="middle">5</text>
+    <text class="label" x="24" y="92">Finalize</text><text class="copy" x="24" y="124">Validate receipts and</text><text class="copy" x="24" y="144">publish final metadata.</text>
+  </g>
+  <path class="line" d="M242 218h20"/><path class="arrow" d="m262 218-10-7v14z"/>
+  <path class="line" d="M468 218h20"/><path class="arrow" d="m488 218-10-7v14z"/>
+  <path class="line" d="M694 218h20"/><path class="arrow" d="m714 218-10-7v14z"/>
+  <path class="line" d="M920 218h20"/><path class="arrow" d="m940 218-10-7v14z"/>
+  <rect class="accent" x="316" y="370" width="568" height="54" rx="14"/>
+  <text class="label on-accent" x="600" y="403" text-anchor="middle">Persist requestId and transaction hashes after every step</text>
+</svg>

@@ -52,10 +52,19 @@ docker compose --env-file .env -f infra/docker/docker-compose.production.yml --p
 Run database migrations:
 
 ```bash
-docker compose --env-file .env -f infra/docker/docker-compose.production.yml exec web npm run db:push
+docker compose --env-file .env -f infra/docker/docker-compose.production.yml exec web pnpm db:push
 ```
 
 If you are using the local Postgres profile, wait for the database container to become healthy first.
+
+## Verify the deployment
+
+```bash
+docker compose -f infra/docker/docker-compose.production.yml ps
+curl -fsS "${SITE_URL}"
+```
+
+Confirm that `web` is healthy, Caddy is serving HTTPS, and the admin wallet can sign in before sending traffic to the host.
 
 ## Common operations
 

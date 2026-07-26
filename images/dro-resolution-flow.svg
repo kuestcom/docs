@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 450" role="img" aria-labelledby="title desc">
+  <title id="title">DRO resolution flow</title>
+  <desc id="desc">An approved proposer verifies rules, reads the adapter request, submits the final result, and waits for synchronization.</desc>
+  <style>
+    .bg{fill:#f7f8fa}.card{fill:#fff;stroke:#d9dee5;stroke-width:2}.accent{fill:#cdff00;stroke:#8eae00;stroke-width:2}.line{fill:none;stroke:#69717c;stroke-width:3}.arrow{fill:#69717c}.title{fill:#101419;font:700 24px ui-sans-serif,system-ui,sans-serif}.label{fill:#101419;font:700 17px ui-sans-serif,system-ui,sans-serif}.copy{fill:#4d5662;font:500 13px ui-sans-serif,system-ui,sans-serif}.eyebrow{fill:#5d6672;font:700 11px ui-sans-serif,system-ui,sans-serif;letter-spacing:1.2px}
+    .on-accent{fill:#101419}
+  </style>
+  <rect class="bg" width="1200" height="450" rx="28"/>
+  <text class="title" x="52" y="54">DRO resolution: verify, submit, synchronize</text>
+
+  <g transform="translate(52 112)">
+    <rect class="card" width="235" height="220" rx="20"/><text class="eyebrow" x="26" y="38">VERIFY</text>
+    <text class="label" x="26" y="82">Rules and source</text><text class="copy" x="26" y="116">Confirm the final outcome</text><text class="copy" x="26" y="136">and proposer permission.</text>
+  </g>
+  <g transform="translate(339 112)">
+    <rect class="card" width="235" height="220" rx="20"/><text class="eyebrow" x="26" y="38">READ</text>
+    <text class="label" x="26" y="82">Adapter request</text><text class="copy" x="26" y="116">Load timestamp, ancillary</text><text class="copy" x="26" y="136">data, and current state.</text>
+  </g>
+  <g transform="translate(626 112)">
+    <rect class="accent" width="235" height="220" rx="20"/><text class="eyebrow on-accent" x="26" y="38">SUBMIT</text>
+    <text class="label on-accent" x="26" y="82">Final on-chain result</text><text class="copy on-accent" x="26" y="116">Sign one standard or</text><text class="copy on-accent" x="26" y="136">negative-risk call.</text>
+  </g>
+  <g transform="translate(913 112)">
+    <rect class="card" width="235" height="220" rx="20"/><text class="eyebrow" x="26" y="38">SYNC</text>
+    <text class="label" x="26" y="82">Market state</text><text class="copy" x="26" y="116">Update payouts, caches,</text><text class="copy" x="26" y="136">event state, and claims.</text>
+  </g>
+  <path class="line" d="M287 222h36"/><path class="arrow" d="m323 222-11-8v16z"/>
+  <path class="line" d="M574 222h36"/><path class="arrow" d="m610 222-11-8v16z"/>
+  <path class="line" d="M861 222h36"/><path class="arrow" d="m897 222-11-8v16z"/>
+  <text class="copy" x="600" y="392" text-anchor="middle">The approved proposer signs; no public REST endpoint submits the result.</text>
+</svg>

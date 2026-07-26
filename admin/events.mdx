@@ -4,8 +4,22 @@ description: Review events, manage visibility and context, configure sync behavi
 icon: calendar-range
 ---
 
+Use this page to operate existing events and to create new ones. Visibility, context, sports data, sync policy, and settlement readiness all meet here.
+
+<CardGroup cols={3}>
+  <Card title="Review" icon="clipboard-list">
+    Find events by category, creator, series, status, or operational attention.
+  </Card>
+  <Card title="Operate" icon="settings-2">
+    Manage visibility, context, livestreams, source matching, and sync behavior.
+  </Card>
+  <Card title="Create" icon="square-plus" href="#create-event">
+    Build and sign a new event through the calendar workflow.
+  </Card>
+</CardGroup>
+
 <AccordionGroup>
-  <Accordion title="Table and filters" icon="filter" defaultOpen>
+  <Accordion title="Table and filters" icon="list-filter" defaultOpen>
     This page is for operating events that already exist. You can search by text and filter by main category, creator, series, active-only status, and operational attention. Attention filters show sports events missing a provider ID or past-due events with unresolved markets, including the filters opened from the [Dashboard](/admin/dashboard). The table also shows status, 24h and total volume, created date, and end date.
   </Accordion>
   <Accordion title="Visibility toggle" icon="eye-off">
@@ -164,13 +178,13 @@ The bond and reward requirements apply only when using UMA. UMA proposers need U
 ### Step 5: Sign & Create
 
 <AccordionGroup>
-  <Accordion title="Auth challenge" icon="file-signature" defaultOpen>
+  <Accordion title="Auth challenge" icon="key-round" defaultOpen>
     First sign the EIP-712 auth challenge so the server can prepare the transaction plan.
   </Accordion>
   <Accordion title="Transaction plan" icon="list-checks">
     Then approve the transactions required to create and register the markets.
   </Accordion>
-  <Accordion title="Finalize" icon="check-circle-2">
+  <Accordion title="Finalize" icon="circle-check-big">
     After signatures are done, the server finalizes and registers the markets.
   </Accordion>
 </AccordionGroup>

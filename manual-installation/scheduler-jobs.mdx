@@ -5,7 +5,7 @@ icon: timer
 ---
 
 <Info>
-If you use Supabase mode, `npm run db:push` already sets up `pg_cron` with this same sync schedule.
+`pnpm db:push` configures the supplied database scheduler only when both `pg_cron` and `pg_net` are available. Read the migration output: if either extension is unavailable, use the external schedule below.
 </Info>
 
 ## What your scheduler should call
@@ -48,7 +48,7 @@ curl -sS -X GET \
 
 Use UTC unless your team needs a strict local timezone.
 
-Supabase mode also creates `clean-cron-details` at `0 0 * * *` and `clean-jobs` at `15 * * * *` as database maintenance jobs. External schedulers should only call the HTTP sync endpoints above.
+When database scheduling is available, the migration also creates `clean-cron-details` at `0 0 * * *` and `clean-jobs` at `15 * * * *` as maintenance jobs. External schedulers should only call the HTTP sync endpoints above.
 
 ## Expected responses
 

@@ -5,15 +5,30 @@ icon: plug
 ---
 
 <Info>
-Each section below matches a card in <code>Admin → Integrations</code>. Open a card to configure that provider.
+Enable only the providers your site actively uses. Each section below matches a card in <code>Admin → Integrations</code>.
 </Info>
+
+| Integration | Enables |
+| --- | --- |
+| Google Analytics | Traffic and audience measurement |
+| OpenRouter | Market context, translations, event assistance, and featured-market tools |
+| Sumsub | Optional or required KYC |
+| TheSportsDB | Sports events, teams, scores, and source matching |
+| PandaScore | Esports matches, teams, scores, and source matching |
+| LI.FI | Cross-chain deposits and swaps |
+| Polymarket arbitrage | Cross-platform opportunity display |
+| Custom integrations | Route-aware scripts for support, analytics, or tracking |
+
+<Tip>
+Configure a provider, test the connection when the card offers that action, then verify the feature that depends on it before enabling the next integration.
+</Tip>
 
 ## Google Analytics
 
 Measure site traffic and user activity with Google Analytics 4.
 
 <AccordionGroup>
-  <Accordion title="Configuration" icon="bar-chart-3" defaultOpen>
+  <Accordion title="Configuration" icon="chart-no-axes-combined" defaultOpen>
     Create or open a property in [Google Analytics](https://analytics.google.com), then enter its GA4 Measurement ID in the `G-XXXXXXXXXX` format.
   </Accordion>
 </AccordionGroup>

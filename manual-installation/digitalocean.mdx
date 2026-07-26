@@ -28,7 +28,7 @@ icon: app-window
     Add the shared values from [Environment Variables](/configuration/environment-variables) and the correct storage profile from [Manual Installation Overview](/manual-installation/overview). Mark secrets as encrypted.
   </Step>
   <Step title="Create resources and validate">
-    Deploy the app, wait for build completion, and validate the main route.
+    Deploy the app and wait for build completion. Run `pnpm db:push` from a secured environment connected to the production database, then validate the main route.
   </Step>
   <Step title="Set the final domain">
     Add the production domain in App Platform and update `SITE_URL` to the final HTTPS URL.
@@ -37,7 +37,7 @@ icon: app-window
 
 ## Scheduler
 
-App Platform deployment does not replace the sync scheduler requirement. If you are not on Supabase mode, use an external scheduler that follows [Scheduled Jobs](/manual-installation/scheduler-jobs).
+App Platform deployment does not replace the sync scheduler requirement. If the supplied database jobs are not active, use an external scheduler that follows [Scheduled Jobs](/manual-installation/scheduler-jobs).
 
 ## Optional Terraform
 

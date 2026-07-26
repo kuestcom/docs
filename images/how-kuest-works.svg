@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200px" height="900px" viewBox="0 0 1200 900" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>how-kuest-works</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="how-kuest-works">
+            <rect id="Rectangle" fill="#F7F8FA" fill-rule="nonzero" x="0" y="0" width="1200" height="900" rx="30"></rect>
+            <text id="How-Kuest-works" fill="#101419" fill-rule="nonzero" font-family="Helvetica" font-size="24" font-weight="normal">
+                <tspan x="48" y="55">How Kuest works</tspan>
+            </text>
+            <text id="Markets-move-between-independent-operator-platforms-through-the-Kuest-Protocol." fill="#5D6672" fill-rule="nonzero" font-family="Helvetica" font-size="13" font-weight="normal">
+                <tspan x="48" y="82">Markets move between independent operator platforms through the Kuest Protocol.</tspan>
+            </text>
+            <g id="Group" transform="translate(469.000000, 112.000000)" fill-rule="nonzero">
+                <rect id="Rectangle" stroke="#D9DEE5" stroke-width="2" fill="#FFFFFF" x="0" y="0" width="259" height="68" rx="18"></rect>
+                <circle id="Oval" fill="#2E5CFF" cx="35" cy="34" r="21"></circle>
+                <g id="P" transform="translate(29.000000, 22.000000)" fill="#FFFFFF" font-family="Helvetica" font-size="20" font-weight="normal">
+                    <g id="Group">
+                        <text id="P">
+                            <tspan x="0" y="19">P</tspan>
+                        </text>
+                    </g>
+                </g>
+                <g id="Polymarket-markets" transform="translate(71.000000, 21.000000)" fill="#101419" font-family="Helvetica" font-size="20" font-weight="normal">
+                    <g id="Group">
+                        <text id="Polymarket-markets">
+                            <tspan x="0" y="19">Polymarket markets</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+            <g id="mirror-source-flow" transform="translate(528.000000, 189.000000)">
+                <line x1="72" y1="0" x2="72" y2="112" id="Path" stroke="#708B00" stroke-width="4"></line>
+                <polygon id="Path" fill="#708B00" fill-rule="nonzero" points="72 120 62 104 82 104"></polygon>
+                <rect id="Rectangle" fill="#F7F8FA" fill-rule="nonzero" x="0" y="44" width="144" height="28" rx="8"></rect>
+                <g id="Mirrored-by-Kuest" transform="translate(8.500000, 48.000000)" fill="#708B00" fill-rule="nonzero" font-family="Helvetica" font-size="16" font-weight="normal">
+                    <g id="Group">
+                        <text id="Mirrored-by-Kuest">
+                            <tspan x="0" y="15">Mirrored by Kuest</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+            <rect id="Rectangle" stroke="#D9DEE5" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero" x="450" y="318" width="300" height="234" rx="30"></rect>
+            <g id="Group" transform="translate(500.000000, 334.000000)" fill="#708B00" fill-rule="nonzero">
+                <path d="M13.5729,0 L18.5976,0 C19.5611134,0.000745176863 20.3418003,0.782036317 20.3418,1.74555 L20.3418,9.396 C20.3418,10.3599 21.12345,11.14155 22.08735,11.14155 L27.2214,11.14155 C28.1853,11.14155 28.9656,11.9232 28.9656,12.88575 L28.9656,21.89835 C28.9656,22.86225 28.1853,23.6439008 27.2214,23.6439008 L22.572,23.6439008 C21.2899748,23.6442581 20.0603355,23.1352266 19.1536802,22.2288245 C18.2470249,21.3224223 17.7376499,20.0929252 17.73765,18.8109 L17.73765,15.16455 C17.73765,14.8494728 17.6124861,14.5473004 17.3896929,14.3245071 C17.1668996,14.1017139 16.8647272,13.97655 16.54965,13.97655 L16.20945,13.97655 C15.6735,13.97655 15.16725,14.22225 14.8365,14.6448 L8.29845,22.97565 C7.96766387,23.3973699 7.46147303,23.6439008 6.9255,23.6439008 L1.48365,23.6439008 C0.664252731,23.6439008 0,22.9796473 0,22.16025 L0,16.7184 C0,16.3458 0.12555,15.984 0.3564,15.6924 L12.20265,0.6642 C12.5336651,0.244744265 13.0385648,0 13.5729,0 L13.5729,0 Z" id="Path"></path>
+            </g>
+            <text id="Kuest-Protocol" fill="#101419" fill-rule="nonzero" font-family="Helvetica" font-size="22" font-weight="normal">
+                <tspan x="543" y="355">Kuest Protocol</tspan>
+            </text>
+            <rect id="Rectangle" stroke="#C9CFD7" stroke-width="1.5" fill="#EEF1F4" fill-rule="nonzero" x="478" y="382" width="112" height="48" rx="13"></rect>
+            <rect id="Rectangle" stroke="#C9CFD7" stroke-width="1.5" fill="#EEF1F4" fill-rule="nonzero" x="610" y="382" width="112" height="48" rx="13"></rect>
+            <rect id="Rectangle" stroke="#C9CFD7" stroke-width="1.5" fill="#EEF1F4" fill-rule="nonzero" x="478" y="444" width="112" height="48" rx="13"></rect>
+            <rect id="Rectangle" stroke="#C9CFD7" stroke-width="1.5" fill="#EEF1F4" fill-rule="nonzero" x="610" y="444" width="112" height="48" rx="13"></rect>
+            <text id="Relayer" fill="#303741" fill-rule="nonzero" font-family="Helvetica" font-size="13" font-weight="normal">
+                <tspan x="643.5" y="473">Relayer</tspan>
+            </text>
+            <text id="CLOB" fill="#303741" fill-rule="nonzero" font-family="Helvetica" font-size="13" font-weight="normal">
+                <tspan x="516" y="411">CLOB</tspan>
+            </text>
+            <text id="Polygon" fill="#303741" fill-rule="nonzero" font-family="Helvetica" font-size="13" font-weight="normal">
+                <tspan x="642.510498" y="403">Polygon</tspan>
+            </text>
+            <text id="Smart-Contracts" fill="#303741" fill-rule="nonzero" font-family="Helvetica" font-size="13" font-weight="normal">
+                <tspan x="619.043213" y="419">Smart Contracts</tspan>
+            </text>
+            <text id="Data-API" fill="#303741" fill-rule="nonzero" font-family="Helvetica" font-size="13" font-weight="normal">
+                <tspan x="508" y="473">Data API</tspan>
+            </text>
+            <text id="40+-services" fill="#5D6672" fill-rule="nonzero" font-family="Helvetica" font-size="13" font-weight="normal">
+                <tspan x="563" y="527">40+ services</tspan>
+            </text>
+            <g id="operator-market-flows" transform="translate(302.000000, 368.000000)">
+                <line x1="4" y1="46" x2="128" y2="46" id="Path" stroke="#C96B12" stroke-width="4"></line>
+                <polygon id="Path" fill="#C96B12" fill-rule="nonzero" points="144 46 128 36 128 56"></polygon>
+                <rect id="Rectangle" fill="#F7F8FA" fill-rule="nonzero" x="0" y="6" width="136" height="28" rx="8"></rect>
+                <g id="A-create-markets" transform="translate(6.000000, 10.000000)" fill="#C96B12" fill-rule="nonzero" font-family="Helvetica" font-size="16" font-weight="normal">
+                    <g id="Group">
+                        <text id="A-create-markets">
+                            <tspan x="0" y="15">A create markets</tspan>
+                        </text>
+                    </g>
+                </g>
+                <line x1="453" y1="34" x2="577" y2="34" id="Path" stroke="#C23A80" stroke-width="4"></line>
+                <polygon id="Path" fill="#C23A80" fill-rule="nonzero" points="593 34 577 24 577 44"></polygon>
+                <rect id="Rectangle" fill="#F7F8FA" fill-rule="nonzero" x="460" y="0" width="106" height="28" rx="8"></rect>
+                <g id="C-Markets" transform="translate(476.000000, 5.000000)" fill="#C23A80" fill-rule="nonzero" font-family="Helvetica" font-size="16" font-weight="normal">
+                    <g id="Group">
+                        <text id="C-Markets">
+                            <tspan x="0" y="15">C Markets</tspan>
+                        </text>
+                    </g>
+                </g>
+                <line x1="144" y1="118" x2="20" y2="118" id="Path" stroke="#708B00" stroke-width="4"></line>
+                <polygon id="Path" fill="#708B00" fill-rule="nonzero" points="4 118 20 108 20 128"></polygon>
+                <rect id="Rectangle" fill="#F7F8FA" fill-rule="nonzero" x="15" y="129" width="131" height="28" rx="8"></rect>
+                <g id="Mirrored-markets-to-A" transform="translate(22.000000, 133.000000)" fill="#708B00" fill-rule="nonzero" font-family="Helvetica" font-size="16" font-weight="normal">
+                    <g id="Group">
+                        <text id="Mirrored-markets">
+                            <tspan x="0" y="15">Mirrored markets</tspan>
+                        </text>
+                    </g>
+                </g>
+                <line x1="453" y1="106" x2="577" y2="106" id="Path" stroke="#708B00" stroke-width="4"></line>
+                <polygon id="Path" fill="#708B00" fill-rule="nonzero" points="593 106 577 96 577 116"></polygon>
+                <rect id="Rectangle" fill="#F7F8FA" fill-rule="nonzero" x="450" y="116" width="130" height="28" rx="8"></rect>
+                <g id="Mirrored-markets-to-B" transform="translate(455.000000, 120.000000)" fill="#708B00" fill-rule="nonzero" font-family="Helvetica" font-size="16" font-weight="normal">
+                    <g id="Group">
+                        <text id="Mirrored-markets">
+                            <tspan x="0" y="15">Mirrored markets</tspan>
+                        </text>
+                    </g>
+                </g>
+                <line x1="299" y1="344" x2="299" y2="210" id="Path" stroke="#C23A80" stroke-width="4"></line>
+                <polygon id="Path" fill="#C23A80" fill-rule="nonzero" points="299 194 289 210 309 210"></polygon>
+                <rect id="Rectangle" fill="#F7F8FA" fill-rule="nonzero" x="234" y="261" width="130" height="28" rx="8"></rect>
+                <g id="C-create-markets" transform="translate(238.500000, 265.000000)" fill="#C23A80" fill-rule="nonzero" font-family="Helvetica" font-size="16" font-weight="normal">
+                    <g id="Group">
+                        <text id="C-create-markets">
+                            <tspan x="0" y="15">C create markets</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+            <g id="operator-a-site" transform="translate(55.000000, 366.000000)">
+                <rect id="Rectangle" stroke="#D9DEE5" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="245" height="138" rx="24"></rect>
+                <circle id="Oval" fill="#FF5F57" fill-rule="nonzero" cx="18" cy="18" r="4"></circle>
+                <circle id="Oval" fill="#FEBC2E" fill-rule="nonzero" cx="32" cy="18" r="4"></circle>
+                <circle id="Oval" fill="#28C840" fill-rule="nonzero" cx="46" cy="18" r="4"></circle>
+                <rect id="Rectangle" stroke="#D9DEE5" fill="#EEF1F4" fill-rule="nonzero" x="62" y="8" width="165" height="20" rx="10"></rect>
+                <g id="site-a.com" transform="translate(119.000000, 12.000000)" fill="#5D6672" fill-rule="nonzero" font-family="Helvetica" font-size="11" font-weight="normal">
+                    <g id="Group">
+                        <text id="site-a.com">
+                            <tspan x="0" y="10">site-a.com</tspan>
+                        </text>
+                    </g>
+                </g>
+                <line x1="1" y1="36" x2="244" y2="36" id="Path" stroke="#EEF1F4"></line>
+                <circle id="Oval" stroke="#C96B12" stroke-width="2.5" fill="#FFF1E3" fill-rule="nonzero" cx="57" cy="87" r="24"></circle>
+                <g id="Group" transform="translate(50.000000, 76.000000)" fill="#A94F00" fill-rule="nonzero" font-family="Helvetica" font-size="20" font-weight="normal">
+                    <g id="A">
+                        <text>
+                            <tspan x="0" y="19">A</tspan>
+                        </text>
+                    </g>
+                </g>
+                <g id="Group" transform="translate(96.000000, 72.000000)" fill="#101419" fill-rule="nonzero" font-family="Helvetica" font-size="24" font-weight="normal">
+                    <g id="Operator-A">
+                        <text>
+                            <tspan x="0" y="23">Operator A</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+            <g id="operator-b-site" transform="translate(900.000000, 366.000000)">
+                <rect id="Rectangle" stroke="#D9DEE5" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="245" height="138" rx="24"></rect>
+                <circle id="Oval" fill="#FF5F57" fill-rule="nonzero" cx="18" cy="18" r="4"></circle>
+                <circle id="Oval" fill="#FEBC2E" fill-rule="nonzero" cx="32" cy="18" r="4"></circle>
+                <circle id="Oval" fill="#28C840" fill-rule="nonzero" cx="46" cy="18" r="4"></circle>
+                <rect id="Rectangle" stroke="#D9DEE5" fill="#EEF1F4" fill-rule="nonzero" x="62" y="8" width="165" height="20" rx="10"></rect>
+                <g id="site-b.com" transform="translate(119.000000, 12.000000)" fill="#5D6672" fill-rule="nonzero" font-family="Helvetica" font-size="11" font-weight="normal">
+                    <g id="Group">
+                        <text id="site-b.com">
+                            <tspan x="0" y="10">site-b.com</tspan>
+                        </text>
+                    </g>
+                </g>
+                <line x1="1" y1="36" x2="244" y2="36" id="Path" stroke="#EEF1F4"></line>
+                <circle id="Oval" stroke="#0086A8" stroke-width="2.5" fill="#E6F8FC" fill-rule="nonzero" cx="56" cy="87" r="24"></circle>
+                <g id="Group" transform="translate(49.000000, 76.000000)" fill="#006A86" fill-rule="nonzero" font-family="Helvetica" font-size="20" font-weight="normal">
+                    <g id="B">
+                        <text>
+                            <tspan x="0" y="19">B</tspan>
+                        </text>
+                    </g>
+                </g>
+                <g id="Group" transform="translate(95.000000, 72.000000)" fill="#101419" fill-rule="nonzero" font-family="Helvetica" font-size="24" font-weight="normal">
+                    <g id="Operator-B">
+                        <text>
+                            <tspan x="0" y="23">Operator B</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+            <g id="operator-c-site" transform="translate(477.000000, 720.000000)">
+                <rect id="Rectangle" stroke="#D9DEE5" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="246" height="138" rx="24"></rect>
+                <circle id="Oval" fill="#FF5F57" fill-rule="nonzero" cx="18" cy="18" r="4"></circle>
+                <circle id="Oval" fill="#FEBC2E" fill-rule="nonzero" cx="32" cy="18" r="4"></circle>
+                <circle id="Oval" fill="#28C840" fill-rule="nonzero" cx="46" cy="18" r="4"></circle>
+                <rect id="Rectangle" stroke="#D9DEE5" fill="#EEF1F4" fill-rule="nonzero" x="62" y="8" width="166" height="20" rx="10"></rect>
+                <g id="site-c.com" transform="translate(119.500000, 12.000000)" fill="#5D6672" fill-rule="nonzero" font-family="Helvetica" font-size="11" font-weight="normal">
+                    <g id="Group">
+                        <text id="site-c.com">
+                            <tspan x="0" y="10">site-c.com</tspan>
+                        </text>
+                    </g>
+                </g>
+                <line x1="1" y1="36" x2="245" y2="36" id="Path" stroke="#EEF1F4"></line>
+                <circle id="Oval" stroke="#C23A80" stroke-width="2.5" fill="#FDEAF4" fill-rule="nonzero" cx="55" cy="87" r="24"></circle>
+                <g id="Group" transform="translate(47.500000, 76.000000)" fill="#A92369" fill-rule="nonzero" font-family="Helvetica" font-size="20" font-weight="normal">
+                    <g id="C">
+                        <text>
+                            <tspan x="0" y="19">C</tspan>
+                        </text>
+                    </g>
+                </g>
+                <g id="Group" transform="translate(97.000000, 72.000000)" fill="#101419" fill-rule="nonzero" font-family="Helvetica" font-size="24" font-weight="normal">
+                    <g id="Operator-C">
+                        <text>
+                            <tspan x="0" y="23">Operator C</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+            <g id="operator-fees-badge" transform="translate(806.000000, 755.000000)">
+                <rect id="operator-fees-badge-background" stroke="#708B00" stroke-width="1.5" fill="#F3F9DD" fill-rule="nonzero" x="0" y="0" width="339" height="68" rx="18"></rect>
+                <g id="badge-percent-icon" stroke-linecap="round" stroke-linejoin="round" transform="translate(22.713822, 23.459122)" stroke="#708B00" stroke-width="2">
+                    <path d="M1.13617769,7.16087769 C0.596971937,5.46044192 1.05828932,3.60170515 2.3308186,2.34912326 C3.60334788,1.09654138 5.46876679,0.663200977 7.16087769,1.22877769 C8.77985329,-0.409592563 11.4175021,-0.409592563 13.0364777,1.22877769 C14.7285886,0.663200977 16.5940075,1.09654138 17.8665368,2.34912326 C19.1390661,3.60170515 19.6003834,5.46044192 19.0611777,7.16087769 C20.699548,8.77985329 20.699548,11.4175021 19.0611777,13.0364777 C19.6267544,14.7285886 19.193414,16.5940075 17.9408321,17.8665368 C16.6882502,19.1390661 14.8295135,19.6003834 13.1290777,19.0611777 C11.5101021,20.699548 8.87245329,20.699548 7.25347769,19.0611777 C5.56136679,19.6267544 3.69594789,19.193414 2.4234186,17.9408321 C1.15088932,16.6882502 0.689571937,14.8295135 1.22877769,13.1290777 C-0.409592563,11.5101021 -0.409592563,8.87245329 1.22877769,7.25347769 L1.13617769,7.16087769 Z" id="Path"></path>
+                    <line x1="12.2861777" y1="7.54087769" x2="6.28617769" y2="13.5408777" id="Path"></line>
+                    <line x1="6.28617769" y1="7.54087769" x2="6.29617769" y2="7.54087769" id="Path"></line>
+                    <line x1="12.2861777" y1="13.5408777" x2="12.2961777" y2="13.5408777" id="Path"></line>
+                </g>
+                <g id="Operators-earn-fees" transform="translate(58.000000, 14.000000)" fill="#314000" fill-rule="nonzero" font-family="Helvetica" font-size="14" font-weight="normal">
+                    <g id="Operators-earn-fees-from-every-trade">
+                        <text>
+                            <tspan x="0" y="14">Operators earn fees from every trade</tspan>
+                        </text>
+                    </g>
+                </g>
+                <g id="on-their-sites-and-SDKs" transform="translate(58.000000, 35.000000)" fill="#617600" fill-rule="nonzero" font-family="Helvetica" font-size="13" font-weight="normal">
+                    <g id="on-their-sites-and-SDKs.">
+                        <text>
+                            <tspan x="0" y="13">on their sites and SDKs.</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

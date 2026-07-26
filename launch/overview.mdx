@@ -5,18 +5,48 @@ icon: rocket
 ---
 
 <Info>
-Use this page while filling `/launch`. It follows the same three steps shown in the product and helps you launch your prediction market quickly.
+Use this page while completing `/launch`. The guided flow creates the repository, connects the required services, and deploys a working site to Vercel.
 </Info>
+
+<Frame>
+  <img
+    className="block dark:hidden"
+    src="/images/guided-launch-flow.svg"
+    alt="Guided launch flow from project details through connected services to a deployed prediction market"
+  />
+  <img
+    className="hidden dark:block"
+    src="/images/dark/guided-launch-flow.svg"
+    alt="Guided launch flow from project details through connected services to a deployed prediction market"
+  />
+</Frame>
+
+## Before you start
+
+<CardGroup cols={2}>
+  <Card title="Admin wallet" icon="wallet">
+    The wallet that will sign the setup request and become the first site admin.
+  </Card>
+  <Card title="GitHub account" icon="github">
+    The account or organization that will own the generated repository.
+  </Card>
+  <Card title="Vercel token" icon="key-round">
+    A token with access to the account or team that will host the project.
+  </Card>
+  <Card title="Reown project" icon="wallet-cards">
+    A project ID used to enable wallet connections on the deployed site.
+  </Card>
+</CardGroup>
 
 <Columns cols={3}>
   <Card title="Step 1: Site + Wallet" icon="wallet" href="#step-1" cta="Open step" arrow="true">
-    Name, admin wallet, email and nonce.
+    Define the site and create its Kuest credentials.
   </Card>
   <Card title="Step 2: Connections" icon="plug" href="#step-2" cta="Open step" arrow="true">
-    GitHub, Vercel, Reown and Supabase.
+    Connect the services used to build and host it.
   </Card>
   <Card title="Step 3: Deploy" icon="rocket" href="#step-3" cta="Open step" arrow="true">
-    Deploy, progress and result links.
+    Start the deployment and verify the result.
   </Card>
 </Columns>
 
@@ -29,7 +59,7 @@ Use this page while filling `/launch`. It follows the same three steps shown in 
     Use the public name users should see on the site.
   </Accordion>
   <Accordion title="Admin wallet" icon="wallet">
-    Connect the wallet that should become the first admin. One signature creates the Kuest credentials.
+    Connect the wallet that should become the first admin. One signature creates the Kuest credentials used by the site.
   </Accordion>
   <Accordion title="Email (optional)" icon="mail">
     Add it only if you want a contact email saved with the generated API key.
@@ -40,7 +70,7 @@ Use this page while filling `/launch`. It follows the same three steps shown in 
 </AccordionGroup>
 
 <Info>
-No funds move in this step. No balance is required. The connected wallet becomes the first admin wallet.
+This signature does not move funds and the wallet does not need a balance. The connected address becomes the first admin wallet.
 </Info>
 
 <div id="step-2" />
@@ -49,7 +79,7 @@ No funds move in this step. No balance is required. The connected wallet becomes
 
 <AccordionGroup>
   <Accordion title="GitHub" icon="github" defaultOpen>
-    Connect GitHub so Kuest can create or use your repository.
+    Connect the account or organization where the project repository should live.
   </Accordion>
   <Accordion title="Vercel Access Token" icon="key-round">
     Paste a Vercel token and let the form verify it. Get it from [vercel.com/account/tokens](https://vercel.com/account/tokens).
@@ -61,7 +91,7 @@ No funds move in this step. No balance is required. The connected wallet becomes
     Paste the project ID used for wallet login. Get it from [cloud.reown.com](https://cloud.reown.com).
   </Accordion>
   <Accordion title="Supabase database" icon="database">
-    Choose **Create new** for a fresh site, or reuse an existing database only if that is intentional.
+    Choose **Create new** for an isolated production database. Reuse an existing project only when the environments are intentionally shared.
   </Accordion>
 </AccordionGroup>
 
@@ -93,7 +123,7 @@ No funds move in this step. No balance is required. The connected wallet becomes
     Fill it only if you already know the final public URL you want to use.
   </Accordion>
   <Accordion title="Extra env vars" icon="plus">
-    Use one `KEY=value` per line for optional services such as OpenRouter or Sentry.
+    Use one `KEY=value` per line for optional services or runtime overrides.
   </Accordion>
 </AccordionGroup>
 
@@ -110,7 +140,7 @@ Helpful pages: [Environment Variables](/configuration/environment-variables) and
     Starts the launch with your site name, repository, branch, database choice, and environment values.
   </Accordion>
   <Accordion title="Timeline" icon="list-todo">
-    Shows validation, project setup, database attach, and deployment progress.
+    Follow credential validation, repository setup, database connection, and deployment progress. If a stage fails, open its logs before retrying.
   </Accordion>
   <Accordion title="Result panel" icon="panel-top">
     Shows the project URL, Vercel dashboard, Supabase dashboard, duration, and logs.
@@ -120,3 +150,17 @@ Helpful pages: [Environment Variables](/configuration/environment-variables) and
 <Info>
 After install, go to [General](/admin/general) to set your brand, support link, fee wallet, and core settings.
 </Info>
+
+## Verify the launch
+
+<Steps>
+  <Step title="Open the project URL">
+    Confirm the home page loads from the URL shown in the result panel.
+  </Step>
+  <Step title="Connect the admin wallet">
+    Sign in with the wallet from Step 1 and confirm the admin dashboard is available.
+  </Step>
+  <Step title="Complete the operator setup">
+    Configure [General settings](/admin/general), [Integrations](/admin/integrations), and your [Custom Domain](/configuration/custom-domain) before sending traffic to the site.
+  </Step>
+</Steps>

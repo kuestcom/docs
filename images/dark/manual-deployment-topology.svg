@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">Manual Kuest deployment topology</title>
+  <desc id="desc">A Kuest web runtime connects to PostgreSQL, asset storage, scheduled jobs, Kuest services, and Polygon.</desc>
+  <style>
+    .bg{fill:#181a1f}.card{fill:#22262c;stroke:#3c434c;stroke-width:2}.accent{fill:#cdff00;stroke:#e3ff75;stroke-width:2}.line{fill:none;stroke:#8d96a2;stroke-width:3}.arrow{fill:#8d96a2}.title{fill:#f5f7f9;font:700 24px ui-sans-serif,system-ui,sans-serif}.label{fill:#f5f7f9;font:700 18px ui-sans-serif,system-ui,sans-serif}.copy{fill:#b8c0ca;font:500 14px ui-sans-serif,system-ui,sans-serif}.eyebrow{fill:#b8c0ca;font:700 12px ui-sans-serif,system-ui,sans-serif;letter-spacing:1.3px}.on-accent{fill:#101419}
+  </style>
+  <rect class="bg" width="1200" height="520" rx="28"/>
+  <text class="title" x="52" y="54">Minimum production topology</text>
+
+  <rect class="accent" x="430" y="100" width="340" height="150" rx="22"/>
+  <text class="eyebrow on-accent" x="462" y="138">PUBLIC RUNTIME</text>
+  <text class="label on-accent" x="462" y="178">Kuest frontend</text>
+  <text class="copy on-accent" x="462" y="207">Node.js 24 · HTTPS · SITE_URL</text>
+
+  <rect class="card" x="52" y="100" width="280" height="150" rx="22"/>
+  <text class="eyebrow" x="82" y="138">STATE</text>
+  <text class="label" x="82" y="178">PostgreSQL</text>
+  <text class="copy" x="82" y="207">Runtime data and migrations</text>
+
+  <rect class="card" x="52" y="310" width="280" height="150" rx="22"/>
+  <text class="eyebrow" x="82" y="348">ASSETS</text>
+  <text class="label" x="82" y="388">Supabase or S3</text>
+  <text class="copy" x="82" y="417">Choose exactly one profile</text>
+
+  <rect class="card" x="430" y="310" width="340" height="150" rx="22"/>
+  <text class="eyebrow" x="462" y="348">OPERATIONS</text>
+  <text class="label" x="462" y="388">Scheduler and monitoring</text>
+  <text class="copy" x="462" y="417">Sync jobs · Logs · Alerts · Backups</text>
+
+  <rect class="card" x="868" y="100" width="280" height="150" rx="22"/>
+  <text class="eyebrow" x="898" y="138">KUEST</text>
+  <text class="label" x="898" y="178">Shared services</text>
+  <text class="copy" x="898" y="207">Trading, data, wallets, lifecycle</text>
+
+  <rect class="card" x="868" y="310" width="280" height="150" rx="22"/>
+  <text class="eyebrow" x="898" y="348">POLYGON</text>
+  <text class="label" x="898" y="388">Contracts</text>
+  <text class="copy" x="898" y="417">Orders, positions, and resolution</text>
+
+  <path class="line" d="M332 175h82"/><path class="arrow" d="m414 175-12-8v16z"/>
+  <path class="line" d="M332 385h82"/><path class="arrow" d="m414 385-12-8v16z"/>
+  <path class="line" d="M770 175h82"/><path class="arrow" d="m852 175-12-8v16z"/>
+  <path class="line" d="M770 385h82"/><path class="arrow" d="m852 385-12-8v16z"/>
+  <path class="line" d="M600 250v44"/><path class="arrow" d="m600 294-8-12h16z"/>
+  <path class="line" d="M1008 250v44"/><path class="arrow" d="m1008 294-8-12h16z"/>
+</svg>

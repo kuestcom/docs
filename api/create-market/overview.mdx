@@ -6,9 +6,34 @@ icon: square-pen
 
 Use the Create Market API when you want to create events and markets outside the admin UI. The API prepares metadata, images, on-chain calldata, and final registration, while your integration signs and sends the wallet transactions from the creator EOA.
 
+<Frame>
+  <img
+    className="block dark:hidden"
+    src="/images/create-market-lifecycle.svg"
+    alt="Create Market API lifecycle from runtime configuration and creator authorization through transactions and final registration"
+  />
+  <img
+    className="hidden dark:block"
+    src="/images/dark/create-market-lifecycle.svg"
+    alt="Create Market API lifecycle from runtime configuration and creator authorization through transactions and final registration"
+  />
+</Frame>
+
 <Info>
 Production base URL: `https://create-market.kuest.com`. Self-hosted deployments can point the app to another worker with `CREATE_MARKET_URL`.
 </Info>
+
+<CardGroup cols={3}>
+  <Card title="API prepares" icon="server">
+    Validates the request, processes images and metadata, and returns the transaction plan.
+  </Card>
+  <Card title="Creator signs" icon="signature">
+    Authorizes the exact payload and sends every transaction from the creator EOA.
+  </Card>
+  <Card title="API finalizes" icon="badge-check">
+    Validates confirmed transactions and registers the completed markets.
+  </Card>
+</CardGroup>
 
 ## Prerequisites
 
@@ -59,6 +84,10 @@ Production base URL: `https://create-market.kuest.com`. Self-hosted deployments 
   </Step>
 </Steps>
 
+<Tip>
+Persist `requestId`, the serialized payload, and every confirmed transaction hash. These values let the integration resume after a timeout or process restart.
+</Tip>
+
 ## Request Statuses
 
 | Status | Meaning | Next action |
@@ -74,7 +103,7 @@ Production base URL: `https://create-market.kuest.com`. Self-hosted deployments 
 ## Security Model
 
 <AccordionGroup>
-  <Accordion title="Preparation requires creator consent" icon="file-signature" defaultOpen>
+  <Accordion title="Preparation requires creator consent" icon="signature" defaultOpen>
     `POST /prepare` only accepts a challenge signed by the creator EOA. The signature expires after 30 minutes and is bound to the exact payload hash.
   </Accordion>
   <Accordion title="Allowed creator policy lives outside this worker" icon="shield">

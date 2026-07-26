@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 430" role="img" aria-labelledby="title desc">
+  <title id="title">Guided Kuest launch flow</title>
+  <desc id="desc">Three-stage launch from site identity and connected services to deployment and admin setup.</desc>
+  <style>
+    .bg{fill:#181a1f}.card{fill:#22262c;stroke:#3c434c;stroke-width:2}.accent{fill:#cdff00;stroke:#e3ff75;stroke-width:2}.line{fill:none;stroke:#8d96a2;stroke-width:4}.arrow{fill:#8d96a2}.title{fill:#f5f7f9;font:700 24px ui-sans-serif,system-ui,sans-serif}.num{fill:#101419;font:800 18px ui-sans-serif,system-ui,sans-serif}.label{fill:#f5f7f9;font:700 19px ui-sans-serif,system-ui,sans-serif}.copy{fill:#b8c0ca;font:500 14px ui-sans-serif,system-ui,sans-serif}.icon{fill:none;stroke:#b8c0ca;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+  </style>
+  <rect class="bg" width="1200" height="430" rx="28"/>
+  <text class="title" x="52" y="54">Guided launch: three decisions, one deployment</text>
+
+  <g transform="translate(52 100)">
+    <rect class="card" width="300" height="260" rx="22"/>
+    <circle class="accent" cx="52" cy="50" r="26"/><text class="num" x="52" y="57" text-anchor="middle">1</text>
+    <path class="icon" d="M132 38a18 18 0 1 1 0 36 18 18 0 0 1 0-36Zm-34 78c7-22 18-32 34-32s27 10 34 32M202 46h58M202 72h42"/>
+    <text class="label" x="30" y="157">Site and wallet</text>
+    <text class="copy" x="30" y="188">Name the site and authorize</text>
+    <text class="copy" x="30" y="209">the first admin wallet.</text>
+  </g>
+
+  <g transform="translate(450 100)">
+    <rect class="card" width="300" height="260" rx="22"/>
+    <circle class="accent" cx="52" cy="50" r="26"/><text class="num" x="52" y="57" text-anchor="middle">2</text>
+    <path class="icon" d="M112 54h45l20 24h55M112 100h45l20-24h55M235 62v28M245 62v28"/>
+    <text class="label" x="30" y="157">Connect services</text>
+    <text class="copy" x="30" y="188">GitHub · Vercel · Reown</text>
+    <text class="copy" x="30" y="209">Supabase · Runtime secrets</text>
+  </g>
+
+  <g transform="translate(848 100)">
+    <rect class="card" width="300" height="260" rx="22"/>
+    <circle class="accent" cx="52" cy="50" r="26"/><text class="num" x="52" y="57" text-anchor="middle">3</text>
+    <path class="icon" d="M120 112V46h96v66M104 112h128M150 78h36M168 60v36"/>
+    <text class="label" x="30" y="157">Deploy and configure</text>
+    <text class="copy" x="30" y="188">Watch the deployment, open</text>
+    <text class="copy" x="30" y="209">the site, then finish Admin.</text>
+  </g>
+
+  <path class="line" d="M352 230h76"/><path class="arrow" d="m428 230-15-10v20z"/>
+  <path class="line" d="M750 230h76"/><path class="arrow" d="m826 230-15-10v20z"/>
+</svg>

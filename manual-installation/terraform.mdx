@@ -9,6 +9,7 @@ icon: blocks
 - `production/gke`
 - `production/kubernetes`
 - `production/cloud-run`
+- `production/railway`
 - `production/fly`
 - `production/digital-ocean`
 
@@ -33,6 +34,9 @@ terraform apply
   </Accordion>
   <Accordion title="Cloud Run">
     Requires Secret Manager secrets to exist before apply.
+  </Accordion>
+  <Accordion title="Railway">
+    Provisions the Railway deployment target from the production environment configuration. Keep runtime secrets in Railway rather than committing them to Terraform variables.
   </Accordion>
   <Accordion title="Fly.io">
     Uses `flyctl deploy` via Terraform `local-exec`. Secrets are still managed manually in Fly.io.

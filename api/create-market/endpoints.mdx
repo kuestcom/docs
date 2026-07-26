@@ -6,6 +6,12 @@ icon: route
 
 All endpoints return JSON except `POST /prepare`, which receives `multipart/form-data` and returns JSON. Error responses use this shape:
 
+Set the worker URL once so the examples work with the Kuest endpoint or an operator runtime override:
+
+```bash
+export CREATE_MARKET_URL=https://create-market.kuest.com
+```
+
 ```json
 {
   "error": {
@@ -21,7 +27,7 @@ All endpoints return JSON except `POST /prepare`, which receives `multipart/form
 Reads runtime configuration for the worker.
 
 ```bash
-curl "https://create-market.kuest.com/market-config"
+curl "${CREATE_MARKET_URL}/market-config"
 ```
 
 Use this response to choose the chain, validate images, display required funding, and know which contracts the returned transaction plan will target.
@@ -118,7 +124,7 @@ Required multipart fields:
 | `teamLogo:home` / `teamLogo:away` | file | Required for sports teams that do not include `logo` in the payload. |
 
 ```bash
-curl -X POST "https://create-market.kuest.com/prepare" \
+curl -X POST "${CREATE_MARKET_URL}/prepare" \
   -F 'payload={"chainId":80002,"creator":"0x1111111111111111111111111111111111111111","title":"Will BTC close above 110000 USD on March 31, 2028?","slug":"btc-above-110000-march-31-2028","endDateIso":"2028-03-31T23:00:00.000Z","mainCategorySlug":"crypto","categories":["crypto","bitcoin","price-action","march","macro"],"marketMode":"binary","binaryQuestion":"Will BTC close above 110000 USD on March 31, 2028?","binaryOutcomeYes":"Yes","binaryOutcomeNo":"No","resolutionRules":"Resolve YES if BTC/USD closes strictly above 110000.00 at the cutoff using the listed source. Resolve NO otherwise."}' \
   -F 'auth={"requestId":"8b583ebd-1f8f-46fa-b31b-06643f58d457","nonce":"0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","expiresAt":1846000000000,"payloadHash":"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","signature":"0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}' \
   -F "eventImage=@./event.webp"
@@ -142,7 +148,7 @@ After this response, poll `GET /pending` until `request.prepared.txPlan` is avai
 Returns a resumable request by `requestId` or the latest resumable request for a creator.
 
 ```bash
-curl "https://create-market.kuest.com/pending?requestId=8b583ebd-1f8f-46fa-b31b-06643f58d457&creator=0x1111111111111111111111111111111111111111&chainId=80002"
+curl "${CREATE_MARKET_URL}/pending?requestId=8b583ebd-1f8f-46fa-b31b-06643f58d457&creator=0x1111111111111111111111111111111111111111&chainId=80002"
 ```
 
 Query parameters:
@@ -350,4 +356,3 @@ Final response:
 ## Optional Health Check
 
 `GET /` returns `"OK"` when the worker is reachable.
-

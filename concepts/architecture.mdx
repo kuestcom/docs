@@ -1,0 +1,85 @@
+---
+title: How Kuest Works
+description: Understand what your deployment owns, which Kuest services it uses, and how orders reach shared liquidity.
+icon: network
+---
+
+Your prediction market is a branded frontend and operational control plane connected to Kuest trading infrastructure. You own the site experience and deployment. Kuest provides the shared services used for market discovery, order matching, wallet operations, and market lifecycle data.
+
+<Frame>
+  <img
+    className="block dark:hidden"
+    src="/images/how-kuest-works.svg"
+    alt="Multiple operator sites connected to the Kuest market network and shared trading services"
+  />
+  <img
+    className="hidden dark:block"
+    src="/images/dark/how-kuest-works.svg"
+    alt="Multiple operator sites connected to the Kuest market network and shared trading services"
+  />
+</Frame>
+
+The Kuest catalog can combine selected mirrored Polymarket markets, markets created by your team, and markets from another operator you explicitly choose as a source. Creating markets is optional: a site can launch using only the shared catalog.
+
+Trading activity remains attributed to the originating operator whether an order comes from the site interface or from a bot or SDK integration used by its traders. That attribution is what connects eligible trading fees to the operator's configured fee wallet.
+
+## Responsibility boundary
+
+<Columns cols={2}>
+  <Card title="You manage" icon="settings-2">
+    Hosting, domain, database, uploaded assets, secrets, admin wallets, brand, integrations, legal settings, support, and release operations.
+  </Card>
+  <Card title="Kuest provides" icon="server-cog">
+    Authentication support, CLOB access, relayed wallet actions, market and account data, community services, market creation, and shared network configuration.
+  </Card>
+</Columns>
+
+<Info>
+Your users interact with your domain and brand. Keep Kuest credentials and service secrets server-side; only public runtime URLs and explicitly public IDs should reach browser code.
+</Info>
+
+## Request path
+
+| User action | Your deployment | Kuest service | Settlement or source |
+| --- | --- | --- | --- |
+| Browse markets | Renders discovery and event pages | Gamma, Data API, community, and price services | Indexed market data |
+| Sign in and prepare trading | Stores the local account and encrypted credentials | Auth and relayer services | User wallet and Deposit Wallet |
+| Place or cancel an order | Builds the request and obtains user signatures | CLOB | Polygon exchange contracts |
+| Create a market | Collects content, creator approval, and wallet signatures | Create Market worker | Market and resolution contracts |
+| Resolve a DRO market | Guides an approved proposer through the result | Resolution data and sync services | Direct Resolution Oracle and adapters |
+
+## Shared liquidity
+
+Markets with the same outcome token IDs use the same Kuest order books. Orders submitted through your site can match compatible orders already resting in those books. Your frontend controls presentation and order entry, but it does not create an isolated matching engine.
+
+<Warning>
+Do not describe a frontend deployment as its own exchange or promise isolated liquidity unless you have built and operate a separate matching and settlement stack.
+</Warning>
+
+## Data you should back up
+
+<AccordionGroup>
+  <Accordion title="Database" icon="database" defaultOpen>
+    User records, settings, categories, local order history, event state, integrations, and operational job data live in your PostgreSQL database.
+  </Accordion>
+  <Accordion title="Uploaded assets" icon="images">
+    Logos, event images, market covers, and uploaded legal files live in the Supabase or S3-compatible storage profile you configure.
+  </Accordion>
+  <Accordion title="Secrets" icon="key-round">
+    Keep an encrypted, access-controlled copy of deployment secrets. Rotating `BETTER_AUTH_SECRET` invalidates sessions and encrypted trading credentials.
+  </Accordion>
+  <Accordion title="Infrastructure configuration" icon="file-cog">
+    Keep environment values, domain records, scheduler definitions, and infrastructure code under change control without committing secrets.
+  </Accordion>
+</AccordionGroup>
+
+## Next step
+
+<CardGroup cols={2}>
+  <Card title="Guided launch" icon="rocket" href="/launch/overview">
+    Use the managed setup path for the fastest production start.
+  </Card>
+  <Card title="Manual installation" icon="server" href="/manual-installation/overview">
+    Compare hosting targets and choose your database, storage, and scheduler.
+  </Card>
+</CardGroup>

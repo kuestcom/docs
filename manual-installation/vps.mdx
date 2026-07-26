@@ -46,9 +46,11 @@ sudo ufw --force enable
   </Step>
   <Step title="Build and migrate">
     ```bash
-    npm ci
-    npm run build
-    npm run db:push
+    corepack enable
+    corepack install
+    pnpm install --frozen-lockfile
+    pnpm build
+    pnpm db:push
     ```
   </Step>
   <Step title="Create the systemd service and Nginx site">
@@ -80,14 +82,14 @@ sudo ufw --force enable
   </Step>
   <Step title="Run database migrations">
     ```bash
-    docker compose --env-file .env -f infra/docker/docker-compose.production.yml exec web npm run db:push
+    docker compose --env-file .env -f infra/docker/docker-compose.production.yml exec web pnpm db:push
     ```
   </Step>
 </Steps>
 
 ## Scheduler on VPS
 
-If you are not using Supabase mode, create Linux cron jobs that follow [Scheduled Jobs](/manual-installation/scheduler-jobs). Keep that page as the single source of truth for the exact cron expressions.
+If the supplied `pg_cron` jobs are not active in your database, create Linux cron jobs that follow [Scheduled Jobs](/manual-installation/scheduler-jobs). Keep that page as the single source of truth for the exact cron expressions.
 
 <Warning>
 Keep only one scheduler backend active for `/api/sync/*`.

@@ -18,6 +18,8 @@ cp infra/kubernetes/secret.example.yaml infra/kubernetes/secret.yaml
 kubectl apply -k infra/kubernetes
 ```
 
+The baseline Kustomize resources do not run database migrations. Run `pnpm db:push` from a secured environment connected to the production database before routing traffic to a release.
+
 ## Important configuration points
 
 - `SITE_URL` must match the canonical public URL.
@@ -25,9 +27,16 @@ kubectl apply -k infra/kubernetes
   - Supabase with `SUPABASE_*`
   - S3 with `S3_BUCKET`, `S3_ACCESS_KEY_ID`, and `S3_SECRET_ACCESS_KEY`
 
+Verify the rollout before updating public DNS:
+
+```bash
+kubectl -n kuest rollout status deployment/kuest-web
+kubectl -n kuest get pods,service,ingress
+```
+
 ## Scheduler
 
-If you are not using Supabase mode, edit `infra/kubernetes/cronjobs.yaml` for your namespace, secret name, and `SITE_URL`, then apply it:
+If the supplied database jobs are not active, edit `infra/kubernetes/cronjobs.yaml` for your namespace, secret name, and `SITE_URL`, then apply it:
 
 ```bash
 kubectl apply -f infra/kubernetes/cronjobs.yaml

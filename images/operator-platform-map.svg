@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">Kuest operator platform architecture</title>
+  <desc id="desc">Traders use an operator-owned site connected to Kuest services and Polygon settlement.</desc>
+  <style>
+    .bg{fill:#f7f8fa}.panel{fill:#fff;stroke:#d9dee5;stroke-width:2}.muted{fill:#f0f3f6;stroke:#d9dee5;stroke-width:2}.accent{fill:#cdff00;stroke:#8eae00;stroke-width:2}.line{fill:none;stroke:#69717c;stroke-width:3}.arrow{fill:#69717c}.title{fill:#101419;font:700 24px ui-sans-serif,system-ui,sans-serif}.label{fill:#101419;font:650 18px ui-sans-serif,system-ui,sans-serif}.copy{fill:#4d5662;font:500 14px ui-sans-serif,system-ui,sans-serif}.eyebrow{fill:#5d6672;font:700 12px ui-sans-serif,system-ui,sans-serif;letter-spacing:1.4px}.icon{fill:none;stroke:#101419;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+    .on-accent{fill:#101419}
+  </style>
+  <rect class="bg" width="1200" height="560" rx="28"/>
+  <text class="title" x="52" y="54">From your users to shared settlement</text>
+
+  <rect class="muted" x="52" y="100" width="230" height="360" rx="22"/>
+  <text class="eyebrow" x="82" y="140">YOUR AUDIENCE</text>
+  <circle class="panel" cx="167" cy="230" r="62"/>
+  <path class="icon" d="M167 190a22 22 0 1 1 0 44 22 22 0 0 1 0-44Zm-44 92c8-25 24-38 44-38s36 13 44 38"/>
+  <text class="label" x="167" y="332" text-anchor="middle">Traders</text>
+  <text class="copy" x="167" y="360" text-anchor="middle">Use your domain,</text>
+  <text class="copy" x="167" y="381" text-anchor="middle">brand, and support</text>
+
+  <rect class="accent" x="362" y="100" width="300" height="360" rx="22"/>
+  <text class="eyebrow on-accent" x="392" y="140">YOU OPERATE</text>
+  <rect class="panel" x="402" y="175" width="220" height="142" rx="14"/>
+  <path class="icon" d="M424 202h176M446 230h132M446 254h80M446 278h110"/>
+  <text class="label on-accent" x="512" y="357" text-anchor="middle">Branded site</text>
+  <text class="copy on-accent" x="512" y="385" text-anchor="middle">Deployment · Database</text>
+  <text class="copy on-accent" x="512" y="406" text-anchor="middle">Admin · Integrations</text>
+
+  <rect class="panel" x="742" y="100" width="406" height="218" rx="22"/>
+  <text class="eyebrow" x="772" y="140">KUEST SERVICES</text>
+  <g transform="translate(772 170)">
+    <rect class="muted" width="160" height="52" rx="12"/><text class="label" x="80" y="33" text-anchor="middle">CLOB</text>
+    <rect class="muted" x="186" width="160" height="52" rx="12"/><text class="label" x="266" y="33" text-anchor="middle">Relayer</text>
+    <rect class="muted" y="74" width="160" height="52" rx="12"/><text class="label" x="80" y="107" text-anchor="middle">Market data</text>
+    <rect class="muted" x="186" y="74" width="160" height="52" rx="12"/><text class="label" x="266" y="107" text-anchor="middle">Lifecycle</text>
+  </g>
+
+  <rect class="panel" x="742" y="342" width="406" height="118" rx="22"/>
+  <text class="eyebrow" x="772" y="382">POLYGON</text>
+  <text class="label" x="772" y="418">Contracts and settlement</text>
+  <path class="icon" d="M1060 379l34 20v40l-34 20-34-20v-40l34-20Zm0 0v40m34-20-34 20-34-20"/>
+
+  <path class="line" d="M282 280h64"/><path class="arrow" d="m346 280-12-8v16z"/>
+  <path class="line" d="M662 210h64"/><path class="arrow" d="m726 210-12-8v16z"/>
+  <path class="line" d="M945 318v18"/><path class="arrow" d="m945 336-8-12h16z"/>
+</svg>

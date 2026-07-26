@@ -6,7 +6,7 @@
   "colors": {
     "primary": "#0E1117",
     "light": "#CDFF00",
-    "dark": "#23292F"
+    "dark": "#708B00"
   },
   "icons": {
     "library": "lucide"
@@ -48,7 +48,8 @@
       {
         "group": "Owner Guide",
         "pages": [
-          "index"
+          "index",
+          "concepts/architecture"
         ]
       },
       {

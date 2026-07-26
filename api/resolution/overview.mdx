@@ -6,9 +6,39 @@ icon: square-check-big
 
 The DRO Resolution API is an on-chain contract API. There is no public REST endpoint that submits a final result. A proposer wallet reads the DRO adapter request, signs a transaction with its private key, and calls the Direct Resolution Oracle contract.
 
+<Frame>
+  <img
+    className="block dark:hidden"
+    src="/images/dro-resolution-flow.svg"
+    alt="DRO resolution flow from market rules and proposer validation through the on-chain resolution transaction and platform synchronization"
+  />
+  <img
+    className="hidden dark:block"
+    src="/images/dark/dro-resolution-flow.svg"
+    alt="DRO resolution flow from market rules and proposer validation through the on-chain resolution transaction and platform synchronization"
+  />
+</Frame>
+
 <Warning>
 DRO resolution is final for approved proposers. Always verify the market rules and the listed resolution source before signing.
 </Warning>
+
+## Before you sign
+
+<Columns cols={2}>
+  <Card title="Confirm the market" icon="list-checks">
+    Match the event, question ID, adapter, resolution rules, source, and cutoff time.
+  </Card>
+  <Card title="Confirm the signer" icon="user-check">
+    Verify that the proposer wallet is whitelisted for the market creator.
+  </Card>
+  <Card title="Confirm the network" icon="network">
+    Use the RPC, chain ID, and contract addresses for the market's deployment.
+  </Card>
+  <Card title="Confirm finality" icon="shield-alert">
+    Treat the selected outcome and submitted resolution transaction as final.
+  </Card>
+</Columns>
 
 ## When to use DRO
 
@@ -844,3 +874,17 @@ echo "Submitted: " . $hash . PHP_EOL;
 ```
 
 </CodeGroup>
+
+## After submission
+
+<Steps>
+  <Step title="Confirm the receipt">
+    Wait for a successful transaction receipt and store its hash with the market question ID and selected outcome.
+  </Step>
+  <Step title="Watch resolution sync">
+    Confirm `/api/sync/resolution` completes and the event reflects the final payout state.
+  </Step>
+  <Step title="Investigate before retrying">
+    If the transaction succeeded but the site has not updated, inspect sync logs and indexed resolution data. Do not submit a second resolution transaction only to force a refresh.
+  </Step>
+</Steps>

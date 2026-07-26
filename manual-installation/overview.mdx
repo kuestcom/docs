@@ -9,7 +9,33 @@ icon: wrench
 Use this path if you want to install your prediction market manually on your own infrastructure, not through the guided `/launch` flow.
 </Info>
 
-Choose the deployment target below. Each guide explains the platform-specific setup, the environment values it needs, and whether it also needs scheduled jobs.
+<Frame>
+  <img
+    className="block dark:hidden"
+    src="/images/manual-deployment-topology.svg"
+    alt="Manual deployment topology connecting the application to PostgreSQL, asset storage, Kuest services, and scheduled sync jobs"
+  />
+  <img
+    className="hidden dark:block"
+    src="/images/dark/manual-deployment-topology.svg"
+    alt="Manual deployment topology connecting the application to PostgreSQL, asset storage, Kuest services, and scheduled sync jobs"
+  />
+</Frame>
+
+Every manual deployment needs the application runtime, a PostgreSQL database, one asset storage profile, and the production secrets listed in [Environment Variables](/configuration/environment-variables).
+
+## Choose a deployment target
+
+| Target | Best fit | Operations level |
+| --- | --- | --- |
+| Vercel + Supabase | Fast hosted setup with minimal infrastructure work. | Low |
+| Railway, Fly.io, or DigitalOcean | Managed application hosting with more runtime control. | Low to medium |
+| Cloud Run | Teams already operating on Google Cloud. | Medium |
+| Docker Compose or VPS | A single Linux server managed directly by your team. | Medium |
+| Kubernetes | Existing cluster, rollout, autoscaling, and policy requirements. | High |
+| Terraform | Repeatable infrastructure managed as code. | Depends on target |
+
+The detailed guides retain the platform-specific commands and deployment files:
 
 <AccordionGroup>
   <Accordion title="Vercel + Supabase" icon="cloud" defaultOpen>
@@ -59,6 +85,42 @@ Choose the deployment target below. Each guide explains the platform-specific se
   </Accordion>
 </AccordionGroup>
 
+## Choose one storage profile
+
+<Tabs>
+  <Tab title="Supabase Storage" icon="database">
+    Use `POSTGRES_URL` for the runtime database and configure `SUPABASE_URL` with `SUPABASE_SERVICE_ROLE_KEY` for uploaded assets.
+
+    If the PostgreSQL database also provides `pg_cron` and `pg_net`, `pnpm db:push` configures the supplied sync jobs there.
+  </Tab>
+  <Tab title="S3-compatible" icon="hard-drive">
+    Use `POSTGRES_URL` for the runtime database and configure the `S3_*` variables for assets. This profile works with AWS S3, Cloudflare R2, DigitalOcean Spaces, MinIO, and compatible providers.
+
+    Storage choice does not determine scheduling. Use the database jobs when `pg_cron` and `pg_net` are available; otherwise configure an external scheduler.
+  </Tab>
+</Tabs>
+
 <Warning>
-External scheduler jobs for `/api/sync/*` are required only for non-Supabase deployments. Use [Scheduled Jobs](/manual-installation/scheduler-jobs) only when your chosen target needs an external scheduler.
+Do not configure both storage profiles. PostgreSQL is always the runtime database; Supabase Storage and S3-compatible storage are alternative locations for uploaded assets.
+</Warning>
+
+## Production baseline
+
+<Columns cols={2}>
+  <Card title="Secrets" icon="shield-check">
+    Keep Kuest credentials, database URLs, storage keys, signer keys, and auth secrets server-side.
+  </Card>
+  <Card title="Canonical URL" icon="globe">
+    Set `SITE_URL` to the final HTTPS origin and update it when the public domain changes.
+  </Card>
+  <Card title="Database migration" icon="database-zap">
+    Run `pnpm db:push` before sending production traffic to a new release.
+  </Card>
+  <Card title="Health and sync" icon="activity">
+    Verify the application health route and confirm scheduled sync jobs are succeeding.
+  </Card>
+</Columns>
+
+<Warning>
+External scheduler jobs for `/api/sync/*` are required when the database is not running the supplied `pg_cron` jobs. See [Scheduled Jobs](/manual-installation/scheduler-jobs).
 </Warning>

@@ -1,22 +1,68 @@
 ---
 title: Owner Guide
 sidebarTitle: Overview
-description: Launch, install, and customize your own prediction market with Kuest.
+description: Choose how to launch, configure, and operate your Kuest-powered prediction market.
 icon: book-open
 ---
 
 <Info>
-This guide is for the owner of a Kuest prediction market. Choose the path that matches how you want to install and manage your site.
+This documentation is for teams building a branded prediction market on Kuest infrastructure. Start with the guided launch unless your team needs to control the runtime, database, or deployment pipeline directly.
 </Info>
 
-<Columns cols={3}>
-  <Card title="Prepare to Launch" icon="rocket" href="/launch/overview">
-    Follow the guided `/launch` tutorial and launch your prediction market in about 15 minutes.
+<Frame>
+  <img
+    className="block dark:hidden"
+    src="/images/operator-platform-map.svg"
+    alt="Operator site connected to Kuest services and Polygon settlement"
+  />
+  <img
+    className="hidden dark:block"
+    src="/images/dark/operator-platform-map.svg"
+    alt="Operator site connected to Kuest services and Polygon settlement"
+  />
+</Frame>
+
+## Choose your installation path
+
+<Columns cols={2}>
+  <Card title="Guided launch" icon="rocket" href="/launch/overview" cta="Start the guided path">
+    Connect GitHub, Vercel, Reown, and Supabase. Kuest prepares the repository and deployment for you.
   </Card>
-  <Card title="Manual Installation" icon="server" href="/manual-installation/overview">
-    Best for developers or teams that want to install a prediction market on dedicated infrastructure.
-  </Card>
-  <Card title="After Install" icon="settings" href="/admin/general">
-    Finished installing? Customize your prediction market brand, fees, links, and core site settings.
+  <Card title="Manual installation" icon="server" href="/manual-installation/overview" cta="Compare deployment targets">
+    Deploy the frontend on infrastructure you manage and choose your own database, storage, scheduler, and release process.
   </Card>
 </Columns>
+
+## What you will manage
+
+<CardGroup cols={2}>
+  <Card title="Deployment" icon="cloud-cog">
+    Repository, hosting, database, asset storage, secrets, domain, monitoring, and scheduled jobs.
+  </Card>
+  <Card title="Site experience" icon="palette">
+    Brand, theme, languages, categories, featured markets, integrations, fees, and legal controls.
+  </Card>
+  <Card title="Operations" icon="activity">
+    Admin wallets, event review, market creation, resolution, user support, and production alerts.
+  </Card>
+  <Card title="Kuest connection" icon="network">
+    Credentials and service URLs that connect your site to shared trading, market data, wallet, and resolution infrastructure.
+  </Card>
+</CardGroup>
+
+## Recommended reading order
+
+<Steps>
+  <Step title="Understand the architecture">
+    Read [How Kuest Works](/concepts/architecture) before choosing infrastructure or exposing the site to users.
+  </Step>
+  <Step title="Launch the site">
+    Use [Guided Launch](/launch/overview) or choose a target in [Manual Installation](/manual-installation/overview).
+  </Step>
+  <Step title="Configure the admin panel">
+    Start with [General](/admin/general), then review [Integrations](/admin/integrations), [Theme](/admin/theme), and [Affiliate & Fees](/admin/affiliate).
+  </Step>
+  <Step title="Prepare production operations">
+    Verify admin access, scheduled jobs, monitoring, market creation, and resolution before inviting traders.
+  </Step>
+</Steps>
