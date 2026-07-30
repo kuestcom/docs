@@ -46,10 +46,10 @@ A market is a DRO market when its metadata has `resolution_type: "dro_moov2"` or
 
 | Contract | Address |
 | --- | --- |
-| Direct Resolution Oracle | `0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c` |
-| Standard DRO CTF Adapter | `0x53C979C9818fC24d1fc5FFc3618bd289a8b10111` |
-| Neg-risk DRO CTF Adapter | `0x54e82621460F19a5eFe49f0562A8F16D107F767a` |
-| Neg-risk Operator | `0xe13B5F29dCF6Ee81C659D839de30047F65541036` |
+| Direct Resolution Oracle | `0x80eA8191033f431F8cC2F7d6Fb2b2CCe4ddAFD5F` |
+| Standard DRO CTF Adapter | `0xF5d85546573eD5400C623b0ad18391b05f4e8CD7` |
+| Neg-risk DRO CTF Adapter | `0xeDA095874A3f2827d240d560616Bb814C91C1781` |
+| Neg-risk Operator | `0xF8cFEe0849F80bcBdb33A365096eC4ff8b14218e` |
 
 ## Required inputs
 
@@ -146,8 +146,8 @@ Each script uses the same environment variables:
 | `NEG_RISK` | No | Set to `true` for neg-risk markets. |
 | `NEG_RISK_OPERATOR_QUESTION_ID` | Conditional | Required when `NEG_RISK=true`; use `market.question_id`. |
 | `CHAIN_ID` | No | Used by the TypeScript script. Defaults to `80002`. |
-| `DRO_ORACLE_ADDRESS` | No | Defaults to `0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c`. |
-| `NEG_RISK_OPERATOR_ADDRESS` | No | Defaults to `0xe13B5F29dCF6Ee81C659D839de30047F65541036`. |
+| `DRO_ORACLE_ADDRESS` | No | Defaults to `0x80eA8191033f431F8cC2F7d6Fb2b2CCe4ddAFD5F`. |
+| `NEG_RISK_OPERATOR_ADDRESS` | No | Defaults to `0xF8cFEe0849F80bcBdb33A365096eC4ff8b14218e`. |
 
 <CodeGroup>
 
@@ -157,9 +157,9 @@ import { privateKeyToAccount } from "viem/accounts";
 import { createPublicClient, createWalletClient, defineChain, http, parseAbi } from "viem";
 
 const DRO_ORACLE_ADDRESS = (process.env.DRO_ORACLE_ADDRESS ??
-  "0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c") as `0x${string}`;
+  "0x80eA8191033f431F8cC2F7d6Fb2b2CCe4ddAFD5F") as `0x${string}`;
 const NEG_RISK_OPERATOR_ADDRESS = (process.env.NEG_RISK_OPERATOR_ADDRESS ??
-  "0xe13B5F29dCF6Ee81C659D839de30047F65541036") as `0x${string}`;
+  "0xF8cFEe0849F80bcBdb33A365096eC4ff8b14218e") as `0x${string}`;
 const YES_OR_NO_IDENTIFIER =
   "0x5945535f4f525f4e4f5f51554552590000000000000000000000000000000000" as `0x${string}`;
 
@@ -260,9 +260,9 @@ console.log("Confirmed.");
 import { Contract, Wallet, JsonRpcProvider, encodeBytes32String } from "ethers";
 
 const DRO_ORACLE_ADDRESS = process.env.DRO_ORACLE_ADDRESS ??
-  "0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c";
+  "0x80eA8191033f431F8cC2F7d6Fb2b2CCe4ddAFD5F";
 const NEG_RISK_OPERATOR_ADDRESS = process.env.NEG_RISK_OPERATOR_ADDRESS ??
-  "0xe13B5F29dCF6Ee81C659D839de30047F65541036";
+  "0xF8cFEe0849F80bcBdb33A365096eC4ff8b14218e";
 const YES_OR_NO_IDENTIFIER = encodeBytes32String("YES_OR_NO_QUERY");
 
 const adapterAddress = process.env.ADAPTER_ADDRESS;
@@ -339,8 +339,8 @@ console.log("Confirmed.");
 import os
 from web3 import Web3
 
-DRO_ORACLE_ADDRESS = os.getenv("DRO_ORACLE_ADDRESS", "0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c")
-NEG_RISK_OPERATOR_ADDRESS = os.getenv("NEG_RISK_OPERATOR_ADDRESS", "0xe13B5F29dCF6Ee81C659D839de30047F65541036")
+DRO_ORACLE_ADDRESS = os.getenv("DRO_ORACLE_ADDRESS", "0x80eA8191033f431F8cC2F7d6Fb2b2CCe4ddAFD5F")
+NEG_RISK_OPERATOR_ADDRESS = os.getenv("NEG_RISK_OPERATOR_ADDRESS", "0xF8cFEe0849F80bcBdb33A365096eC4ff8b14218e")
 YES_OR_NO_IDENTIFIER = Web3.to_bytes(text="YES_OR_NO_QUERY").ljust(32, b"\x00")
 
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
@@ -538,8 +538,8 @@ func main() {
 	rpcURL := os.Getenv("RPC_URL")
 	adapterAddress := common.HexToAddress(os.Getenv("ADAPTER_ADDRESS"))
 	questionID := common.HexToHash(os.Getenv("QUESTION_ID"))
-	oracleAddress := common.HexToAddress(env("DRO_ORACLE_ADDRESS", "0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c"))
-	negRiskOperatorAddress := common.HexToAddress(env("NEG_RISK_OPERATOR_ADDRESS", "0xe13B5F29dCF6Ee81C659D839de30047F65541036"))
+	oracleAddress := common.HexToAddress(env("DRO_ORACLE_ADDRESS", "0x80eA8191033f431F8cC2F7d6Fb2b2CCe4ddAFD5F"))
+	negRiskOperatorAddress := common.HexToAddress(env("NEG_RISK_OPERATOR_ADDRESS", "0xF8cFEe0849F80bcBdb33A365096eC4ff8b14218e"))
 	negRiskQuestionID := common.HexToHash(os.Getenv("NEG_RISK_OPERATOR_QUESTION_ID"))
 	isNegRisk := os.Getenv("NEG_RISK") == "true"
 	outcome := os.Getenv("OUTCOME")
@@ -679,9 +679,9 @@ async fn main() -> eyre::Result<()> {
         eyre::bail!("Unknown outcome is not supported for neg-risk markets.");
     }
 
-    let oracle_address: Address = env_or("DRO_ORACLE_ADDRESS", "0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c").parse()?;
+    let oracle_address: Address = env_or("DRO_ORACLE_ADDRESS", "0x80eA8191033f431F8cC2F7d6Fb2b2CCe4ddAFD5F").parse()?;
     let neg_risk_operator_address: Address =
-        env_or("NEG_RISK_OPERATOR_ADDRESS", "0xe13B5F29dCF6Ee81C659D839de30047F65541036").parse()?;
+        env_or("NEG_RISK_OPERATOR_ADDRESS", "0xF8cFEe0849F80bcBdb33A365096eC4ff8b14218e").parse()?;
     let neg_risk_operator_question_id: Option<[u8; 32]> = env::var("NEG_RISK_OPERATOR_QUESTION_ID")
         .ok()
         .map(|value| value.parse::<H256>().map(|hash| hash.0))
@@ -755,8 +755,8 @@ use Web3\Contract;
 use Web3p\EthereumTx\Transaction;
 use Web3p\EthereumUtil\Util;
 
-$droOracle = getenv("DRO_ORACLE_ADDRESS") ?: "0xaBEd29135dFF44bC6A6443dFbE3B6a2081c9918c";
-$negRiskOperator = getenv("NEG_RISK_OPERATOR_ADDRESS") ?: "0xe13B5F29dCF6Ee81C659D839de30047F65541036";
+$droOracle = getenv("DRO_ORACLE_ADDRESS") ?: "0x80eA8191033f431F8cC2F7d6Fb2b2CCe4ddAFD5F";
+$negRiskOperator = getenv("NEG_RISK_OPERATOR_ADDRESS") ?: "0xF8cFEe0849F80bcBdb33A365096eC4ff8b14218e";
 $identifier = "0x5945535f4f525f4e4f5f51554552590000000000000000000000000000000000";
 
 $privateKey = preg_replace("/^0x/", "", getenv("PRIVATE_KEY") ?: "");
