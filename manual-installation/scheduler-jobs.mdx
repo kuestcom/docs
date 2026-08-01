@@ -5,7 +5,7 @@ icon: timer
 ---
 
 <Info>
-`pnpm db:push` configures the supplied database scheduler only when both `pg_cron` and `pg_net` are available. Read the migration output: if either extension is unavailable, use the external schedule below.
+If you use Supabase mode, `npm run db:push` already sets up `pg_cron` with this same sync schedule.
 </Info>
 
 ## What your scheduler should call
@@ -39,8 +39,8 @@ curl -sS -X GET \
 | `/api/sync/events` | `2,11,20,29,38,47,56 * * * *` | Seven times per hour, spaced to reduce overlap |
 | `/api/sync/event-creations/enqueue` | `0,30 * * * *` | Enqueues scheduled event creations twice per hour |
 | `/api/sync/event-creations` | `1,31 * * * *` | Processes event creation jobs after enqueue runs |
-| `/api/sync/translations/enqueue` | `17 * * * *` | Enqueues translation jobs hourly |
-| `/api/sync/translations` | `18 * * * *` | Processes translation jobs after enqueue runs |
+| `/api/sync/translations/enqueue` | `3,12,21,30,39,48,57 * * * *` | Enqueues translation jobs seven times per hour |
+| `/api/sync/translations` | `4,13,22,31,40,49,58 * * * *` | Processes translation jobs one minute after enqueue runs |
 | `/api/sync/resolution` | `5-55/10 * * * *` | Every 10 minutes, offset by 5 minutes |
 | `/api/sync/sports-scores` | `* * * * *` | Updates live and recently started sports scores every minute |
 | `/api/sync/volume/enqueue` | `*/10 * * * *` | Enqueues volume sync work every 10 minutes |
@@ -48,7 +48,7 @@ curl -sS -X GET \
 
 Use UTC unless your team needs a strict local timezone.
 
-When database scheduling is available, the migration also creates `clean-cron-details` at `0 0 * * *` and `clean-jobs` at `15 * * * *` as maintenance jobs. External schedulers should only call the HTTP sync endpoints above.
+Supabase mode also creates `clean-cron-details` at `0 0 * * *` and `clean-jobs` at `15 * * * *` as database maintenance jobs. External schedulers should only call the HTTP sync endpoints above.
 
 ## Expected responses
 
