@@ -1,0 +1,32 @@
+---
+title: Resolution Rewards
+description: Community outcome proposals backed by a bond without changing who officially resolves a DRO market.
+---
+
+Resolution Rewards is an optional layer beside the Direct Resolution Oracle. A trader can reserve the `YES` or `NO` proposal slot from a canonical Kuest DepositWallet by locking the market's configured USDC bond. The creator's approved proposer still defines the official result; a Rewards failure never prevents that resolution.
+
+## Funding and frozen configuration
+
+The market-creation fee remains paid to the DRO. When rewards are active, the DRO sends the creator's effective share to the Rewards proxy and the remainder to Kuest atomically. The initial defaults are a `$300` bond, `80%` reward pool, `48h` lock and `24h` withdrawal delay. Kuest can update defaults for future markets and override only `rewardBps` per creator. A zero override disables rewards and sends the full creation fee to Kuest.
+
+Bond, split, recipients and timers are copied into the market and never change afterward. Integer division remainder belongs to Kuest.
+
+## Proposal lifecycle
+
+- Only a DepositWallet recognized both by `DepositWallet.isDepositWallet()` and the official Factory may propose.
+- Each DepositWallet can submit only once during the entire market lifetime, even after withdrawal or expiration.
+- There is one active slot for `YES` and one for `NO`; proposals can be submitted any time before official resolution.
+- Withdrawal can be requested after 48 hours. It is irreversible and immediately removes reward eligibility, while the bond remains exposed and occupies the slot for another 24 hours.
+- After that delay, the proposal is logically expired, its slot can be released permissionlessly, and only the originating DepositWallet may claim the bond.
+
+## Finalization and claims
+
+On `YES` or `NO`, an eligible correct proposal receives its bond plus the pool. A correct proposal already withdrawing receives only its bond. Wrong bonds are credited to `SAFE-SECURITY-RESERVE`; when no eligible winner exists, the pool is credited to Kuest.
+
+For `UNKNOWN`/`0.5`, cancellation or emergency, every bond is refunded and the pool is credited to the Security Reserve. Credits are pull-based and claims have fixed beneficiaries: users can only send funds back to the originating DepositWallet, while institutional balances can only go to the frozen Kuest or Reserve address.
+
+If the DRO's bounded-gas finalization hook fails, the market still resolves. Anyone may later call `syncFinalization(marketId)`; the function reads the result and timestamp directly from the DRO and accepts neither value from the caller.
+
+## DepositWallet verification
+
+`isDepositWallet()` is a marker, not sufficient proof by itself. Integrations must also call `DepositWalletFactory.isDepositWallet(wallet)`, which validates the marker, declared Factory, wallet ID and deterministic address. A wallet pinned to an older Beacon implementation is ineligible until it opts back into an implementation exposing both checks.

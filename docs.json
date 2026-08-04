@@ -115,7 +115,8 @@
       {
         "group": "Resolution API",
         "pages": [
-          "api/resolution/overview"
+          "api/resolution/overview",
+          "api/resolution/rewards"
         ]
       }
     ]
