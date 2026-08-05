@@ -52,6 +52,20 @@ Your users interact with your domain and brand. Keep Kuest credentials and servi
 
 Markets with the same outcome token IDs use the same Kuest order books. Orders submitted through your site can match compatible orders already resting in those books. Your frontend controls presentation and order entry, but it does not create an isolated matching engine.
 
+## Complementary outcome settlement
+
+For a binary condition, the CLOB treats its two outcome tokens as complementary parts of one fully collateralized pair. Matching can therefore settle three ways:
+
+| Matching orders | Settlement |
+| --- | --- |
+| `BUY` and `SELL` for the same outcome token | Transfers the outcome tokens to the buyer and collateral to the seller. |
+| `BUY` for outcome A and `BUY` for outcome B | **MINT:** splits $1 of collateral into one complete pair and sends each buyer the outcome purchased. The limits cross when their prices sum to at least $1. |
+| `SELL` for outcome A and `SELL` for outcome B | **MERGE:** receives one complete pair, merges it back into $1 of collateral, and pays each seller. The limits cross when their prices sum to at most $1. |
+
+For example, `BUY A @ $0.15` can match `BUY B @ $0.85` without either order waiting for an existing seller. Likewise, complementary sell orders at `$0.15` and `$0.85` can settle by merging the paired positions. Only the common executable quantity fills; any remainder keeps its place in the order book.
+
+The CLOB classifies and batches the fills, while the exchange contract performs the corresponding transfer, split, or merge onchain. Public activity keeps each participant's physical action—for example, a submitted `SELL A` remains displayed as `SELL A`, even when settlement uses a merge.
+
 <Warning>
 Do not describe a frontend deployment as its own exchange or promise isolated liquidity unless you have built and operate a separate matching and settlement stack.
 </Warning>
