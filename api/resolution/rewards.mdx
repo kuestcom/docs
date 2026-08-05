@@ -1,32 +1,168 @@
 ---
-title: Resolution Rewards
-description: Community outcome proposals backed by a bond without changing who officially resolves a DRO market.
+title: DRO Resolution & Rewards
+description: How operators resolve markets and fund bonded community outcome reports.
+icon: badge-check
 ---
 
-Resolution Rewards is an optional layer beside the Direct Resolution Oracle. A trader can reserve the `YES` or `NO` proposal slot from a canonical Kuest DepositWallet by locking the market's configured USDC bond. The creator's approved proposer still defines the official result; a Rewards failure never prevents that resolution.
+import { SecurityReserveBalance } from '/snippets/security-reserve-balance.jsx';
 
-## Funding and frozen configuration
+The Direct Resolution Oracle (DRO) lets an approved wallet for your creator submit the
+official outcome directly onchain. Resolution Rewards adds a bonded community signal
+without changing that authority: users may report **YES** or **NO**, while your approved
+proposer still decides the final result from the market rules and source.
 
-The market-creation fee remains paid to the DRO. When rewards are active, the DRO sends the creator's effective share to the Rewards proxy and the remainder to Kuest atomically. The initial defaults are a `$300` bond, `80%` reward pool, `48h` lock and `24h` withdrawal delay. Kuest can update defaults for future markets and override only `rewardBps` per creator. A zero override disables rewards and sends the full creation fee to Kuest.
+<Info>
+Resolution Rewards is an engagement layer, not a vote. A user report cannot resolve a market or override your approved proposer.
+</Info>
 
-Bond, split, recipients and timers are copied into the market and never change afterward. Integer division remainder belongs to Kuest.
+## Resolution rules
+
+Before resolving, verify the market's complete criteria, named source, relevant date and
+timezone, thresholds, and cancellation behavior. The title summarizes the question; the
+written rules determine the result.
+
+<Warning>
+DRO resolution is final. Resolve only after the answer can be verified from the market's published rules and source.
+</Warning>
+
+## Fee and reward split
+
+With the current global default, Kuest receives **20%** of the DRO creation fee and the
+remaining **80%** funds the market's community reward pool.
+
+| Market type | Creation fee | User reward pool | Kuest share |
+| --- | ---: | ---: | ---: |
+| Standard market | $5.00 | $4.00 | $1.00 |
+| Multi-market / neg-risk question | $2.00 per question | $1.60 per question | $0.40 per question |
+
+The Kuest share is transferred immediately to the RefillVault. The reward pool remains in
+the Resolution Rewards proxy until finalization and claim. Any integer-division remainder
+also belongs to Kuest.
+
+Kuest controls the global defaults for bond, reward percentage, timers, fee recipient, and
+Security Reserve. A creator-specific override may change only the reward percentage or
+disable rewards. When disabled, the full fee goes to Kuest and the market is not registered
+for proposals.
+
+<Note>
+The effective configuration is copied and frozen when each market is created. Later global or creator-level changes affect only new markets.
+</Note>
+
+Resolution Rewards uses an upgradeable proxy with a permanent address. Market records,
+accounting, and claims remain in proxy storage when Kuest upgrades the implementation.
 
 ## Proposal lifecycle
 
-- Only a DepositWallet recognized both by `DepositWallet.isDepositWallet()` and the official Factory may propose.
-- Each DepositWallet can submit only once during the entire market lifetime, even after withdrawal or expiration.
-- There is one active slot for `YES` and one for `NO`; proposals can be submitted any time before official resolution.
-- Withdrawal can be requested after 48 hours. It is irreversible and immediately removes reward eligibility, while the bond remains exposed and occupies the slot for another 24 hours.
-- After that delay, the proposal is logically expired, its slot can be released permissionlessly, and only the originating DepositWallet may claim the bond.
+<Steps>
+  <Step title="A user reports an outcome">
+    A canonical DepositWallet locks the market's configured bond—currently **300 USDC**—and selects **YES** or **NO**.
+    Reports may be submitted at any time before official resolution, but users should wait until the answer is verifiable.
+  </Step>
+  <Step title="The report occupies a side">
+    Each market has one active YES slot and one active NO slot. Each DepositWallet may participate only once during the
+    entire market lifetime and cannot change sides.
+  </Step>
+  <Step title="Your approved proposer resolves">
+    The proposer whitelisted for the creator evaluates the rules and submits the official outcome. It does not receive
+    forfeited bonds and therefore cannot profit by resolving against a user report.
+  </Step>
+  <Step title="Balances become claimable">
+    Users, Kuest, and the Security Reserve withdraw only their own credited balances. Finalization does not loop through
+    reporters or push funds to arbitrary recipients.
+  </Step>
+</Steps>
 
-## Finalization and claims
+The contract accepts a reporter only when both the wallet's `isDepositWallet()` marker and
+the official DepositWallet Factory validation succeed. Passing through the relayer alone
+does not prove that a caller is an eligible DepositWallet.
 
-On `YES` or `NO`, an eligible correct proposal receives its bond plus the pool. A correct proposal already withdrawing receives only its bond. Wrong bonds are credited to `SAFE-SECURITY-RESERVE`; when no eligible winner exists, the pool is credited to Kuest.
+### Why reporting both sides does not pay
 
-For `UNKNOWN`/`0.5`, cancellation or emergency, every bond is refunded and the pool is credited to the Security Reserve. Credits are pull-based and claims have fixed beneficiaries: users can only send funds back to the originating DepositWallet, while institutional balances can only go to the frozen Kuest or Reserve address.
+The protocol permits one active report on each side so opposing signals remain visible.
+This does not create a risk-free strategy: after a binary result, one 300 USDC bond is
+forfeited, while the correct side receives only its 300 USDC bond plus the small reward
+pool. One DepositWallet cannot submit both reports.
 
-If the DRO's bounded-gas finalization hook fails, the market still resolves. Anyone may later call `syncFinalization(marketId)`; the function reads the result and timestamp directly from the DRO and accepts neither value from the caller.
+## Withdrawal from an unresolved market
 
-## DepositWallet verification
+A report is locked for **48 hours**. After that period, only its originating DepositWallet
+may request withdrawal. The request is irreversible and starts a further **24-hour** delay:
 
-`isDepositWallet()` is a marker, not sufficient proof by itself. Integrations must also call `DepositWalletFactory.isDepositWallet(wallet)`, which validates the marker, declared Factory, wallet ID and deterministic address. A wallet pinned to an older Beacon implementation is ineligible until it opts back into an implementation exposing both checks.
+- reward eligibility is waived immediately;
+- the bond remains exposed to the official result and the slot remains occupied;
+- if the report is correct during the delay, only the bond is returned;
+- if it is wrong, the bond is credited to the Security Reserve;
+- if the market remains unresolved, the bond becomes claimable and the slot can be
+  released permissionlessly.
+
+No third party can redirect or claim the reporter's bond. Releasing an expired slot only
+makes that bond claimable by its original DepositWallet.
+
+## Finalization outcomes
+
+| Official outcome | Bond treatment | Reward-pool treatment |
+| --- | --- | --- |
+| Eligible active report is correct | Bond returned to that DepositWallet | Credited to the same DepositWallet |
+| Correct report already requested withdrawal | Bond returned | Credited to Kuest |
+| Report is wrong | Credited to the Security Reserve | Not applicable |
+| YES or NO with no eligible correct report | Any wrong bond goes to the Security Reserve | Credited to Kuest |
+| UNKNOWN / 50-50, cancellation, or emergency | Every bond is returned | Credited to the Security Reserve |
+
+If no one reports before a YES or NO resolution, the reward pool returns to Kuest. An
+unresolved market may keep its pool pending while reporters remain free to complete the
+withdrawal flow above.
+
+## Reliability and accounting
+
+- With rewards active, market creation, fee split, reward funding, and registration are
+  atomic. A registration or funding failure reverts creation.
+- During resolution, the Rewards hook is isolated. A Rewards failure never prevents the
+  DRO from recording the official result.
+- If that hook fails, anyone may call `syncFinalization(marketId)`. The retry reads the
+  outcome and timestamp from the DRO and never trusts caller-supplied result data.
+- Claims are pull-based and have fixed recipients. A reporter can claim only to the
+  originating DepositWallet; institutional credits can go only to their frozen recipient.
+- A pause blocks new registrations and proposals but does not block claims, expired bond
+  release, refunds, or pending finalization sync.
+
+## Security Reserve
+
+Forfeited bonds and exceptional-result pools are credited to a separate Safe. The Reserve
+can support security work, exceptional reimbursements, and future improvements to the
+Resolution Rewards system. It is not the operator's revenue wallet.
+
+**SAFE-SECURITY-RESERVE:** `0x089517438121eA31BAf3666554d812ca0b36c6c5`
+
+<Tabs>
+  <Tab title="Polygon mainnet">
+    <SecurityReserveBalance network="polygon" />
+  </Tab>
+  <Tab title="Amoy testnet">
+    <SecurityReserveBalance network="amoy" />
+  </Tab>
+</Tabs>
+
+These live values are the USDC balances already held by each Safe address. Reserve credits
+still claimable inside the Resolution Rewards proxy are not included until the Safe claims
+them.
+
+## Kuest fee recipient
+
+Kuest's fee share is sent to the RefillVault, which replenishes the wallets and contracts
+used to operate the Kuest system.
+
+**RefillVault:** `0xE2fD3A613f0290705d777af5ef87277C4BD82EEe`
+
+## Contract addresses
+
+The same addresses are used on Polygon mainnet and Amoy.
+
+| Contract | Address |
+| --- | --- |
+| Direct Resolution Oracle | `0x57827d48Da09ba227aFda89C083b4E35972Aa741` |
+| Resolution Rewards proxy | `0x1EedF578442F4C52429BB2B6449Ff0872ae73Be1` |
+| SAFE-SECURITY-RESERVE | `0x089517438121eA31BAf3666554d812ca0b36c6c5` |
+| Kuest RefillVault | `0xE2fD3A613f0290705d777af5ef87277C4BD82EEe` |
+
+For the final-resolution calls, proposer checks, outcome values, and adapter addresses, see
+[DRO Resolution API](/api/resolution/overview).
