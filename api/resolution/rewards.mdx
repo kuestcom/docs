@@ -4,8 +4,6 @@ description: How operators resolve markets and fund bonded community outcome rep
 icon: badge-check
 ---
 
-import { SecurityReserveBalance } from '/snippets/security-reserve-balance.jsx';
-
 The Direct Resolution Oracle (DRO) lets an approved wallet for your creator submit the
 official outcome directly onchain. Resolution Rewards adds a bonded community signal
 without changing that authority: users may report **YES** or **NO**, while your approved
@@ -14,6 +12,19 @@ proposer still decides the final result from the market rules and source.
 <Info>
 Resolution Rewards is an engagement layer, not a vote. A user report cannot resolve a market or override your approved proposer.
 </Info>
+
+<Frame>
+  <img
+    className="block dark:hidden"
+    src="/images/resolution-rewards-flow.svg"
+    alt="The market-creation fee splits between the Kuest RefillVault and Resolution Rewards, bonded reports flow through the approved resolver, and final balances become claimable or move to the Security Reserve"
+  />
+  <img
+    className="hidden dark:block"
+    src="/images/dark/resolution-rewards-flow.svg"
+    alt="The market-creation fee splits between the Kuest RefillVault and Resolution Rewards, bonded reports flow through the approved resolver, and final balances become claimable or move to the Security Reserve"
+  />
+</Frame>
 
 ## Resolution rules
 
@@ -132,19 +143,6 @@ can support security work, exceptional reimbursements, and future improvements t
 Resolution Rewards system. It is not the operator's revenue wallet.
 
 **SAFE-SECURITY-RESERVE:** `0x089517438121eA31BAf3666554d812ca0b36c6c5`
-
-<Tabs>
-  <Tab title="Polygon mainnet">
-    <SecurityReserveBalance network="polygon" />
-  </Tab>
-  <Tab title="Amoy testnet">
-    <SecurityReserveBalance network="amoy" />
-  </Tab>
-</Tabs>
-
-These live values are the USDC balances already held by each Safe address. Reserve credits
-still claimable inside the Resolution Rewards proxy are not included until the Safe claims
-them.
 
 ## Kuest fee recipient
 
