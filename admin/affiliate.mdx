@@ -1,36 +1,52 @@
 ---
 title: Affiliate & Fees
-description: Understand Kuest's dynamic trading fees and configure operator fees, affiliate sharing, and fee claims.
+description: Understand Kuest's dynamic trading fees and configure operator participation, affiliate sharing, and fee claims.
 icon: badge-percent
 ---
 
-Kuest applies a dynamic protocol fee when a taker order is matched. Your site can add an operator fee to maker and taker fills, and can share part of that operator fee with affiliates.
+Kuest charges takers with a category-specific curve. Your site receives a configurable share of the final taker fee and can share that operator amount with affiliates. Maker fees are a separate optional flat fee.
 
 <Info>
-Kuest maker fee is `0%`. Kuest's taker fee varies by market category and execution price. The fee parameters are applied at match time and are not included in the signed order.
+Kuest maker fee and the recommended operator maker fee are both `0%`. The operator taker setting is a share of the final fee, not a flat percentage of trade value.
 </Info>
 
-## Kuest taker fee
+## Kuest fee base
 
-The Kuest component is calculated for each fill:
+The Kuest component is calculated for every fill:
 
 ```text
-Kuest fee = shares × rate × [price × (1 - price)]^exponent
+Kuest fee base = shares × rate × [price × (1 - price)]^exponent
 ```
 
-Where:
+`price` is expressed from `0` to `1`, and `exponent` is currently `1`. The curve is highest at `50¢` and symmetric around the midpoint.
 
-- `shares` is the number of shares filled.
-- `price` is the execution price expressed from `0` to `1`.
-- `rate` is determined by the market category.
-- `exponent` is currently `1`.
+| Market category | Rate | Maker rebate |
+| --- | ---: | ---: |
+| Crypto | `0.0441` | `20%` |
+| Sports | `0.0315` | `15%` |
+| Finance, Politics, Mentions, Tech, Geopolitics | `0.0252` | `25%` |
+| Economics, Culture, Weather, General | `0.0315` | `25%` |
 
-The rate is a formula parameter, not a flat percentage of trade value. Fees are highest around `50¢` and decrease toward `0¢` and `100¢`. With exponent `1`, the Kuest fee is symmetric: a fill at `30¢` has the same Kuest fee in USDC as a fill at `70¢` for the same number of shares.
+This is Kuest's own versioned table. Native and mirrored markets both use the local category. An unclassified market remains fee-free until reviewed.
+
+The fee base uses integer arithmetic and half-up rounding to five USDC decimal places. Values below `0.00001 USDC` are charged as zero.
+
+## Operator taker share
+
+The operator receives a share of the final taker fee. The initial allowed range is `20–45%`, and a new or unregistered builder uses `30%`.
+
+```text
+total fee = ceil_5(Kuest fee base × 10,000 / (10,000 - operator share bps))
+operator fee = floor(total fee × operator share bps / 10,000)
+Kuest fee = total fee - operator fee
+```
+
+The gross-up is rounded upward at five decimal places. Integer division dust remains in the Kuest component.
 
 <div style={{ background: "#ffffff", borderRadius: "12px", overflow: "hidden", padding: "14px 16px 8px" }}>
   <iframe
-    title="Kuest taker fee in USDC by share price for 100 shares"
-    aria-label="Line chart showing Kuest taker fees by category and share price"
+    title="Taker fee curve in USDC by share price for 100 shares"
+    aria-label="Line chart comparing taker fee curves by category and share price"
     src="https://datawrapper.dwcdn.net/FxbQa/1/"
     scrolling="no"
     frameBorder="0"
@@ -41,95 +57,79 @@ The rate is a formula parameter, not a flat percentage of trade value. Fees are 
 </div>
 
 <Note>
-The chart shows only the Kuest fee for `100` shares. Your configured operator fee is calculated separately and added to it.
+The chart illustrates how the category curves change across share prices for `100` shares. Your selected operator share is applied through the gross-up above: at the recommended `30%`, the final fee is the Kuest fee base divided by `70%`, and your site receives `30%` of that final amount.
 </Note>
-
-| Market category | Rate | Kuest maker fee | Maker rebate |
-| --- | ---: | ---: | ---: |
-| Crypto | `0.07` | `0%` | `20%` |
-| Sports | `0.05` | `0%` | `15%` |
-| Finance, Politics, Mentions, Tech | `0.04` | `0%` | `25%` |
-| Economics, Culture, Weather, General | `0.05` | `0%` | `25%` |
-| Geopolitics | `0` | `0%` | None |
-
-Mirrored markets follow their active Polymarket fee schedule. Kuest-native markets use their assigned category, while an unclassified native market remains fee-free until it is reviewed.
-
-### Precision
-
-Kuest fees are rounded to five decimal places. A calculated fee below `0.00001 USDC` is charged as zero.
-
-## Operator fees
-
-Your site can configure independent maker and taker fees from `0%` to `1%`. These are flat percentages of filled notional:
-
-```text
-filled notional = shares × execution price
-operator fee = filled notional × operator fee rate
-```
-
-The trader's total fee is the sum of the applicable components:
-
-```text
-total taker fee = Kuest dynamic taker fee + operator taker fee
-total maker fee = operator maker fee
-```
-
-We recommend starting with:
-
-| Operator setting | Recommended value |
-| --- | ---: |
-| Taker fee | `0.5%` |
-| Maker fee | `0%` |
-
-Keeping the maker fee at zero avoids discouraging resting liquidity. The operator taker fee remains additional to the Kuest curve; it does not reduce or replace the Kuest component.
 
 ### Example
 
-Consider a Crypto taker fill of `100` shares at `50¢`, with an operator taker fee of `0.5%`:
+For `100` Crypto shares at `50¢` and the recommended `30%` operator share:
 
 | Component | Calculation | Fee |
 | --- | --- | ---: |
-| Kuest | `100 × 0.07 × 0.50 × 0.50` | `$1.75` |
-| Operator | `$50 filled notional × 0.5%` | `$0.25` |
-| **Total charged** | `$1.75 + $0.25` | **`$2.00`** |
+| Kuest fee base | `100 × 0.0441 × 0.50 × 0.50` | `$1.10250` |
+| Total charged | `ceil_5($1.10250 / 0.70)` | `$1.57500` |
+| Operator | `floor($1.57500 × 30%)` | `$0.47250` |
+| Kuest | `$1.57500 - $0.47250` | `$1.10250` |
 
-## Maker Rebates and Liquidity Rewards
+An order without a registered builder pays the same total. Its default operator portion is classified as `UNASSIGNED_BUILDER`, but both components are credited to Kuest. Registering the builder at `30%` changes the receiver split without changing the trader's total fee.
 
-The Kuest fee and operator fee have separate destinations:
+## Maker fee
 
-- **Maker Rebates** reserve the category's rebate percentage from confirmed Kuest taker fees in each market and daily epoch. Eligible maker fills share that pool proportionally.
-- **Liquidity Rewards** use the remaining eligible Kuest fee budget after the Maker Rebate reserve to reward qualifying resting orders near the midpoint.
-- **Operator and affiliate fees never fund either program.** They belong to the operator fee flow.
+The maker setting is independent and flat on filled cash value. It starts at `0%` and is initially capped at `1%` for the operator. Kuest also has an independent maker setting that starts at `0%`.
 
-Maker Rebates and Liquidity Rewards are independent. An order can earn Liquidity Rewards while it rests and also earn a Maker Rebate if it fills as maker.
+```text
+maker total = Kuest maker flat + operator maker flat
+```
 
 <Warning>
-Do not calculate either rewards pool from the trader's combined fee. Only the Kuest component funds Kuest Maker Rebates and Liquidity Rewards.
+Recommended: `0%`. Maker fees may reduce liquidity.
 </Warning>
 
-## Admin settings
+## Affiliate split
 
-<AccordionGroup>
-  <Accordion title="Maker and taker fees" icon="percent" defaultOpen>
-    Configure the operator component for maker and taker fills separately. Both fields accept decimal percentages from `0` to `1`. The fee chart updates with the taker value before you save.
-  </Accordion>
-  <Accordion title="Affiliate share (%)" icon="hand-coins">
-    This is not a percentage of trade volume or of the Kuest fee. It is the percentage of your operator fee shared with affiliates. For example, `50` sends half of the operator component to the affiliate.
-  </Accordion>
-  <Accordion title="Fee wallet receiver" icon="wallet">
-    The Polygon fee wallet must match your deployed admin deposit wallet. The field is read-only; use <strong>Use my deposit wallet</strong> when the saved receiver has not been set yet.
-  </Accordion>
-  <Accordion title="Claimable fees" icon="coins">
-    The page shows the configured receiver's claimable operator-fee balance across supported exchanges. Connect the receiver wallet and withdraw once at least `$1` is claimable. Deposit-wallet claims may ask for a trading signature first.
-  </Accordion>
-  <Accordion title="Totals and affiliate performance" icon="table-properties">
-    Totals summarize referrals, trading volume, affiliate fees, and claimable fees. The performance table shows each partner's affiliate code, referrals, attributed volume, and earnings.
-  </Accordion>
-</AccordionGroup>
-
-Affiliate payouts are calculated only from the operator component:
+Affiliate percentage applies only inside the operator amount:
 
 ```text
 affiliate payout = operator fee × affiliate share
 operator retained fee = operator fee - affiliate payout
 ```
+
+It does not change what the trader pays and never reduces the Kuest component.
+
+## Maker Rebates and Liquidity Rewards
+
+- Maker Rebates reserve the category percentage from confirmed Kuest fee amounts for each market and daily epoch.
+- Liquidity Rewards use eligible Kuest fee budget for configured markets.
+- Operator, affiliate, maker-flat, and `UNASSIGNED_BUILDER` amounts do not fund either program.
+
+Maker Rebates and Liquidity Rewards are independent. A resting order can earn a Liquidity Reward and also receive a Maker Rebate when it fills.
+
+## Who funds what
+
+| Kuest funds | The operator funds |
+| --- | --- |
+| Maker Rebates, Liquidity Rewards, protocol-owned liquidity (POL), and backend infrastructure | Affiliate payouts, when enabled, frontend infrastructure, and marketing |
+
+## Admin settings
+
+<AccordionGroup>
+  <Accordion title="Taker share" icon="percent" defaultOpen>
+    Use the slider to select `20–45%`. New sites start at the recommended `30%`. The chart previews the Kuest component, your site's component, and the final total across prices and categories.
+  </Accordion>
+  <Accordion title="Maker fee" icon="settings-2">
+    The advanced maker setting accepts `0–1%`. Keep it at zero unless you deliberately want to charge makers.
+  </Accordion>
+  <Accordion title="Affiliate share" icon="hand-coins">
+    Choose how much of your operator amount is paid to the affiliate that referred the trader.
+  </Accordion>
+  <Accordion title="Fee wallet receiver" icon="wallet">
+    The receiver must be your deployed Deposit Wallet. On Amoy, the page identifies the field as Polygon Amoy. Use <strong>Use my deposit wallet</strong> when the stored receiver differs.
+  </Accordion>
+  <Accordion title="Claimable earnings" icon="coins">
+    Claimable balances are read from the current CTF and NegRisk Exchanges. Connect the receiver wallet to claim; the interface excludes replaced Exchange addresses.
+  </Accordion>
+</AccordionGroup>
+
+## Operational changes
+
+Range, default share, maker caps, Kuest maker fee, and `maxFeeRateBps` are Exchange-admin settings. Change both Exchanges together while trading is paused, verify their getters, let the CLOB and orderbook subgraph synchronize, and resume only after both report the same policy.

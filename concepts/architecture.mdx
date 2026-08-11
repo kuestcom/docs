@@ -23,6 +23,8 @@ The Kuest catalog can combine selected mirrored Polymarket markets, markets crea
 
 Trading activity remains attributed to the originating operator whether an order comes from the site interface or from a bot or SDK integration used by its traders. That attribution is what connects eligible trading fees to the operator's configured fee wallet.
 
+The CLOB calculates the category-based Kuest fee off the matching hot path, grosses it up for the signed order's operator share, and sends the deterministic total to the Exchange. The Exchange splits that total between Kuest, the operator, and any affiliate. Orders without an assigned builder use the configured default share, but the unassigned portion stays with Kuest and is accounted separately from amounts eligible to fund rewards.
+
 ## Responsibility boundary
 
 <Columns cols={2}>
