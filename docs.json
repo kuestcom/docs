@@ -91,14 +91,14 @@
             "expanded": false,
             "pages": [
               "admin/dashboard",
+              "admin/events",
+              "admin/users",
+              "admin/affiliate",
               "admin/general",
               "admin/integrations",
-              "admin/theme",
-              "admin/locales",
               "admin/categories",
-              "admin/affiliate",
-              "admin/events",
-              "admin/users"
+              "admin/locales",
+              "admin/theme"
             ]
           },
           "configuration/custom-domain"
