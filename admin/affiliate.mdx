@@ -99,7 +99,7 @@ It does not change what the trader pays and never reduces the Kuest component.
 ## Maker Rebates and Liquidity Rewards
 
 - Maker Rebates reserve the category percentage from confirmed Kuest fee amounts for each market and daily epoch.
-- Liquidity Rewards use eligible Kuest fee budget for configured markets.
+- Liquidity Rewards reserve a configurable share of each creator's confirmed Kuest fees. Fees from one UTC epoch fund that creator's eligible markets in the next epoch, according to their configured weights and caps.
 - Operator, affiliate, maker-flat, and `UNASSIGNED_BUILDER` amounts do not fund either program.
 
 Maker Rebates and Liquidity Rewards are independent. A resting order can earn a Liquidity Reward and also receive a Maker Rebate when it fills.
