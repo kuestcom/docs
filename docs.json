@@ -87,13 +87,14 @@
         "pages": [
           {
             "group": "Admin Panel",
-            "icon": "shield",
+            "icon": "shield-keyhole",
             "expanded": false,
             "pages": [
               "admin/dashboard",
               "admin/events",
               "admin/users",
               "admin/affiliate",
+              "admin/market-making",
               "admin/general",
               "admin/integrations",
               "admin/categories",

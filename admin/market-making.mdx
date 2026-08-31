@@ -1,0 +1,323 @@
+---
+title: Market Making
+description: Sponsor liquidity campaigns, import Polymarket mirrors, and monitor market maker commitments from the Admin Panel.
+icon: handshake
+---
+
+Use **Admin → Market Making** to fund campaigns that invite an approved market maker to provide two-sided liquidity. The page combines market discovery, quote calculation, wallet transactions, Polymarket imports, and campaign monitoring.
+
+<Info>
+  A sponsorship is a funded offer, not a guarantee that orders are already live. The campaign becomes active when an approved market maker accepts it, and the market maker must have the required orders live by the displayed service start.
+</Info>
+
+<CardGroup cols={3}>
+  <Card title="Sponsor a Kuest market" icon="coins" href="#sponsor-a-kuest-market">
+    Choose an existing market, set its liquidity terms, and fund a campaign in the escrow contract.
+  </Card>
+  <Card title="Import Polymarket liquidity" icon="download" href="#sponsor-a-polymarket-mirror">
+    Find an event or market by URL, pay the separate import fee, and wait for its mirror deployment.
+  </Card>
+  <Card title="Monitor campaigns" icon="activity" href="#campaigns-and-statuses">
+    Follow open, active, review, disputed, completed, expired, and cancelled campaigns.
+  </Card>
+</CardGroup>
+
+## Before you start
+
+<AccordionGroup>
+  <Accordion title="Verified email" icon="shield-check" defaultOpen>
+    If the sponsorship flow asks for an email, add and verify it before funding so operational notifications can be delivered.
+  </Accordion>
+  <Accordion title="Connected wallet" icon="wallet">
+    The sponsor is the connected wallet. It needs enough USDC for the displayed commitment and enough POL for network gas. USDC is taken from this wallet through the escrow contract; it is not taken from a separate Deposit Wallet balance.
+  </Accordion>
+  <Accordion title="Correct network" icon="network">
+    Connect to the network configured for this operator site. The wallet flow asks you to confirm a network switch when necessary.
+  </Accordion>
+  <Accordion title="Market eligibility" icon="circle-check">
+    The selected market must be eligible for sponsorship and have enough time remaining for the selected service window. A market that ends too soon may not produce a quote.
+  </Accordion>
+  <Accordion title="First-time USDC approval" icon="key-round">
+    The first campaign may ask you to approve USDC spending for <code>MarketMakerEscrow</code>. Approval only authorizes the contract to spend USDC; it is separate from the transaction that funds the campaign. Later campaigns can reuse the allowance while it remains sufficient.
+  </Accordion>
+</AccordionGroup>
+
+## Find a market
+
+The discovery page has two tabs:
+
+- **Sponsor** finds markets that can receive a new sponsorship.
+- **Campaigns** shows campaigns already created by the connected sponsor wallet.
+
+Use the source filters to narrow the discovery list:
+
+| Filter | Use it for |
+| --- | --- |
+| **All** | Search both Kuest markets and Polymarket sources. |
+| **My markets** | Find operator-created Kuest markets, excluding mirrors created by the import service. |
+| **On Kuest** | Search markets that already exist on Kuest and can usually be sponsored without an import. |
+| **Add from Polymarket** | Search for a Polymarket event or market and prepare a mirror import. |
+
+You can search with normal text or paste a complete Polymarket URL:
+
+```text
+https://polymarket.com/event/<event-slug>
+https://polymarket.com/market/<market-slug>
+```
+
+The URL is resolved by its slug. Use the canonical `polymarket.com` host and an event or market path. If a URL does not resolve, switch to text search or confirm that the source market is still available and eligible.
+
+<Tip>
+  A **Polymarket hedge** label identifies a Kuest market with a linked Polymarket source. **Import required** means the mirror must be prepared before its deployment campaign can be finalized.
+</Tip>
+
+## Campaign terms
+
+Select a market to open the sponsorship modal. The quote is recalculated when a term changes, and the displayed backend quote is the source of truth for the summary and funding amount.
+
+### Liquidity terms
+
+<AccordionGroup>
+  <Accordion title="Liquidity per side" icon="arrow-left-right" defaultOpen>
+    This is the minimum order depth the market maker should keep on both the buy and sell sides. The orderbook preview shows the intended distribution on each side.
+  </Accordion>
+  <Accordion title="Maximum spread" icon="move-horizontal">
+    This is the widest allowed gap between the best buy and sell prices. A smaller spread is more demanding and normally increases the market maker payment.
+  </Accordion>
+  <Accordion title="Liquidity availability" icon="percent">
+    This is the expected percentage of the service period during which the required liquidity should be available. Higher availability generally increases the campaign payment.
+  </Accordion>
+  <Accordion title="Service period" icon="calendar-range">
+    The service period defines when the market maker is expected to provide liquidity. The quote checks that the period is valid and ends no later than the source market.
+  </Accordion>
+</AccordionGroup>
+
+### Payment and costs
+
+The payment summary separates the campaign components so you can review the commitment before signing:
+
+| Line | Meaning |
+| --- | --- |
+| **Market maker payment** | Reward offered to the market maker for meeting the selected terms. |
+| **Extra (optional)** | An additional percentage applied to the base market maker payment. The allowed range is 0–1000%. |
+| **Kuest fee** | Protocol fee included by the quote. |
+| **Import event** | Separate USDC payment required to prepare a Polymarket mirror. It is paid to the import receiver, not deposited into the escrow campaign. |
+| **Estimated** | Total amount the connected wallet is expected to fund or pay across the shown steps. |
+
+The optional extra is included in the returned market maker payment before the total is shown. A higher payment can make the campaign more attractive to market makers. At 0% there is no increase; at 1000% the market maker payment is eleven times its base amount.
+
+<Warning>
+  Review the final quote before signing. The import fee and the escrow campaign funding are separate on-chain payments. Cancelling a campaign returns its escrowed campaign funds, not its import fee. A terminal import failure may be marked eligible for a separate operational refund.
+</Warning>
+
+## How the escrow works
+
+`MarketMakerEscrow` holds campaign funds and enforces the campaign lifecycle. It does not deploy markets, place orders, or control whether a mirror is visible.
+
+<Steps>
+  <Step title="Fund">
+    The sponsor deposits the quoted market maker reward and Kuest fee into escrow. For a Polymarket mirror, this happens through a deployment reservation before the campaign is finalized.
+  </Step>
+  <Step title="Wait for acceptance">
+    The campaign remains open until an approved market maker accepts it. The market maker also deposits a bond when the campaign requires one.
+  </Step>
+  <Step title="Provide liquidity">
+    Acceptance makes the campaign active. The market maker must meet the depth, spread, availability, and timing terms shown in the campaign.
+  </Step>
+  <Step title="Review and settle">
+    After the service period, the funds remain protected through the displayed review window. If there is no dispute, the market maker can claim the reward and recover its bond after the claimable time. A dispute freezes normal settlement until it is resolved.
+  </Step>
+</Steps>
+
+<Info>
+  USDC approval does not transfer funds. It gives the escrow contract a reusable allowance; each funding transaction still transfers only the amount required for that campaign.
+</Info>
+
+## Sponsor a Kuest market
+
+Use this path when the selected market already exists on Kuest and does not require a Polymarket mirror deployment.
+
+<Steps>
+  <Step title="Select the market">
+    Search for the market, review its source, end date, liquidity, and volume, then open the sponsorship modal.
+  </Step>
+  <Step title="Set the terms">
+    Choose liquidity per side, maximum spread, availability, service period, and any optional extra payment. Check the orderbook preview and the final quote.
+  </Step>
+  <Step title="Confirm the wallet">
+    Connect the sponsor wallet, switch networks if requested, and make sure it has the displayed USDC and POL balances.
+  </Step>
+  <Step title="Approve and fund">
+    Approve USDC spending if required, then confirm **Fund market maker campaign** in the wallet. The approval and funding are different transactions.
+  </Step>
+  <Step title="Monitor acceptance">
+    The campaign appears in **Campaigns** with an open status while it waits for a market maker. It becomes active only after acceptance.
+  </Step>
+</Steps>
+
+## Sponsor a Polymarket mirror
+
+Use this path when the market is not yet deployed on Kuest. The import process and the market maker campaign are related, but their payments have different purposes.
+
+<Info>
+  The creator of a Polymarket mirror is the configured <code>POLY_SYNCER_CREATOR_ADDRESS</code>. It is not automatically the connected sponsor wallet. The connected wallet pays the import fee and sponsors the escrow campaign.
+</Info>
+
+<Steps>
+  <Step title="Find the source">
+    Search by the Polymarket event or market URL and select the source to mirror. Review the source title, markets, end date, and hedge information.
+  </Step>
+  <Step title="Review the canonical service window">
+    For a non-series import, the backend determines the service start and uses the saved source end date. The disabled date control is intentional: a sponsor cannot shorten the mirror's required coverage period from the browser.
+  </Step>
+  <Step title="Review the quote">
+    Confirm the market maker payment, optional extra, Kuest fee, import fee, and estimated total. The quote uses the canonical timing and rejects a source that ends too soon.
+  </Step>
+  <Step title="Pay the import fee">
+    Confirm **Pay import fee** in the wallet. This direct USDC payment goes to the configured import receiver and is separate from escrow. Ordinary campaign cancellation does not return it.
+  </Step>
+  <Step title="Reserve the deployment">
+    Confirm **Reserve deployment** when requested. The reservation records the sponsor, campaign terms, timing, and operator authorization on-chain so the mirror cannot be deployed without its sponsorship path.
+  </Step>
+  <Step title="Deploy the hidden mirror">
+    The import service deploys the mirror with <code>hidden: true</code> and <code>paused: false</code>. It is excluded from normal public discovery while it waits for a market maker, but it remains technically able to receive orders.
+  </Step>
+  <Step title="Wait for the relayer">
+    After the mirror mappings are complete, the escrow relayer finalizes the reserved deployment as an open campaign. The sponsor wallet does not finalize it.
+  </Step>
+  <Step title="Publish after acceptance">
+    When an approved market maker accepts the campaign, the escrow service observes the on-chain acceptance and queues activation. The import service then removes the hidden flag from the mirror.
+  </Step>
+</Steps>
+
+<Warning>
+  Acceptance is the publication trigger; it is not proof that the required orders are already live. The accepted market maker must have them live by the displayed service start. If nobody accepts, the mirror remains hidden and the sponsor can cancel the open campaign to recover its escrowed campaign funds.
+</Warning>
+
+### Imported market rules
+
+<AccordionGroup>
+  <Accordion title="Source end date is authoritative" icon="calendar-clock" defaultOpen>
+    For individual non-series imports, client-provided service dates are ignored. The server calculates the service start and uses the source end date stored with the import. A modified frontend therefore cannot shorten the required coverage to only part of the mirror's lifetime.
+  </Accordion>
+  <Accordion title="Multiple markets in one import" icon="layers-2">
+    All markets in the same import must have the same end time. If their end times differ, the preview, quote, and reservation are blocked instead of silently choosing the earliest date.
+  </Accordion>
+  <Accordion title="Series sponsorship" icon="repeat">
+    Series campaigns keep their own fixed duration and are not converted to the individual-import timing rule. When the series option is available, the campaign applies to new markets in the selected recurring series for the displayed period.
+  </Accordion>
+  <Accordion title="Import progress can be closed" icon="panel-top-close">
+    Closing the progress modal does not cancel the import. Progress is saved and can be followed again from the open import or its campaign. Rejected wallet transactions close the progress step and leave the main sponsorship dialog available for recovery.
+  </Accordion>
+</AccordionGroup>
+
+## Wallet steps
+
+The signing modal uses short labels for the actions requested from the wallet:
+
+| Wallet label | What it does |
+| --- | --- |
+| **Confirm network switch** | Changes the connected wallet to the configured chain. |
+| **Approve USDC spending** | Grants or increases the escrow contract's USDC allowance. |
+| **Pay import fee** | Pays the separate fee for preparing a Polymarket mirror. |
+| **Reserve deployment** | Creates the on-chain deployment reservation for a non-reusable mirror. |
+| **Fund market maker campaign** | Transfers the quoted campaign funds into the escrow contract for a normal sponsorship flow. A non-reusable Polymarket mirror is finalized by the escrow relayer after deployment. |
+
+If a step is rejected, the transaction is not completed. The page displays the error above the main action and keeps the relevant recovery path available. An insufficient-balance error refers to USDC in the connected wallet.
+
+## Campaigns and statuses
+
+Open **Campaigns** to search by campaign ID or market and filter by lifecycle state.
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| **Open** | The campaign is funded and waiting for a market maker to accept it. | Review the terms, wait, or cancel before acceptance. |
+| **Active** | A market maker accepted the campaign. Orders must be live by the service start and maintained under the agreed terms. | Monitor the campaign and open a dispute if the agreed service is materially not delivered. |
+| **Review** | The service period ended and the settlement review window is in progress. | Wait for the claimable time unless a dispute is required. |
+| **Disputed** | Payment is frozen while Kuest reviews a submitted dispute. | Follow the review outcome; settlement remains paused. |
+| **Completed** | The campaign was settled or resolved. | Review the final payment and sponsor refund shown in the detail view. |
+| **Expired** | The open campaign passed its acceptance deadline without a market maker. | Cancel and then withdraw the refundable balance. |
+| **Cancelled** | The campaign was cancelled before acceptance. | Withdraw the pending refund from the connected sponsor wallet. |
+
+<Info>
+  **Expired** is the interface label for an open campaign whose acceptance deadline passed. It still needs an on-chain cancellation before its refund becomes withdrawable.
+</Info>
+
+The campaign detail view includes:
+
+- liquidity per side, maximum spread, and availability;
+- service start and end dates;
+- market maker payment, Kuest fee, and current payment summary;
+- the lifecycle timeline and remaining time where applicable;
+- the market maker and linked event or series information when available.
+
+<Tip>
+  An open campaign can remain without liquidity while it waits for acceptance. For imported mirrors, deployment alone does not publish the market or prove that liquidity is live.
+</Tip>
+
+## Cancellation, refunds, and disputes
+
+### Open campaign
+
+You can cancel a campaign before a market maker accepts it. Cancellation makes the refundable amount available to the sponsor, but the funds are not necessarily transferred to the wallet in the same transaction. Use **Withdraw refund** afterward when the pending withdrawal is shown.
+
+### Imported deployment failure
+
+Import failures are separated by recoverability:
+
+| Import state | Meaning | Next step |
+| --- | --- | --- |
+| **Retryable failure** | A temporary import, RPC, or relayer problem prevented progress. | Use **Retry**. The stored import can resume without paying the import fee again. |
+| **Refundable failure** | The deployment cannot continue, or its terminal deadline was reached. | Request the signed cancellation, confirm the on-chain cancellation, then use **Withdraw refund**. |
+
+The deployment cancellation requires both the sponsor transaction and an EIP-712 signature from the configured escrow operator used by the relayer. The interface requests that signature automatically. Neither side can cancel the reservation alone, which protects it from unilateral or unauthorized refunds.
+
+The cancellation returns the reserved campaign reward and Kuest fee through escrow. It does not automatically return the separate import fee. When a terminal import failure is eligible for an operational import-fee refund, that eligibility is shown and handled separately.
+
+### Active or review campaign
+
+After acceptance, the campaign is locked against ordinary cancellation. If the market maker materially fails to meet the agreed liquidity terms, open a dispute while the campaign is within its dispute window. The dispute freezes settlement while Kuest reviews the case.
+
+## Operating checklist
+
+<Steps>
+  <Step title="Check the source and end date">
+    Confirm that you selected the intended Kuest market or Polymarket source and that the service window has enough time remaining.
+  </Step>
+  <Step title="Check the commitment">
+    Review both the market maker payment and the total, including Kuest fee and any import fee. Confirm the optional extra is intentional.
+  </Step>
+  <Step title="Check the wallet">
+    Verify the connected address, network, USDC balance, POL gas balance, and allowance prompt before signing.
+  </Step>
+  <Step title="Track the result">
+    For imports, wait for the hidden deployment and campaign finalization. For every campaign, use the Campaigns tab to confirm acceptance, publication where applicable, and later settlement.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="No market was found" icon="search-x" defaultOpen>
+    Confirm the spelling of the text or paste the complete Polymarket event or market URL. Check the source filter, source availability, and whether the market has enough time remaining for the required service period.
+  </Accordion>
+  <Accordion title="The quote is unavailable" icon="circle-help">
+    The quote service validates market metadata, pricing configuration, canonical dates, and escrow configuration before returning a price. Retry after a temporary error. If a multi-market import has different end times, it must be corrected at the source instead of being priced with a shortened date.
+  </Accordion>
+  <Accordion title="Insufficient USDC in your connected wallet" icon="wallet-cards">
+    The displayed campaign and import amounts are checked against the connected wallet's USDC balance. Fund that wallet or connect the intended sponsor wallet, then retry without changing the terms.
+  </Accordion>
+  <Accordion title="The wallet rejected a transaction" icon="triangle-alert">
+    The rejected step did not complete. The page keeps the sponsorship flow available where it can be safely retried. For an import, the progress modal closes because the next steps cannot proceed until the rejected payment, reservation, or funding action succeeds.
+  </Accordion>
+  <Accordion title="Import progress appears to wait" icon="loader-circle">
+    Preparation, hidden mirror deployment, campaign finalization, and later activation run asynchronously. Refresh or reopen the saved import to read its current state. A retryable failure can be retried; a refundable terminal failure follows the signed cancellation and withdrawal path.
+  </Accordion>
+  <Accordion title="Campaign is open but has no liquidity" icon="hourglass">
+    Open means that the campaign is waiting for acceptance. Review whether the payment and terms are attractive enough for an approved market maker. For imported mirrors, the market remains hidden until acceptance triggers publication.
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+  For broader operator configuration, see [General](/admin/general), [Events](/admin/events), and [Environment Variables](/configuration/environment-variables). Keep escrow, import receiver, creator, chain, and relayer configuration consistent before sponsoring production markets.
+</Info>
