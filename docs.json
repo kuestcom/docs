@@ -87,7 +87,7 @@
         "pages": [
           {
             "group": "Admin Panel",
-            "icon": "shield-keyhole",
+            "icon": "shield-check",
             "expanded": false,
             "pages": [
               "admin/dashboard",
