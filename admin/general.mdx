@@ -1,11 +1,11 @@
 ---
 title: General
-description: Configure the brand, market context, featured markets, synced sources, and legal controls in Admin -> General.
+description: Configure the brand, market context, featured markets, synced sources, Terms of Service, and geoblocking in Admin -> General.
 icon: settings
 ---
 
 <Info>
-Start here after deployment. Configure the public brand and support details first, then review discovery, market context, creator sources, and legal controls.
+Start here after deployment. Configure the public brand and support details first, then review discovery, market context, creator sources, Terms of Service, and geoblocking.
 </Info>
 
 <Tip>
@@ -117,13 +117,20 @@ Save one section at a time and verify the public site in another session. This m
   </Accordion>
 </AccordionGroup>
 
-## Legal & Geoblocking
+## Terms of Service
 
 <AccordionGroup>
-  <Accordion title="Terms of Use PDF" icon="file-text" defaultOpen>
-    Upload a PDF to replace the default `/tos` page content. You can open or remove the current uploaded file from this same card.
+  <Accordion title="Terms of Service" icon="file-text" defaultOpen>
+    Use this section to update the Terms of Service shown on your site. Use the flag selector next to <strong>Choose the language</strong> to switch between the available versions and edit the terms for each language.
+
+    Use Markdown formatting to edit the content: `#` for titles, `##` for headings, `-` for bullet lists, blank lines for paragraphs, and `**text**` for bold text. You can also use `{{siteName}}`, `{{siteNameUpper}}`, and `{{siteUrl}}` as site variables.
   </Accordion>
-  <Accordion title="Blocked countries" icon="shield-ban">
+</AccordionGroup>
+
+## Geoblocking
+
+<AccordionGroup>
+  <Accordion title="Blocked countries" icon="map-pin-off">
     Select countries that should be blocked from accessing the platform. If none are selected, access stays available for all regions.
   </Accordion>
 </AccordionGroup>

@@ -79,7 +79,7 @@ Do not describe a frontend deployment as its own exchange or promise isolated li
     User records, settings, categories, local order history, event state, integrations, and operational job data live in your PostgreSQL database.
   </Accordion>
   <Accordion title="Uploaded assets" icon="images">
-    Logos, event images, market covers, and uploaded legal files live in the Supabase or S3-compatible storage profile you configure.
+    Logos, event images, and market covers live in the Supabase or S3-compatible storage profile you configure. Terms of Service translations are stored in your PostgreSQL database.
   </Accordion>
   <Accordion title="Secrets" icon="key-round">
     Keep an encrypted, access-controlled copy of deployment secrets. Rotating `BETTER_AUTH_SECRET` invalidates sessions and encrypted trading credentials.
